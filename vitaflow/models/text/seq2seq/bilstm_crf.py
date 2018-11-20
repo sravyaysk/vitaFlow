@@ -23,7 +23,6 @@ from tensorflow.contrib.learn import ModeKeys
 from tensorflow.contrib import lookup
 
 from vitaflow.config.hyperparams import HParams
-from vitaflow.data.text.iterators.conll_csv_iterator import CoNLLCsvDataIterator
 from vitaflow.data.text.vocabulary import SpecialTokens
 from vitaflow.models.internal.model_base import ModelBase
 from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
