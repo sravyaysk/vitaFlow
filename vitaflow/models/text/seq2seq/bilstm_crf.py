@@ -23,6 +23,7 @@ from tensorflow.contrib.learn import ModeKeys
 from tensorflow.contrib import lookup
 
 from vitaflow.config.hyperparams import HParams
+from vitaflow.data.text.iterators.conll_csv_in_memory import CoNLLCsvInMemory
 from vitaflow.data.text.vocabulary import SpecialTokens
 from vitaflow.models.internal.model_base import ModelBase
 from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
@@ -47,7 +48,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         - https://github.com/tensorflow/tensorflow/issues/14018
 
     """
-    def __init__(self, hparams=None, data_iterator: CoNLLCsvDataIterator=None):
+    def __init__(self, hparams=None, data_iterator: CoNLLCsvInMemory=None):
         ITextFeature.__init__(self)
         self._hparams = HParams(hparams,
                                 self.default_hparams(),

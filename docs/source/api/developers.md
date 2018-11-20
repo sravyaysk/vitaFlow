@@ -20,3 +20,11 @@
 - [GIT Travis](https://travis-ci.org/)
 
 ## IntelliJ Integration
+
+### Note:
+- Good practice to run below command to get rid of python compiled 
+files to avoid errors in new environment:
+
+```
+ find . -name "*.pyc" -exec rm -f {} \;
+ ```
