@@ -1,0 +1,22 @@
+#TODO add version number
+cython3 --install-option="--no-cython-compile"
+#python code quality check
+flake8
+#standard python framework
+pandas
+numpy
+sklearn
+tqdm
+overrides
+#Deep Learning framework
+.[tensorflow-cpu] --install-option='-e'
+#NLP
+spacy
+#audio libs
+pyAudioAnalysis
+eyed3
+pydub
+madmom
+#for sphinix doc build
+recommonmark
+sphinx_rtd_theme
