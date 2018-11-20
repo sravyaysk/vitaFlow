@@ -33,6 +33,10 @@ from vitaflow.helpers.print_helper import *
 
 class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
     """
+    CoNLL dataset obtained from https://github.com/synalp/NER/tree/master/corpus/CoNLL-2003
+    and uploaded to Gdrive.
+
+    
     """
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
