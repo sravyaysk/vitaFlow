@@ -1,9 +1,6 @@
-[![Build Status](https://travis-ci.com/dhiraa/shabda.svg?branch=master)](https://travis-ci.com/dhiraa/shabda/)
-[![Documentation Status](https://readthedocs.org/projects/shabda/badge/?version=latest)](https://shabda.readthedocs.io/en/latest/?badge=latest)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/imaginea/vitaflow/blob/master/LICENSE)
- 
+# About
 
-# vitaFlow - VideoImageTextAudioFlow
+## vitaFlow - VideoImageTextAudioFlow
  
 ## Introduction
 
@@ -30,6 +27,23 @@ Come up with following modular components which can be then used as plug and pla
 
 ## Architecture
 
-![](docs/images/vitaflow_stack.png)
+![](../images/vitaflow_stack.png)
 
-## [Doc](https://vitaflow.readthedocs.io/en/latest/index.html)
+
+
+## Python Environment
+
+```
+conda create -n vitaflow python=3.6
+source activate vitaflow
+pip install -r requirements.txt
+```
+
+
+## A Simple Demo
+```
+cd /path/to/vitaflow/
+python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py
+```
+
+
