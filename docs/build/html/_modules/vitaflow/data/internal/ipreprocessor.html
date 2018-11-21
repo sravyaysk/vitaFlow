@@ -91,6 +91,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../api/config/hparams.html">HParams</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api/data/internal/ipreprocessor.html">IPreprocessor</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Dataset:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/data/text/conll/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">DataIterators:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/data/text/iterators/conll_csv_in_memory.html">CoNLLCsvInMemory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Models:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/models/text/seq2seq/bilstm_crf.html">BiLSTMCrf</a></li>
+</ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../audio/AudioBasics.html">Audio Basics</a></li>
@@ -183,7 +195,7 @@
 <span class="kn">from</span> <span class="nn">vitaflow.config.hyperparams</span> <span class="k">import</span> <span class="n">HParams</span>
 
 <div class="viewcode-block" id="IPreprocessor"><a class="viewcode-back" href="../../../../api/data/internal/ipreprocessor.html#vitaflow.data.internal.IPreprocessor">[docs]</a><span class="k">class</span> <span class="nc">IPreprocessor</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A pre-processing interface that every dataset class should inherit.</span>
 <span class="sd">    This make sure that data of concern are downloaded and preprocessed alike across</span>
 <span class="sd">    all the data sets.</span>
@@ -198,7 +210,7 @@
 <span class="sd">                val/</span>
 <span class="sd">                test/</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 
@@ -229,8 +241,8 @@
 <span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            {</span>
-<span class="sd">                &quot;experiment_root_directory&quot; : os.path.expanduser(&quot;~&quot;),</span>
-<span class="sd">                &quot;experiment_name&quot; : &quot;test_experiment&quot;,</span>
+<span class="sd">                &quot;experiment_root_directory&quot; : os.path.expanduser(&quot;~&quot;) + &quot;/vitaFlow/&quot;,</span>
+<span class="sd">                &quot;experiment_name&quot; : &quot;experiment_name&quot;,</span>
 <span class="sd">                &quot;preprocessed_data_path&quot; : &quot;preprocessed_data&quot;,</span>
 <span class="sd">                &quot;train_data_path&quot; : &quot;train&quot;,</span>
 <span class="sd">                &quot;validation_data_path&quot; : &quot;val&quot;,</span>
@@ -263,8 +275,8 @@
 <span class="sd">        :return: A dictionary of hyperparameters with default values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;experiment_root_directory&quot;</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;experiment_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;test_experiment&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;experiment_root_directory&quot;</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/vitaFlow/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;experiment_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;experiment_name&quot;</span><span class="p">,</span>
             <span class="s2">&quot;preprocessed_data_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;preprocessed_data&quot;</span><span class="p">,</span>
             <span class="s2">&quot;train_data_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>
             <span class="s2">&quot;validation_data_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;val&quot;</span><span class="p">,</span>

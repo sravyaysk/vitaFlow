@@ -26,26 +26,50 @@ class IIteratorBase():
 
     @staticmethod
     def default_hparams():
+        """
+        .. role:: python(code)
+           :language: python
+
+        .. code-block:: python
+
+            {
+                "batch_size" : 32
+            }
+
+        Here:
+
+        "batch_size" : int
+            Batch size for the current iterator
+
+        :return:  A dictionary of hyperparameters with default values
+        """
         return {
             "batch_size" : 32
         }
 
     @property
-    def num_output_units(self):
+    def num_labels(self):
         raise NotImplementedError
 
     @property
     def batch_size(self):
-        raise NotImplementedError
+        return self._hparams.batch_size
 
     @property
     def num_train_samples(self):
         raise NotImplementedError
 
+    @property
+    def num_val_samples(self):
+        raise NotImplementedError
+
+    @property
+    def num_test_samples(self):
+        raise NotImplementedError
 
     def set_dataset(self, dataset):
         """
-        Inheriting class must check for the dataset type and raise runtime error if not matched
+        Inheriting class must check for the data set type and raise runtime error if not matched
         :param dataset:
         :return:
         """

@@ -1,0 +1,442 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vitaflow.data.text.conll.conll_2003_dataset &mdash; vitaFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="author" title="About these documents" href="../../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> vitaFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../about.html">About</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/developers.html">Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/config/hparams.html">HParams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/data/internal/ipreprocessor.html">IPreprocessor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Dataset:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/data/text/conll/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">DataIterators:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/data/text/iterators/conll_csv_in_memory.html">CoNLLCsvInMemory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Models:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/models/text/seq2seq/bilstm_crf.html">BiLSTMCrf</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../audio/AudioBasics.html">Audio Basics</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">vitaFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vitaflow.data.text.conll.conll_2003_dataset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vitaflow.data.text.conll.conll_2003_dataset</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2018 The vitFlow Authors. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">CoNLL Dataset Class</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CoNLL2003Dataset&quot;</span><span class="p">]</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.0.1&#39;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Mageswaran Dhandapani &lt;mageswaran1989@gmail.com&gt;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">vitaflow.data.internal.ipreprocessor</span> <span class="k">import</span> <span class="n">IPreprocessor</span>
+<span class="kn">from</span> <span class="nn">vitaflow.data.text.iterators.internal.dataset_types</span> <span class="k">import</span> <span class="n">ICoNLLType1</span>
+<span class="kn">from</span> <span class="nn">vitaflow.config.hyperparams</span> <span class="k">import</span> <span class="n">HParams</span>
+<span class="kn">from</span> <span class="nn">vitaflow.data.text.vocabulary</span> <span class="k">import</span> <span class="n">SpecialTokens</span>
+<span class="kn">from</span> <span class="nn">vitaflow.utils.data_io</span> <span class="k">import</span> <span class="n">maybe_download</span>
+<span class="kn">from</span> <span class="nn">vitaflow.helpers.print_helper</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="CoNLL2003Dataset"><a class="viewcode-back" href="../../../../../api/data/text/conll/conll_2003_dataset.html#vitaflow.data.text.conll.CoNLL2003Dataset">[docs]</a><span class="k">class</span> <span class="nc">CoNLL2003Dataset</span><span class="p">(</span><span class="n">IPreprocessor</span><span class="p">,</span> <span class="n">ICoNLLType1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads the data and converts the text file into CSV file for each sentence along with its tags.</span>
+<span class="sd">        - CoNLL dataset : https://github.com/synalp/NER/tree/master/corpus/CoNLL-2003</span>
+<span class="sd">        - GDrive : https://drive.google.com/open?id=1tdwxPJnnkyO-s1oHDETj89cfgLC2xp0c</span>
+
+<span class="sd">    .. code-block:: text</span>
+
+<span class="sd">        Sample Raw Data:</span>
+
+<span class="sd">            EU NNP B-NP B-ORG</span>
+<span class="sd">            rejects VBZ B-VP O</span>
+<span class="sd">            German JJ B-NP B-MISC</span>
+<span class="sd">            call NN I-NP O</span>
+<span class="sd">            to TO B-VP O</span>
+<span class="sd">            boycott VB I-VP O</span>
+<span class="sd">            British JJ B-NP B-MISC</span>
+<span class="sd">            lamb NN I-NP O</span>
+<span class="sd">            . . O O</span>
+
+<span class="sd">        Preprocessed Data:</span>
+
+<span class="sd">            0,1,2,3</span>
+<span class="sd">            EU,NNP,B-NP,B-ORG</span>
+<span class="sd">            rejects,VBZ,B-VP,O</span>
+<span class="sd">            German,JJ,B-NP,B-MISC</span>
+<span class="sd">            call,NN,I-NP,O</span>
+<span class="sd">            to,TO,B-VP,O</span>
+<span class="sd">            boycott,VB,I-VP,O</span>
+<span class="sd">            British,JJ,B-NP,B-MISC</span>
+<span class="sd">            lamb,NN,I-NP,O</span>
+<span class="sd">            .,.,O,O</span>
+
+<span class="sd">        ~/vitaflow/CoNLL2003Dataset/</span>
+<span class="sd">                raw_data/</span>
+<span class="sd">                    train.txt</span>
+<span class="sd">                    test.txt</span>
+<span class="sd">                    val.txt</span>
+<span class="sd">                preprocessed_data/</span>
+<span class="sd">                    train/</span>
+<span class="sd">                    val/</span>
+<span class="sd">                    test/</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">IPreprocessor</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="n">hparams</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span> <span class="o">=</span> <span class="n">HParams</span><span class="p">(</span><span class="n">hparams</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_download_path</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">experiment_root_directory</span> <span class="o">+</span> \
+                         <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">experiment_name</span> <span class="o">+</span> \
+                        <span class="s2">&quot;/raw_data/&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_link</span> <span class="o">=</span> <span class="s2">&quot;https://drive.google.com/open?id=1tdwxPJnnkyO-s1oHDETj89cfgLC2xp0c&quot;</span>
+
+        <span class="n">maybe_download</span><span class="p">(</span><span class="n">urls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_link</span><span class="p">,</span>
+                       <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_download_path</span><span class="p">,</span>
+                       <span class="n">filenames</span><span class="o">=</span><span class="s2">&quot;conll2003.zip&quot;</span><span class="p">,</span>
+                       <span class="n">extract</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_data</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CoNLL2003Dataset.default_hparams"><a class="viewcode-back" href="../../../../../api/data/text/conll/conll_2003_dataset.html#vitaflow.data.text.conll.CoNLL2003Dataset.default_hparams">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">default_hparams</span><span class="p">():</span>      
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        .. role:: python(code)</span>
+<span class="sd">           :language: python</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;experiment_root_directory&quot; : os.path.expanduser(&quot;~&quot;) + &quot;/vitaFlow/&quot; ,</span>
+<span class="sd">                &quot;experiment_name&quot; : &quot;CoNLL2003Dataset&quot;,</span>
+<span class="sd">                &quot;preprocessed_data_path&quot; : &quot;preprocessed_data&quot;,</span>
+<span class="sd">                &quot;train_data_path&quot; : &quot;train&quot;,</span>
+<span class="sd">                &quot;validation_data_path&quot; : &quot;val&quot;,</span>
+<span class="sd">                &quot;test_data_path&quot; : &quot;test&quot;,</span>
+<span class="sd">                &quot;minimum_num_words&quot; : 5,</span>
+<span class="sd">                &quot;over_write&quot; : False,</span>
+<span class="sd">            }</span>
+
+<span class="sd">        Here:</span>
+
+<span class="sd">        &quot;experiment_root_directory&quot; : str</span>
+<span class="sd">            Root directory where the data is downloaded or copied, also</span>
+<span class="sd">            acts as the folder for any subsequent experimentation</span>
+
+<span class="sd">        &quot;experiment_name&quot; : str</span>
+<span class="sd">            Name of the data set</span>
+
+<span class="sd">        &quot;preprocessed_data_path&quot; : str</span>
+<span class="sd">            Folder path under `experiment_root_directory` where the preprocessed data</span>
+<span class="sd">            should be stored</span>
+
+<span class="sd">        &quot;train_data_path&quot; : str</span>
+<span class="sd">            Folder path under `experiment_root_directory` where the train data is stored</span>
+
+<span class="sd">        &quot;validation_data_path&quot; : str</span>
+<span class="sd">            Folder path under `experiment_root_directory` where the validation data is stored</span>
+
+<span class="sd">        &quot;test_data_path&quot; : str</span>
+<span class="sd">            Folder path under `experiment_root_directory` where the test data is stored</span>
+
+<span class="sd">        &quot;minimum_num_words&quot; : str</span>
+<span class="sd">            Number of word to be considered for a sentence to be used down the flow</span>
+
+<span class="sd">        &quot;over_write&quot; : boolean</span>
+<span class="sd">            Flag to over write the previous copy of the downloaded data</span>
+
+
+<span class="sd">        :return: A dictionary of hyperparameters with default values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hparams</span> <span class="o">=</span> <span class="n">IPreprocessor</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">()</span>
+
+        <span class="n">hparams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s2">&quot;experiment_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CoNLL2003Dataset&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;minimum_num_words&quot;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;over_write&quot;</span> <span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">hparams</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_target_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">over_write</span><span class="p">:</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Deleting data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">))</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">)</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Recreating data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">))</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Skipping preprocessing step, since the data might already be available&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_conll_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txt_file_path</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Converts CoNLL 2003 data set text files into CSV file for each</span>
+<span class="sd">        example/statement.</span>
+<span class="sd">        :param txt_file_path: Input text file path</span>
+<span class="sd">        :param out_dir: Output directory to store CSV files</span>
+<span class="sd">        :return: Creates files in the specified train/val/test paths</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">out_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Found previous version at </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_dir</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing data to </span><span class="si">{}</span><span class="s2">...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_dir</span><span class="p">))</span>
+
+        <span class="c1"># Read the text file</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">txt_file_path</span><span class="p">,</span>
+                         <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span>
+                         <span class="n">skip_blank_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">UNK_WORD</span><span class="p">)</span>
+
+        <span class="c1"># Filter out the DOCSTART lines</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;DOCSTART&quot;</span><span class="p">)]</span>
+
+        <span class="n">current_file</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))):</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">UNK_WORD</span><span class="p">:</span>
+                <span class="n">current_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Consider dumping files with size 2</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_file</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">minimum_num_words</span><span class="p">:</span>
+                    <span class="n">current_file</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">current_file</span><span class="p">)</span>
+                    <span class="n">current_file</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_dir</span> <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">current_file</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares the data for training </span>
+<span class="sd">        :return: </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Preprocessing the train data...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conll_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_download_path</span> <span class="o">+</span> <span class="s2">&quot;/train.txt&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_OUT_PATH</span><span class="p">)</span>
+
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Preprocessing the test data...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conll_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_download_path</span> <span class="o">+</span> <span class="s2">&quot;/test.txt&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TEST_OUT_PATH</span><span class="p">)</span>
+
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Preprocessing the validation data...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conll_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_download_path</span><span class="o">+</span><span class="s2">&quot;/val.txt&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAL_OUT_PATH</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, vitaFlow Team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

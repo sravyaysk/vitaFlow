@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-
+CoNLL 2003 dataset iterator class
 """
 
 import sys
@@ -64,7 +64,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         self.TEST_OUT_PATH = self.PREPROCESSED_DATA_OUT_DIR + "/" + \
                              self._hparams.test_data_path + "/"
 
-        self.OUT_DIR = self.EXPERIMENT_ROOT_DIR + "/" + self._hparams.name + "/"
+        self.OUT_DIR = self.EXPERIMENT_ROOT_DIR + "/" + self._hparams.iterator_name + "/"
 
         # This rule is assumed to be correct if the previous stage is of IPreprocessor
         self.TRAIN_FILES_IN_PATH = self.PREPROCESSED_DATA_OUT_DIR + "/train/"
@@ -86,7 +86,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
                                SpecialTokens.PAD_CHAR,  # sentence padded on the right with id_pad_word
                                SpecialTokens.PAD_TAG)   # labels padded on the right with id_pad_tag
 
-        self.extract_vocab()
+        self._extract_vocab()
 
     @staticmethod
     def default_hparams():
@@ -97,26 +97,29 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         .. code-block:: python
 
             {
-            "name" : "conll_data_iterator",
-            "experiment_root_directory" : "default_experiment",
-            "preprocessed_data_path" : "preprocessed_data",
-            "train_data_path" : "train",
-            "validation_data_path" : "val",
-            "test_data_path" : "test",
-
-            "text_col" : 0,
-            "entity_col" : 3,
-            "batch_size" : 16,
+                "experiment_root_directory" : os.path.expanduser("~") + "/vitaFlow/",
+                "experiment_name" : "test_experiment",
+                "iterator_name" : "conll_data_iterator",
+                "preprocessed_data_path" : "preprocessed_data",
+                "train_data_path" : "train",
+                "validation_data_path" : "val",
+                "test_data_path" : "test",
+                "batch_size" : 32,
+                "text_col" : 0,
+                "entity_col" : 3,
             }
 
         Here:
 
-        "name" : str
-            Name of the data iterator
-
         "experiment_root_directory" : str
             Root directory where the data is downloaded or copied, also
             acts as the folder for any subsequent experimentation
+
+        "experiment_name" : str
+            Name for the current experiment
+
+        "iterator_name" : str
+            Name of the data iterator
 
         "preprocessed_data_path" : str
             Folder path under `experiment_root_directory` where the preprocessed data
@@ -131,49 +134,90 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         "test_data_path" : str
             Folder path under `experiment_root_directory` where the test data is stored
 
-        "text_col" : int
+        "batch_size" : int
+            Batch size for the current iterator
+
+        "text_col" : str
             Text column to be referred in the preprocessed CoNLL data CSV files
 
-        "entity_col" : int
+        "entity_col" : str
             Entity/Label column to be referred in the preprocessed CoNLL data CSV files
+
+        "seperator" : str
+            Seprator character to be used while joining the words from CSV
+
+        "max_word_length" : int
+            Maximum word length to be considerd while padding at character level
+
+        "use_char_embd" : boolean
+            Flag to enable character index as one of the feature
 
         :return: A dictionary of hyperparameters with default values
         """
 
         hparams = IPreprocessor.default_hparams()
-
+        hparams.update(IIteratorBase.default_hparams())
         hparams.update({
-            "name" : "conll_data_iterator",
+            "iterator_name" : "conll_data_iterator",
             "text_col" : "0",
             "entity_col" : "3",
-            "seperator" : "~", # potential error point depending on the dataset
+            "seperator" : "~",
             "quotechar" : "^",
-            "empty_line_filler" : "<LINE_END>",
             "max_word_length" : 20,
             "use_char_embd" : False
         })
-
-        hparams.update(IIteratorBase.default_hparams())
 
         return hparams
 
     @property
     def word_vocab_size(self):
+        """
+        Number of words in current data set
+        """
         return self.WORD_VOCAB_SIZE
 
     @property
     def char_vocab_size(self):
+        """
+        Number of characters in the current data set
+        """
         return self.CHAR_VOCAB_SIZE
 
     @property
     def num_lables(self):
+        """
+        Number of out put tags in the current data set
+        """
         return self.NUM_TAGS
 
     @property
     def num_train_samples(self):
+        """
+        Number of training samples
+        """
         return len(self._train_files_path)
 
-    def extract_vocab(self):
+    @property
+    def num_val_samples(self):
+        """
+       Number of training samples
+       """
+        return len(self._val_files_path)
+
+
+    @property
+    def num_test_samples(self):
+        """
+       Number of training samples
+       """
+        return len(self._test_files_path)
+
+    def _extract_vocab(self):
+        """
+        Uses the preprocessed data from the configured location and extracts
+        the word and character level vocab.
+        :return:
+        """
         if not os.path.exists(self.WORDS_VOCAB_FILE) \
                 or not os.path.exists(self.ENTITY_VOCAB_FILE) \
                 or not os.path.exists(self.CHARS_VOCAB_FILE):
@@ -242,8 +286,16 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
     @property
     def _val_files_path(self):
         files = []
-        for csv_file in tqdm(os.listdir(self.TRAIN_FILES_IN_PATH)):
-            csv_file = os.path.join(self.TRAIN_FILES_IN_PATH, csv_file)
+        for csv_file in tqdm(os.listdir(self.VAL_FILES_IN_PATH)):
+            csv_file = os.path.join(self.VAL_FILES_IN_PATH, csv_file)
+            files.append(csv_file)
+        return files
+
+    @property
+    def _test_files_path(self):
+        files = []
+        for csv_file in tqdm(os.listdir(self.TEST_FILES_IN_PATH)):
+            csv_file = os.path.join(self.TEST_FILES_IN_PATH, csv_file)
             files.append(csv_file)
         return files
 
@@ -445,4 +497,29 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
 
     @overrides
     def _get_test_input_function(self):
-        raise NotImplementedError
+        file_name = "test_padded_data_" + str(self._hparams.use_char_embd) + ".p"
+        train_sentences, train_char_ids, train_ner_tags = None, None, None
+        data = self.get_padded_data(file_name=file_name)
+
+        if data is None:
+            train_sentences, train_char_ids, train_ner_tags = \
+                self._make_seq_pair(df_files_path=self.TEST_FILES_IN_PATH,
+                                    char_2_id_map=self.CHAR_2_ID_MAP,
+                                    use_char_embd=self._hparams.use_char_embd)
+            self.store_padded_data(data=(train_sentences, train_char_ids, train_ner_tags), file_name=file_name)
+        else:
+            train_sentences, train_char_ids, train_ner_tags = data
+
+        print_error(train_char_ids)
+        print_info(train_ner_tags)
+        if self._hparams.use_char_embd:
+            dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences,
+                                                           self.FEATURE_2_NAME: train_char_ids},
+                                                          train_ner_tags))
+        else:
+            dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences},
+                                                          train_ner_tags))
+        dataset = dataset.batch(batch_size=self._hparams.batch_size)
+        print_info("Dataset output sizes are: ")
+        print_info(dataset.output_shapes)
+        return dataset
