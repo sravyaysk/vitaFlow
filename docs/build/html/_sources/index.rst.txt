@@ -22,6 +22,24 @@ Welcome to vitaFlow's documentation!
 
 .. toctree::
    :maxdepth: 1
+   :caption: Dataset:
+
+   api/data/text/conll/conll_2003_dataset.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: DataIterators:
+
+   api/data/text/iterators/conll_csv_in_memory.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Models:
+
+   api/models/text/seq2seq/bilstm_crf.rst
+
+.. toctree::
+   :maxdepth: 1
    :caption: References:
 
    audio/AudioBasics.md

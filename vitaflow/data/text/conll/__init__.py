@@ -15,4 +15,4 @@
 Modules of vitaflow library conll.
 """
 
-from vitaflow.data.text.conll import *
+from vitaflow.data.text.conll.conll_2003_dataset import *

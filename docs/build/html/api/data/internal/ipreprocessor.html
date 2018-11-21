@@ -29,7 +29,7 @@
     <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Audio Basics" href="../../../audio/AudioBasics.html" />
+    <link rel="next" title="CoNLL2003Dataset" href="../text/conll/conll_2003_dataset.html" />
     <link rel="prev" title="HParams" href="../../config/hparams.html" /> 
 
   
@@ -92,6 +92,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../developers.html">Developers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config/hparams.html">HParams</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">IPreprocessor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Dataset:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../text/conll/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">DataIterators:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../text/iterators/conll_csv_in_memory.html">CoNLLCsvInMemory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Models:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../models/text/seq2seq/bilstm_crf.html">BiLSTMCrf</a></li>
 </ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
@@ -181,8 +193,8 @@ all the data sets.</p>
 <dt id="vitaflow.data.internal.IPreprocessor.default_hparams">
 <em class="property">static </em><code class="descname">default_hparams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/vitaflow/data/internal/ipreprocessor.html#IPreprocessor.default_hparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vitaflow.data.internal.IPreprocessor.default_hparams" title="Permalink to this definition">¶</a></dt>
 <dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">&quot;experiment_root_directory&quot;</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;experiment_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;test_experiment&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;experiment_root_directory&quot;</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/vitaFlow/&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;experiment_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;experiment_name&quot;</span><span class="p">,</span>
     <span class="s2">&quot;preprocessed_data_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;preprocessed_data&quot;</span><span class="p">,</span>
     <span class="s2">&quot;train_data_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>
     <span class="s2">&quot;validation_data_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;val&quot;</span><span class="p">,</span>
@@ -236,7 +248,7 @@ should be stored</dd>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../../audio/AudioBasics.html" class="btn btn-neutral float-right" title="Audio Basics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../text/conll/conll_2003_dataset.html" class="btn btn-neutral float-right" title="CoNLL2003Dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../../config/hparams.html" class="btn btn-neutral" title="HParams" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

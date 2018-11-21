@@ -92,6 +92,18 @@
 <li class="toctree-l1"><a class="reference internal" href="api/config/hparams.html">HParams</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/data/internal/ipreprocessor.html">IPreprocessor</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Dataset:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/data/text/conll/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">DataIterators:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/data/text/iterators/conll_csv_in_memory.html">CoNLLCsvInMemory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Models:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/models/text/seq2seq/bilstm_crf.html">BiLSTMCrf</a></li>
+</ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="audio/AudioBasics.html">Audio Basics</a></li>
@@ -162,13 +174,18 @@
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="A">A</h2>
@@ -179,11 +196,41 @@
   </ul></td>
 </tr></table>
 
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/text/seq2seq/bilstm_crf.html#vitaflow.models.text.seq2seq.BiLSTMCrf">BiLSTMCrf (class in vitaflow.models.text.seq2seq)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.char_vocab_size">char_vocab_size (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/conll/conll_2003_dataset.html#vitaflow.data.text.conll.CoNLL2003Dataset">CoNLL2003Dataset (class in vitaflow.data.text.conll)</a>
+</li>
+      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory">CoNLLCsvInMemory (class in vitaflow.data.text.iterators)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data/internal/ipreprocessor.html#vitaflow.data.internal.IPreprocessor.default_hparams">default_hparams() (vitaflow.data.internal.IPreprocessor static method)</a>
+
+      <ul>
+        <li><a href="api/data/text/conll/conll_2003_dataset.html#vitaflow.data.text.conll.CoNLL2003Dataset.default_hparams">(vitaflow.data.text.conll.CoNLL2003Dataset static method)</a>
 </li>
+        <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.default_hparams">(vitaflow.data.text.iterators.CoNLLCsvInMemory static method)</a>
+</li>
+        <li><a href="api/models/text/seq2seq/bilstm_crf.html#vitaflow.models.text.seq2seq.BiLSTMCrf.default_hparams">(vitaflow.models.text.seq2seq.BiLSTMCrf static method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -223,6 +270,30 @@
   </ul></td>
 </tr></table>
 
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/text/seq2seq/bilstm_crf.html#vitaflow.models.text.seq2seq.BiLSTMCrf.model_dir">model_dir (vitaflow.models.text.seq2seq.BiLSTMCrf attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.num_lables">num_lables (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+</li>
+      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.num_test_samples">num_test_samples (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.num_train_samples">num_train_samples (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+</li>
+      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.num_val_samples">num_val_samples (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -235,6 +306,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/config/hparams.html#vitaflow.config.HParams.todict">todict() (vitaflow.config.HParams method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.word_vocab_size">word_vocab_size (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
 </li>
   </ul></td>
 </tr></table>

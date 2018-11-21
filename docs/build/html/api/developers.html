@@ -94,11 +94,26 @@
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-tool">Build Tool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#intellij-integration">IntelliJ Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intellij-integration">IntelliJ Integration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#note">Note:</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config/hparams.html">HParams</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data/internal/ipreprocessor.html">IPreprocessor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Dataset:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data/text/conll/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">DataIterators:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data/text/iterators/conll_csv_in_memory.html">CoNLLCsvInMemory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Models:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="models/text/seq2seq/bilstm_crf.html">BiLSTMCrf</a></li>
 </ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
@@ -204,6 +219,16 @@
 </div>
 <div class="section" id="intellij-integration">
 <span id="intellij-integration"></span><h2>IntelliJ Integration<a class="headerlink" href="#intellij-integration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="note">
+<span id="note"></span><h3>Note:<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Good practice to run below command to get rid of python compiled
+files to avoid errors in new environment:</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">find</span> <span class="o">.</span> <span class="o">-</span><span class="n">name</span> <span class="s2">&quot;*.pyc&quot;</span> <span class="o">-</span><span class="n">exec</span> <span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="p">{}</span> \<span class="p">;</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 

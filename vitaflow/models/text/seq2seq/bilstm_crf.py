@@ -33,6 +33,20 @@ from vitaflow.helpers.print_helper import *
 class BiLSTMCrf(ModelBase, ITextFeature):
     """
 
+    .. code-block:: text
+
+        Features : {Sentence, [character ids]}, label
+        Word Feature Tensor
+        Character Feature Tensor
+        Word Embeddings Layer
+        Character Embeddings Layer
+        Word Level BiLSTM
+        Character Level BiLSTM
+        Word Level BiLSTM Output + Character Level BiLSTM
+        Fully Connected Layer
+        CRF Loss
+        Classes and Probability Predictions
+
 
     References:
         - https://github.com/guillaumegenthial/sequence_tagging
@@ -84,6 +98,54 @@ class BiLSTMCrf(ModelBase, ITextFeature):
 
     @staticmethod
     def default_hparams():
+        """
+        .. role:: python(code)
+           :language: python
+
+        .. code-block:: python
+
+            {
+                "model_directory" : os.path.expanduser("~") + "/vitaFlow/",
+                "experiment_name" : "experiment_name",
+                # hyper parameters
+                "use_char_embd": False,
+                "learning_rate": 0.001,
+                "word_level_lstm_hidden_size": 24,
+                "char_level_lstm_hidden_size": 24,
+                "word_emd_size": 24,
+                "char_emd_size": 24,
+                "num_lstm_layers": 1,
+                "keep_propability": 0.5,
+            }
+
+        Here:
+
+        "use_char_embd" : boolean
+            Use character level embedding as part of the model
+
+        "learning_rate" : float
+            Learning rate
+
+        "word_level_lstm_hidden_size" : int
+            Word layer LSTM hidden size
+
+        "char_level_lstm_hidden_size" : int
+            Character layer LSTM hidden size
+
+        "word_emd_size" : int
+            Word embedding size
+
+        "char_emd_size" : int
+            Character embedding size
+
+        "num_lstm_layers" : int
+            Number of LSTM layer
+
+        "keep_propability" : float
+            Drop out layer `keep` probability value
+
+        :return: A dictionary of hyperparameters with default values
+        """
         hparams = {
             "model_directory" : os.path.expanduser("~") + "/vitaFlow/",
             "experiment_name" : "default",
@@ -101,6 +163,10 @@ class BiLSTMCrf(ModelBase, ITextFeature):
 
     @property
     def model_dir(self):
+        """
+        Returns model directory `model_directory`/`experiment_name`/BiLSTMCrf
+        :return:
+        """
         return self._hparams.model_directory + "/" + self._hparams.experiment_name + "/" + type(self).__name__
 
     def _build_layers(self, features, mode):

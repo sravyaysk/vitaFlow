@@ -33,10 +33,46 @@ from vitaflow.helpers.print_helper import *
 
 class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
     """
-    CoNLL dataset obtained from https://github.com/synalp/NER/tree/master/corpus/CoNLL-2003
-    and uploaded to Gdrive.
+    Downloads the data and converts the text file into CSV file for each sentence along with its tags.
+        - CoNLL dataset : https://github.com/synalp/NER/tree/master/corpus/CoNLL-2003
+        - GDrive : https://drive.google.com/open?id=1tdwxPJnnkyO-s1oHDETj89cfgLC2xp0c
 
-    
+    .. code-block:: text
+
+        Sample Raw Data:
+
+            EU NNP B-NP B-ORG
+            rejects VBZ B-VP O
+            German JJ B-NP B-MISC
+            call NN I-NP O
+            to TO B-VP O
+            boycott VB I-VP O
+            British JJ B-NP B-MISC
+            lamb NN I-NP O
+            . . O O
+
+        Preprocessed Data:
+
+            0,1,2,3
+            EU,NNP,B-NP,B-ORG
+            rejects,VBZ,B-VP,O
+            German,JJ,B-NP,B-MISC
+            call,NN,I-NP,O
+            to,TO,B-VP,O
+            boycott,VB,I-VP,O
+            British,JJ,B-NP,B-MISC
+            lamb,NN,I-NP,O
+            .,.,O,O
+
+        ~/vitaflow/CoNLL2003Dataset/
+                raw_data/
+                    train.txt
+                    test.txt
+                    val.txt
+                preprocessed_data/
+                    train/
+                    val/
+                    test/
     """
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
@@ -51,33 +87,76 @@ class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
                        filenames="conll2003.zip",
                        extract=True)
 
-        self.text_col = self._hparams.text_col
-        self.entity_col1 = self._hparams.entity_col1
-        self.entity_col2 = self._hparams.entity_col2
-        self.entity_col3 = self._hparams.entity_col3
-
         self._prepare_data()
 
     @staticmethod
-    def default_hparams():
+    def default_hparams():      
+        """
+        .. role:: python(code)
+           :language: python
+
+        .. code-block:: python
+
+            {
+                "experiment_root_directory" : os.path.expanduser("~") + "/vitaFlow/" ,
+                "experiment_name" : "CoNLL2003Dataset",
+                "preprocessed_data_path" : "preprocessed_data",
+                "train_data_path" : "train",
+                "validation_data_path" : "val",
+                "test_data_path" : "test",
+                "minimum_num_words" : 5,
+                "over_write" : False,
+            }
+
+        Here:
+
+        "experiment_root_directory" : str
+            Root directory where the data is downloaded or copied, also
+            acts as the folder for any subsequent experimentation
+
+        "experiment_name" : str
+            Name of the data set
+
+        "preprocessed_data_path" : str
+            Folder path under `experiment_root_directory` where the preprocessed data
+            should be stored
+
+        "train_data_path" : str
+            Folder path under `experiment_root_directory` where the train data is stored
+
+        "validation_data_path" : str
+            Folder path under `experiment_root_directory` where the validation data is stored
+
+        "test_data_path" : str
+            Folder path under `experiment_root_directory` where the test data is stored
+
+        "minimum_num_words" : str
+            Number of word to be considered for a sentence to be used down the flow
+
+        "over_write" : boolean
+            Flag to over write the previous copy of the downloaded data
+
+
+        :return: A dictionary of hyperparameters with default values
+        """
         hparams = IPreprocessor.default_hparams()
 
         hparams.update({
-            "text_col" : 0,
-            "entity_col1" : 1,
-            "entity_col2" : 2,
-            "entity_col3" : 3,
-            "number_of_word" : 5,
-
+            "experiment_name" : "CoNLL2003Dataset",
+            "minimum_num_words" : 5,
             "over_write" : False,
         })
 
         return hparams
 
     def _create_target_directories(self):
+        """
+
+        :return:
+        """
         if os.path.exists(self.DATA_OUT_DIR):
             if self._hparams.over_write:
-                print_info("Deletingls data folder: {}".format(self.DATA_OUT_DIR))
+                print_info("Deleting data folder: {}".format(self.DATA_OUT_DIR))
                 shutil.rmtree(self.DATA_OUT_DIR)
                 print_info("Recreating data folder: {}".format(self.DATA_OUT_DIR))
                 os.makedirs(self.DATA_OUT_DIR)
@@ -120,12 +199,16 @@ class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
                 current_file.append(row)
             else:
                 # Consider dumping files with size 2
-                if len(current_file) > self._hparams.number_of_word:
+                if len(current_file) > self._hparams.minimum_num_words:
                     current_file = pd.DataFrame(current_file)
                     current_file.to_csv(out_dir + "/{}.csv".format(i), index=False)
                     current_file = []
 
     def _prepare_data(self):
+        """
+        Prepares the data for training 
+        :return: 
+        """
         print_info("Preprocessing the train data...")
         self._conll_to_csv(self._download_path + "/train.txt", self.TRAIN_OUT_PATH)
 

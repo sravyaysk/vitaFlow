@@ -24,7 +24,7 @@ import os
 from vitaflow.config.hyperparams import HParams
 
 class IPreprocessor():
-    '''
+    """
     A pre-processing interface that every dataset class should inherit.
     This make sure that data of concern are downloaded and preprocessed alike across
     all the data sets.
@@ -39,7 +39,7 @@ class IPreprocessor():
                 val/
                 test/
 
-    '''
+    """
     def __init__(self, hparams=None):
         '''
 
@@ -70,8 +70,8 @@ class IPreprocessor():
         .. code-block:: python
 
             {
-                "experiment_root_directory" : os.path.expanduser("~"),
-                "experiment_name" : "test_experiment",
+                "experiment_root_directory" : os.path.expanduser("~") + "/vitaFlow/",
+                "experiment_name" : "experiment_name",
                 "preprocessed_data_path" : "preprocessed_data",
                 "train_data_path" : "train",
                 "validation_data_path" : "val",
@@ -104,8 +104,8 @@ class IPreprocessor():
         :return: A dictionary of hyperparameters with default values
         """
         return {
-            "experiment_root_directory" : os.path.expanduser("~"),
-            "experiment_name" : "test_experiment",
+            "experiment_root_directory" : os.path.expanduser("~") + "/vitaFlow/",
+            "experiment_name" : "experiment_name",
             "preprocessed_data_path" : "preprocessed_data",
             "train_data_path" : "train",
             "validation_data_path" : "val",

@@ -31,7 +31,7 @@
 #         ITextFeature.__init__(self)
 #         self._hparams = HParams(hparams, self.default_hparams())
 #
-#         self.extract_vocab()
+#         self._extract_vocab()
 #         self.num_training_samples = -1
 #
 #     @staticmethod
@@ -69,7 +69,7 @@
 #             raise RuntimeError("Given Dataset cant be used with this iterator")
 #         self._dataset: ICoNLLType1 = dataset
 #
-#     def extract_vocab(self):
+#     def _extract_vocab(self):
 #         if not os.path.exists(self.WORDS_VOCAB_FILE) \
 #                 or not os.path.exists(self.ENTITY_VOCAB_FILE) \
 #                 or not os.path.exists(self.CHARS_VOCAB_FILE):
