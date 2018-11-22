@@ -31,19 +31,19 @@ Come up with following modular components which can be then used as plug and pla
 
 
 
-## Python Environment
+## Installing in Conda Environment
 
-```
-conda create -n vitaflow python=3.6
-source activate vitaflow
-pip install -r requirements.txt
+``` bash
+$ conda create -n vitaflow python=3.6
+$ source activate vitaflow
+$ pip install -r requirements.txt
 ```
 
 
 ## A Simple Demo
-```
-cd /path/to/vitaflow/
-python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py
+``` bash
+$ cd /path/to/vitaflow/
+$ python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py
 ```
 
 
