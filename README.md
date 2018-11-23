@@ -32,7 +32,8 @@ Come up with following modular components which can be then used as plug and pla
 ![](docs/images/vitaflow_stack.png)
 
 ## A Simple Demo
-```
+
+``` bash
 cd /path/to/vitaflow/
 python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py
 ```

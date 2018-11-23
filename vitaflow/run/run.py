@@ -32,6 +32,7 @@ if __name__ == "__main__":
         subprocess.call(download_en_core_web_md.split())
         print('OSError: Not able to find Spacy Package - Downloading "en_core_web_md" !')
         print('OSError: Run following command & re-run the experiment')
+        print(' -' * 35)
         print('Downloading missing package(command: {})'.format(download_en_core_web_md))
         print(' -' * 35)
     experiment = Experiments(hparams=config.experiments, mode=FLAGS.mode)
