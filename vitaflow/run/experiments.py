@@ -39,6 +39,7 @@ log.setLevel(logging.DEBUG)
 CGREEN2  = '\33[92m'
 CEND      = '\33[0m'
 
+
 class Experiments(object):
     """
     Experiments uses dataset, data iterator & model factory classes and import them
@@ -58,7 +59,6 @@ class Experiments(object):
     @staticmethod
     def default_hparams():
         return None
-
 
     def get_dataset_reference(self, dataset_name):
         """
@@ -125,7 +125,6 @@ class Experiments(object):
         return run_config
 
     def setup(self):
-
         self.check_interoperability_n_import()
         # Initialize the handles and call any user specific init() methods
         self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_name']])
@@ -164,6 +163,6 @@ class Experiments(object):
         if (mode == "train" or mode == "retrain"):
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
-                exec.train(max_steps=current_max_steps)#, eval_steps=None)
+                exec.train(max_steps=current_max_steps) #, eval_steps=None)
                 exec.evaluate(steps=200)
 

@@ -21,4 +21,4 @@ from __future__ import print_function
 
 # pylint: disable=wildcard-import
 
-from vitaflow.run.executor import *
+from vitaflow.run.executor import Executor
