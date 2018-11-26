@@ -30,9 +30,9 @@ to production dataset when the Data Engineering team bring in the production dat
 - **Business Deadlines** : We had spend few months of effort while addressing a clients proposals and build a prototype.
 Can we showcase the prototype developed to upcoming project proposals as quick as possible? 
 
-One of the main use case we wanted to address is to keep our Deep Learning exploration projects as modular as possible, 
-a plug and play framework and reuse our experience (hours of development and testing) from one project to another, 
-while improving on existing capabilities.  
+In our Deep Learning exploration/projects we wanted to build a framework that is modular as much as possible, 
+plug ang play architecture for main modules and reuse our experience (hours of development and testing) from one 
+project to another, while improving on existing capabilities without breaking it.  
  
 ## Proposed Solution
 
