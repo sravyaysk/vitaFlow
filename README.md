@@ -26,7 +26,9 @@ in different end points.
 open datasets, data iterators and models? to learn by doing?
 - **A Data Scientist** : Can I build a model with an avaiable open dataset and later switch 
 to production dataset when the Data Engineering team bring in the production data?
-- **A Data Engineer** : Can I use any available model and run through my data during my data prepration cycle?
+- **A Data Engineer** : Can I use any available model and run through my data during my data preparation cycle?
+- **Online Competitioner** : Can I reuse the models and pieces of modules that I have developed for my last competition 
+in my current competition? 
 - **Business Deadlines** : We had spend few months of effort while addressing a clients proposals and build a prototype.
 Can we showcase the prototype developed to upcoming project proposals as quick as possible? 
 
@@ -53,7 +55,7 @@ configuration:
 
 ![](docs/images/vitaflow_stack.png)
 
-## Demo
+## vitaFlow in Action
 
 CoNLL 2003 data set is considered since the data size small and easy to test:
 
@@ -77,5 +79,17 @@ Say, if the model needs to replaced based on a latest paper published, it is sim
 (that adheres some rules) and plugin into the vitaFlow, you are good to go with new model with old tested 
 dataset and data iterator modules.
 
+This level of configuration and project design will allows as to iterate the Deep Learning ideas as fast as possible to 
+meet the business demands.
 
-  
+## Future Road Map
+
+Add support for set of open datasets across domains and corresponding models based on published papers, tweak the model
+to derive the best insights of given dataset, while exposing right sets of  configurations for any new incoming datasets.
+
+With that in place, we hope it would reduce lot of efforts when we have to address any future requirements.
+
+**As an example:**: 
+We currently have Sequence to Sequence model(s) (text and character level embeddings) based on CoNLL dataset.
+With that model and iterator in place, we can address any Seq2Seq model requirements, once we write a Dataset 
+module for the new data that gives some predefined intermediate data for the data iterator.
