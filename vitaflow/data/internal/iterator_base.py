@@ -96,6 +96,13 @@ class IIteratorBase():
         """
         raise NotImplementedError
 
+    def _get_predict_text_input_function(self, sentence):
+        """
+
+        :return:
+        """
+        raise NotImplementedError
+
     def train_input_fn(self):
         """
         Returns an data set iterator function that can be used in estimator
@@ -110,9 +117,34 @@ class IIteratorBase():
         """
         return self._get_val_input_fn()
 
-    def test_input_function(self):
+    def test_input_fn(self):
         """
         Returns an data set iterator function that can be used in estimator
         :return:
         """
         return self._get_test_input_function()
+
+    def test_sentence_input_fn(self, sentence):
+        """
+
+        :return:
+        """
+        return self._get_predict_text_input_function(sentence)
+
+    def predict_on_test_files(self, predict_fn):
+        '''
+        Iterate through the files and use `predict_on_test_file`, for prediction
+        :param estimator: One of the models that support this data iterator
+        :param df_files_path: Files that can be opened by the pandas
+        :return: Creates a folder estimator.model_dir/predictions/ and adds the predicted files
+        '''
+        raise NotImplementedError
+
+    def predict_on_text(self, predict_fn):
+        '''
+        Use this for user interaction on the fly
+        :param estimator: One of the models that support this data iterator
+        :param sentence: Text deliminated by space
+        :return:
+        '''
+        raise NotImplementedError

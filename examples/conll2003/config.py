@@ -5,7 +5,7 @@ experiment_name = "conll_2003_dataset"
 use_char_embd = True
 
 experiments = {
-    "num_epochs" : 1,
+    "num_epochs" : 5,
     "dataset_name" : "conll_2003_dataset",
     "data_iterator_name" : "conll_csv_in_memory",
     "model_name" : "bilstm_crf",

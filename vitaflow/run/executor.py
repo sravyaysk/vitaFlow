@@ -158,3 +158,22 @@ class Executor(object):
         eval_spec = self._get_eval_spec(steps=eval_steps)
         tf.estimator.train_and_evaluate(self._estimator, train_spec, eval_spec)
 
+    def predict(self):
+        '''
+
+        :param steps:
+        :param checkpoint_path:
+        :return:
+        '''
+
+        predict_fn = self._estimator.predict(input_fn= lambda :self._data_iterator.test_input_fn())
+        self._data_iterator.predict_on_test_files(predict_fn)
+
+    def predict_sentence(self, sentence):
+        '''
+
+        :return:
+        '''
+        predict_fn = self._estimator.predict(input_fn = lambda :self._data_iterator.test_sentence_input_fn(sentence))
+        results = self._data_iterator.predict_on_text(predict_fn)
+        print(list(zip(sentence.split(),results)))

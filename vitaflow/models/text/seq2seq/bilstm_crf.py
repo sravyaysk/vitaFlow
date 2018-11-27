@@ -449,8 +449,21 @@ class BiLSTMCrf(ModelBase, ITextFeature):
             learning_rate=self.LEARNING_RATE)
         return train_op
 
-    def _get_eval_metrics(self, labels, logits):
-        pass
+    def _get_eval_metrics(self, predictions, labels):
+        return {
+                'Accuracy': tf.metrics.accuracy(
+                    labels=labels,
+                    predictions=predictions["viterbi_seq"],
+                    name='accuracy'),
+                'Precision': tf.metrics.precision(
+                    labels=labels,
+                    predictions=predictions["viterbi_seq"],
+                    name='Precision'),
+                'Recall': tf.metrics.recall(
+                    labels=labels,
+                    predictions=predictions["viterbi_seq"],
+                    name='Recall')
+            }
 
 
     @overrides
@@ -502,6 +515,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
 
         predictions = self._get_predictions(logits=logits, trans_params=trans_params)
 
+        eval_metric_ops = {}
 
         if mode != tf.estimator.ModeKeys.PREDICT:
             # labels = tf.reshape(labels, shape=(-1, self._out_dim), name="labels")
@@ -509,7 +523,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
 
             loss = tf.reduce_mean(-log_likelihood, name="crf_loss")
             optimizer = self._get_optimizer(loss)
-            eval_metric_ops = self._get_eval_metrics(logits=logits, labels=labels)
+            eval_metric_ops = self._get_eval_metrics(predictions=predictions, labels=ner_ids)
 
 
         return tf.estimator.EstimatorSpec(
