@@ -166,3 +166,8 @@ class Experiments(object):
                 exec.train(max_steps=current_max_steps) #, eval_steps=None)
                 exec.evaluate(steps=200)
 
+        elif(mode=="predict"):
+            exec.predict()
+
+        elif(mode=="predict_sentence"):
+            exec.predict_sentence("SOCCER - JAPAN GET LUCKY WIN , CHINA IN SURPRISE DEFEAT .")
