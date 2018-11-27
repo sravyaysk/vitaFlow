@@ -75,7 +75,7 @@ class ModelBase(object):
     def _get_optimizer(self, loss):
         raise NotImplementedError
 
-    def _get_eval_metrics(self, labels, logits):
+    def _get_eval_metrics(self, predictions, labels):
         raise NotImplementedError
 
     def _build(self, features, labels, params, mode, config=None):

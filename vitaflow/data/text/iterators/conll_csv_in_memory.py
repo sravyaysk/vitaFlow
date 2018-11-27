@@ -25,6 +25,7 @@ from tqdm import tqdm
 import tensorflow as tf
 from overrides import overrides
 import numpy as np
+import ntpath
 
 from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
 from vitaflow.data.text.vocabulary import SpecialTokens
@@ -408,7 +409,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
             seq_length = np.array(seq_length)
             tag_label, seq_length = self._pad_sequences(tag_label,
                                                         nlevels=1,
-                                                        pad_tok="{}{}".format(self._hparams.seperator, SpecialTokens.PAD_WORD))
+                                                        pad_tok="{}{}".format(self._hparams.seperator, SpecialTokens.PAD_TAG))
             tag_label = np.array(tag_label)
 
             return sentence_feature1, char_ids_feature2, tag_label
@@ -417,6 +418,44 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
             sentence_feature1 = np.array(sentence_feature1)
             tag_label = np.array(tag_label)
             return sentence_feature1, None, tag_label
+
+    def _make_seq_pair_text(self, sentence, char_2_id_map, use_char_embd):
+        '''
+
+        :param df_files_path: Path to read files that are compatible with Pandas
+        :param char_2_id_map:
+        :param use_char_embd:
+        :return:
+        '''
+
+        # [feature1 ,feature2, label]
+        sentence_feature1 = []
+        char_ids_feature2 = []
+
+
+
+        list_text = sentence.split()
+        list_char_ids = [[char_2_id_map.get(c, 0) for c in str(word)] for word in list_text]
+
+        sentence_feature1.append("{}".format(self._hparams.seperator).join(list_text))
+        char_ids_feature2.append(list_char_ids)
+
+
+        if use_char_embd:
+            sentence_feature1, seq_length = self._pad_sequences(sentence_feature1,
+                                                                nlevels=1,
+                                                                pad_tok="{}{}".format(self._hparams.seperator, SpecialTokens.PAD_WORD))  # space is used so that it can append to the string sequence
+            sentence_feature1 = np.array(sentence_feature1)
+
+            char_ids_feature2, seq_length = self._pad_sequences(char_ids_feature2, nlevels=2, pad_tok=int(SpecialTokens.PAD_CHAR_ID))
+            char_ids_feature2 = np.array(char_ids_feature2)
+            seq_length = np.array(seq_length)
+
+            return sentence_feature1, char_ids_feature2, None
+
+        else:
+            sentence_feature1 = np.array(sentence_feature1)
+            return sentence_feature1, None, None
 
     def get_padded_data(self, file_name):
         file_path = self.EXPERIMENT_ROOT_DIR + '/' + file_name
@@ -523,3 +562,125 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
+
+    @overrides
+    def _get_predict_text_input_function(self, sentence):
+
+        train_sentences, train_char_ids, train_ner_tags = None, None, None
+
+        train_sentences, train_char_ids, train_ner_tags = \
+            self._make_seq_pair_text(sentence=sentence,
+                                char_2_id_map=self.CHAR_2_ID_MAP,
+                                use_char_embd=self._hparams.use_char_embd)
+
+        print_error(train_char_ids)
+        print_info(train_ner_tags)
+        if self._hparams.use_char_embd:
+            dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences,
+                                                           self.FEATURE_2_NAME: train_char_ids},np.zeros(1)))
+        else:
+            dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences},np.zeros(1)))
+        dataset = dataset.batch(batch_size=self._hparams.batch_size)
+        print_info("Dataset output sizes are: ")
+        print_info(dataset.output_shapes)
+        return dataset
+
+    @overrides
+    def predict_on_test_files(self, predict_fn):
+        '''
+        Iterate through the files and use `predict_on_test_file`, for prediction
+        :param estimator: One of the models that support this data iterator
+        :param df_files_path: Files that can be opened by the pandas
+        :return: Creates a folder estimator.model_dir/predictions/ and adds the predicted files
+        '''
+        predictions = []
+        for predict in predict_fn:
+            predictions.append(predict)
+
+        results =[]
+        files = self._test_files_path
+
+        for each_prediction,file in zip(predictions,files):
+
+            df = pd.read_csv(file)
+
+            predicted_id = []
+            confidence = []
+
+            for tag_score in each_prediction["confidence"]:
+                confidence.append(tag_score)
+            for tag_id in each_prediction["viterbi_seq"]:
+                predicted_id.append(self.TAGS_2_ID[tag_id])
+            top_3_predicted_indices = each_prediction["top_3_indices"]
+            top_3_predicted_confidence = each_prediction["top_3_confidence"]
+
+            # print(top_3_predicted_indices)
+
+            pred_1 = top_3_predicted_indices[:, 0:1].flatten()
+            pred_1 = list(map(lambda x: self.TAGS_2_ID[x], pred_1))
+
+            pred_2 = top_3_predicted_indices[:, 1:2].flatten()
+            pred_2 = list(map(lambda x: self.TAGS_2_ID[x], pred_2))
+
+            pred_3 = top_3_predicted_indices[:, 2:].flatten()
+            pred_3 = list(map(lambda x: self.TAGS_2_ID[x], pred_3))
+
+            pred_1_confidence = top_3_predicted_confidence[:, 0:1]
+            pred_2_confidence = top_3_predicted_confidence[:, 1:2]
+            pred_3_confidence = top_3_predicted_confidence[:, 2:]
+
+            results.append({
+                "tokens": df[self._hparams.text_col].astype(str).values.tolist(),
+                "predicted_id":predicted_id,
+                "confidence":confidence,
+                "pred_1":pred_1,
+                "pred_1_confidence":pred_1_confidence,
+                "pred_2": pred_2,
+                "pred_2_confidence": pred_2_confidence,
+                "pred_3": pred_3,
+                "pred_3_confidence": pred_3_confidence,
+
+            })
+
+            df["predicted_id"] = [j for i,j in zip(df[self._hparams.text_col].astype(str).values.tolist(), predicted_id)]
+            out_dir = self.OUT_DIR + "/predictions/"
+            check_n_makedirs(out_dir)
+            df.to_csv(out_dir + ntpath.basename(file), index=False)
+
+        return results
+
+    @overrides
+    def predict_on_text(self, predict_fn):
+        '''
+        Use this for user interaction on the fly
+        :param estimator: One of the models that support this data iterator
+        :param sentence: Text deliminated by space
+        :return:
+        '''
+        predicted_id = []
+        confidence = []
+        for each_prediction in predict_fn:
+            for tag_score in each_prediction["confidence"]:
+                confidence.append(tag_score)
+            for tag_id in each_prediction["viterbi_seq"]:
+                predicted_id.append(self.TAGS_2_ID[tag_id])
+            top_3_predicted_indices = each_prediction["top_3_indices"]
+            top_3_predicted_confidence = each_prediction["top_3_confidence"]
+
+            # print(top_3_predicted_indices)
+
+            pred_1 = top_3_predicted_indices[:, 0:1].flatten()
+            pred_1 = list(map(lambda x: self.TAGS_2_ID[x], pred_1))
+
+            pred_2 = top_3_predicted_indices[:, 1:2].flatten()
+            pred_2 = list(map(lambda x: self.TAGS_2_ID[x], pred_2))
+
+            pred_3 = top_3_predicted_indices[:, 2:].flatten()
+            pred_3 = list(map(lambda x: self.TAGS_2_ID[x], pred_3))
+
+            pred_1_confidence = top_3_predicted_confidence[:, 0:1]
+            pred_2_confidence = top_3_predicted_confidence[:, 1:2]
+            pred_3_confidence = top_3_predicted_confidence[:, 2:]
+
+        return predicted_id
+
