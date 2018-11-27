@@ -31,6 +31,7 @@ from vitaflow.data.text.vocabulary import SpecialTokens
 from vitaflow.utils.data_io import maybe_download
 from vitaflow.helpers.print_helper import *
 
+
 class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
     """
     Downloads the data and converts the text file into CSV file for each sentence along with its tags.
@@ -74,6 +75,7 @@ class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
                     val/
                     test/
     """
+
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
         self._hparams = HParams(hparams, self.default_hparams())
@@ -95,7 +97,7 @@ class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
         self._prepare_data()
 
     @staticmethod
-    def default_hparams():      
+    def default_hparams():
         """
         .. role:: python(code)
            :language: python
@@ -147,16 +149,16 @@ class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
         hparams = IPreprocessor.default_hparams()
 
         hparams.update({
-            "experiment_name" : "CoNLL2003Dataset",
-            "minimum_num_words" : 5,
-            "over_write" : False,
+            "experiment_name": "CoNLL2003Dataset",
+            "minimum_num_words": 5,
+            "over_write": False,
         })
 
         return hparams
 
     def _create_target_directories(self):
         """
-
+        To setup destination folders structure if not present.
         :return:
         """
         if os.path.exists(self.DATA_OUT_DIR):
@@ -172,13 +174,13 @@ class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
             os.makedirs(self.DATA_OUT_DIR)
 
     def _conll_to_csv(self, txt_file_path, out_dir):
-        '''
+        """
         Converts CoNLL 2003 data set text files into CSV file for each
         example/statement.
         :param txt_file_path: Input text file path
         :param out_dir: Output directory to store CSV files
         :return: Creates files in the specified train/val/test paths
-        '''
+        """
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
         else:
@@ -215,10 +217,13 @@ class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
         :return: 
         """
         print_info("Preprocessing the train data...")
-        self._conll_to_csv(self._download_path + "/train.txt", self.TRAIN_OUT_PATH)
+        self._conll_to_csv(os.path.join(self._download_path, "train.txt"),
+                           self.TRAIN_OUT_PATH)
 
         print_info("Preprocessing the test data...")
-        self._conll_to_csv(self._download_path + "/test.txt", self.TEST_OUT_PATH)
+        self._conll_to_csv(os.path.join(self._download_path, "test.txt"),
+                           self.TEST_OUT_PATH)
 
         print_info("Preprocessing the validation data...")
-        self._conll_to_csv(self._download_path+"/val.txt", self.VAL_OUT_PATH)
+        self._conll_to_csv(os.path.join(self._download_path, "val.txt"),
+                           self.VAL_OUT_PATH)

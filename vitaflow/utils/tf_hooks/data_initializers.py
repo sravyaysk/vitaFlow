@@ -12,6 +12,7 @@ class DataIteratorInitializerHook(tf.train.SessionRunHook):
         """Initialise the iterator after the session has been created."""
         self.iterator_initializer_func(session)
 
+
 class IteratorInitializerHook(tf.train.SessionRunHook):
     """Hook to initialise utils iterator after Session is created."""
 

@@ -54,20 +54,20 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,
                                                 self._hparams.experiment_name)
         self.PREPROCESSED_DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
-                                                      self._hparams.preprocessed_data_path + "/")
+                                                      self._hparams.preprocessed_data_path)
         self.TRAIN_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
-                                           self._hparams.train_data_path + "/")
+                                           self._hparams.train_data_path)
         self.VAL_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
-                                         self._hparams.validation_data_path + "/")
+                                         self._hparams.validation_data_path)
         self.TEST_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
-                                          self._hparams.test_data_path + "/")
+                                          self._hparams.test_data_path)
         self.OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
-                                    self._hparams.iterator_name + "/")
+                                    self._hparams.iterator_name)
 
         # This rule is assumed to be correct if the previous stage is of IPreprocessor
-        self.TRAIN_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "/train/")
-        self.VAL_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "/val/")
-        self.TEST_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "/test/")
+        self.TRAIN_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "train/")
+        self.VAL_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "val/")
+        self.TEST_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "test/")
 
         self.WORDS_VOCAB_FILE = os.path.join(self.OUT_DIR, self._hparams.text_col + "_" + "vocab.tsv")
         self.CHARS_VOCAB_FILE = os.path.join(self.OUT_DIR, self._hparams.text_col + "_" + "chars_vocab.tsv")
@@ -75,13 +75,13 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
 
         check_n_makedirs(self.OUT_DIR)
 
-        self.padded_shapes = (tf.TensorShape([None]),   # sentence of unknown size
+        self.padded_shapes = (tf.TensorShape([None]),  # sentence of unknown size
                               tf.TensorShape([None]),
                               tf.TensorShape([None]))  # labels of unknown size
 
         self.padding_values = (SpecialTokens.PAD_WORD,
                                SpecialTokens.PAD_CHAR,  # sentence padded on the right with id_pad_word
-                               SpecialTokens.PAD_TAG)   # labels padded on the right with id_pad_tag
+                               SpecialTokens.PAD_TAG)  # labels padded on the right with id_pad_tag
 
         self._extract_vocab()
 
@@ -155,13 +155,13 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         hparams = IPreprocessor.default_hparams()
         hparams.update(IIteratorBase.default_hparams())
         hparams.update({
-            "iterator_name" : "conll_data_iterator",
-            "text_col" : "0",
-            "entity_col" : "3",
-            "seperator" : "~",
-            "quotechar" : "^",
-            "max_word_length" : 20,
-            "use_char_embd" : False
+            "iterator_name": "conll_data_iterator",
+            "text_col": "0",
+            "entity_col": "3",
+            "seperator": "~",
+            "quotechar": "^",
+            "max_word_length": 20,
+            "use_char_embd": False
         })
 
         return hparams
@@ -200,7 +200,6 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
        Number of training samples
        """
         return len(self._val_files_path)
-
 
     @property
     def num_test_samples(self):
@@ -270,7 +269,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
                                                             out_file_name=self.ENTITY_VOCAB_FILE,
                                                             use_nlp=False)
 
-        self.TAGS_2_ID =  {id_num: tag for id_num, tag in enumerate(tags_vocab)}
+        self.TAGS_2_ID = {id_num: tag for id_num, tag in enumerate(tags_vocab)}
 
     @property
     def _train_files_path(self):
@@ -356,7 +355,6 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
 
         return np.array(sequence_padded), sequence_length
 
-
     def _make_seq_pair(self, df_files_path, char_2_id_map, use_char_embd):
         '''
 
@@ -380,7 +378,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
 
             df_file = os.path.join(df_files_path, df_file)
 
-            if df_file.endswith(".csv"): #TODO start and stop tags
+            if df_file.endswith(".csv"):  # TODO start and stop tags
                 df = pd.read_csv(df_file).fillna(SpecialTokens.UNK_WORD)
             elif df_file.endswith(".json"):
                 df = pd.read_json(df_file).filla(SpecialTokens.UNK_WORD)
@@ -393,19 +391,21 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
             char_ids_feature2.append(list_char_ids)
             tag_label.append("{}".format(self._hparams.seperator).join(list_tag))
 
-
         if use_char_embd:
             sentence_feature1, seq_length = self._pad_sequences(sentence_feature1,
                                                                 nlevels=1,
-                                                                pad_tok="{}{}".format(self._hparams.seperator, SpecialTokens.PAD_WORD))  # space is used so that it can append to the string sequence
+                                                                pad_tok="{}{}".format(self._hparams.seperator,
+                                                                                      SpecialTokens.PAD_WORD))  # space is used so that it can append to the string sequence
             sentence_feature1 = np.array(sentence_feature1)
 
-            char_ids_feature2, seq_length = self._pad_sequences(char_ids_feature2, nlevels=2, pad_tok=int(SpecialTokens.PAD_CHAR_ID))
+            char_ids_feature2, seq_length = self._pad_sequences(char_ids_feature2, nlevels=2,
+                                                                pad_tok=int(SpecialTokens.PAD_CHAR_ID))
             char_ids_feature2 = np.array(char_ids_feature2)
             seq_length = np.array(seq_length)
             tag_label, seq_length = self._pad_sequences(tag_label,
                                                         nlevels=1,
-                                                        pad_tok="{}{}".format(self._hparams.seperator, SpecialTokens.PAD_WORD))
+                                                        pad_tok="{}{}".format(self._hparams.seperator,
+                                                                              SpecialTokens.PAD_WORD))
             tag_label = np.array(tag_label)
 
             return sentence_feature1, char_ids_feature2, tag_label
@@ -428,22 +428,21 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         sentence_feature1 = []
         char_ids_feature2 = []
 
-
-
         list_text = sentence.split()
         list_char_ids = [[char_2_id_map.get(c, 0) for c in str(word)] for word in list_text]
 
         sentence_feature1.append("{}".format(self._hparams.seperator).join(list_text))
         char_ids_feature2.append(list_char_ids)
 
-
         if use_char_embd:
             sentence_feature1, seq_length = self._pad_sequences(sentence_feature1,
                                                                 nlevels=1,
-                                                                pad_tok="{}{}".format(self._hparams.seperator, SpecialTokens.PAD_WORD))  # space is used so that it can append to the string sequence
+                                                                pad_tok="{}{}".format(self._hparams.seperator,
+                                                                                      SpecialTokens.PAD_WORD))  # space is used so that it can append to the string sequence
             sentence_feature1 = np.array(sentence_feature1)
 
-            char_ids_feature2, seq_length = self._pad_sequences(char_ids_feature2, nlevels=2, pad_tok=int(SpecialTokens.PAD_CHAR_ID))
+            char_ids_feature2, seq_length = self._pad_sequences(char_ids_feature2, nlevels=2,
+                                                                pad_tok=int(SpecialTokens.PAD_CHAR_ID))
             char_ids_feature2 = np.array(char_ids_feature2)
             seq_length = np.array(seq_length)
 
@@ -495,7 +494,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
                                                           train_ner_tags))
         else:
             dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences},
-                                                     train_ner_tags))
+                                                          train_ner_tags))
         dataset = dataset.batch(batch_size=self._hparams.batch_size)
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
@@ -566,16 +565,16 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
 
         train_sentences, train_char_ids, train_ner_tags = \
             self._make_seq_pair_text(sentence=sentence,
-                                char_2_id_map=self.CHAR_2_ID_MAP,
-                                use_char_embd=self._hparams.use_char_embd)
+                                     char_2_id_map=self.CHAR_2_ID_MAP,
+                                     use_char_embd=self._hparams.use_char_embd)
 
         print_error(train_char_ids)
         print_info(train_ner_tags)
         if self._hparams.use_char_embd:
             dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences,
-                                                           self.FEATURE_2_NAME: train_char_ids},np.zeros(1)))
+                                                           self.FEATURE_2_NAME: train_char_ids}, np.zeros(1)))
         else:
-            dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences},np.zeros(1)))
+            dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences}, np.zeros(1)))
         dataset = dataset.batch(batch_size=self._hparams.batch_size)
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
@@ -593,10 +592,10 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         for predict in predict_fn:
             predictions.append(predict)
 
-        results =[]
+        results = []
         files = self._test_files_path
 
-        for each_prediction,file in zip(predictions,files):
+        for each_prediction, file in zip(predictions, files):
 
             df = pd.read_csv(file)
 
@@ -627,10 +626,10 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
 
             results.append({
                 "tokens": df[self._hparams.text_col].astype(str).values.tolist(),
-                "predicted_id":predicted_id,
-                "confidence":confidence,
-                "pred_1":pred_1,
-                "pred_1_confidence":pred_1_confidence,
+                "predicted_id": predicted_id,
+                "confidence": confidence,
+                "pred_1": pred_1,
+                "pred_1_confidence": pred_1_confidence,
                 "pred_2": pred_2,
                 "pred_2_confidence": pred_2_confidence,
                 "pred_3": pred_3,
@@ -638,7 +637,8 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
 
             })
 
-            df["predicted_id"] = [j for i,j in zip(df[self._hparams.text_col].astype(str).values.tolist(), predicted_id)]
+            df["predicted_id"] = [j for i, j in
+                                  zip(df[self._hparams.text_col].astype(str).values.tolist(), predicted_id)]
             out_dir = self.OUT_DIR + "/predictions/"
             check_n_makedirs(out_dir)
             df.to_csv(out_dir + ntpath.basename(file), index=False)
@@ -679,4 +679,3 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
             pred_3_confidence = top_3_predicted_confidence[:, 2:]
 
         return predicted_id
-

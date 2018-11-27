@@ -20,7 +20,7 @@ from vitaflow.config.hyperparams import HParams
 
 
 class IIteratorBase():
-    def __init__(self,  hparams=None, dataset=None):
+    def __init__(self, hparams=None, dataset=None):
         self._hparams = HParams(hparams, self.default_hparams())
         # self.set_dataset(dataset=dataset)
 
@@ -44,7 +44,7 @@ class IIteratorBase():
         :return:  A dictionary of hyperparameters with default values
         """
         return {
-            "batch_size" : 32
+            "batch_size": 32
         }
 
     @property

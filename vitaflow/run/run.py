@@ -22,19 +22,21 @@ config = config.replace(".py", "")
 config = importlib.import_module(config)
 
 import pdb
-pdb.set_trace()
 
+pdb.set_trace()
 
 if __name__ == "__main__":
     print(' -' * 35)
     print('Running Experiment: Conll')
     print(' -' * 35)
     import spacy
+
     try:
         spacy.load('en_core_web_md')
     except OSError:
         download_en_core_web_md = 'python -m spacy download en_core_web_md'
         import subprocess
+
         subprocess.call(download_en_core_web_md.split())
         print('OSError: Not able to find Spacy Package - Downloading "en_core_web_md" !')
         print('OSError: Run following command & re-run the experiment')

@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.training import session_run_hook
 
+
 class EarlyStoppingLossHook(tf.train.SessionRunHook):
     def __init__(self, loss_tensor_name, value, threshold=3):
         '''
@@ -16,7 +17,7 @@ class EarlyStoppingLossHook(tf.train.SessionRunHook):
         '''
         self._best_loss = value
         self.threshold = threshold
-        self.count  = 0
+        self.count = 0
         self.loss_tensor_name = loss_tensor_name
         logging.info("Create EarlyStoppingLossHook for {}".format(self.loss_tensor_name))
 
@@ -34,8 +35,3 @@ class EarlyStoppingLossHook(tf.train.SessionRunHook):
             if self.count == self.threshold:
                 logging.info("EarlyStoppingHook: Request early stop")
                 run_context.request_stop()
-
-
-
-
-

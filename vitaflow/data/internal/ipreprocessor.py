@@ -23,6 +23,7 @@ __author__ = 'Mageswaran Dhandapani <mageswaran1989@gmail.com>'
 import os
 from vitaflow.config.hyperparams import HParams
 
+
 class IPreprocessor():
     """
     A pre-processing interface that every dataset class should inherit.
@@ -40,6 +41,7 @@ class IPreprocessor():
                 test/
 
     """
+
     def __init__(self, hparams=None):
         '''
 
@@ -50,14 +52,13 @@ class IPreprocessor():
         self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,
                                                 self._hparams.experiment_name)
         self.DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
-                                         self._hparams.preprocessed_data_path + "/")
+                                         self._hparams.preprocessed_data_path)
         self.TRAIN_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
-                                           self._hparams.train_data_path + "/")
+                                           self._hparams.train_data_path)
         self.VAL_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
-                                         self._hparams.validation_data_path + "/")
+                                         self._hparams.validation_data_path)
         self.TEST_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
-                                          self._hparams.test_data_path + "/")
-
+                                          self._hparams.test_data_path)
 
     @staticmethod
     def default_hparams():
@@ -102,12 +103,12 @@ class IPreprocessor():
         :return: A dictionary of hyperparameters with default values
         """
         return {
-            "experiment_root_directory" : os.path.expanduser("~") + "/vitaFlow/",
-            "experiment_name" : "experiment_name",
-            "preprocessed_data_path" : "preprocessed_data",
-            "train_data_path" : "train",
-            "validation_data_path" : "val",
-            "test_data_path" : "test"
+            "experiment_root_directory": os.path.expanduser("~") + "/vitaFlow/",
+            "experiment_name": "experiment_name",
+            "preprocessed_data_path": "preprocessed_data",
+            "train_data_path": "train",
+            "validation_data_path": "val",
+            "test_data_path": "test"
         }
 
     def _create_target_directories(self):
@@ -127,13 +128,9 @@ class IPreprocessor():
         """
         raise NotImplementedError
 
-
     def preprocess_prepare(self):
         """Pre-process and prepares the data for training
         :return:
         """
         self._create_target_directories()
         self._prepare_data()
-
-
-

@@ -47,6 +47,7 @@ class Experiments(object):
     This allows the user to choose the modules dynamically and run the experiments without ever writing the
     code when we need mix and experiment dataset and modules.
     """
+
     def __init__(self, hparams, mode='train'):
         self._hparams = HParams(hparams, self.default_hparams())
 
@@ -91,7 +92,7 @@ class Experiments(object):
 
         print_debug("Dynamically importing model : " + model_name)
         model = ModelsFactory.get(model_name=model_name)
-        return  model
+        return model
 
     def check_interoperability_n_import(self):
         # Using factory classes get the handle for the actual classes from string
@@ -128,7 +129,8 @@ class Experiments(object):
         self.check_interoperability_n_import()
         # Initialize the handles and call any user specific init() methods
         self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_name']])
-        self._data_iterator = self._data_iterator(hparams=self._hparams[self._hparams['data_iterator_name']], dataset = self._dataset)
+        self._data_iterator = self._data_iterator(hparams=self._hparams[self._hparams['data_iterator_name']],
+                                                  dataset=self._dataset)
         self._model = self._model(hparams=self._hparams[self._hparams['model_name']], data_iterator=self._data_iterator)
 
     def test_dataset(self):
@@ -163,11 +165,11 @@ class Experiments(object):
         if (mode == "train" or mode == "retrain"):
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
-                exec.train(max_steps=current_max_steps) #, eval_steps=None)
+                exec.train(max_steps=current_max_steps)  # , eval_steps=None)
                 exec.evaluate(steps=200)
 
-        elif(mode=="predict"):
+        elif (mode == "predict"):
             exec.predict()
 
-        elif(mode=="predict_sentence"):
+        elif (mode == "predict_sentence"):
             exec.predict_sentence("SOCCER - JAPAN GET LUCKY WIN , CHINA IN SURPRISE DEFEAT .")

@@ -15,7 +15,6 @@
 Utility functions related to data types.
 """
 
-
 # pylint: disable=invalid-name, no-member, protected-access
 
 import six
@@ -32,7 +31,8 @@ __all__ = [
     "compat_as_text"
 ]
 
-def get_tf_dtype(dtype): # pylint: disable=too-many-return-statements
+
+def get_tf_dtype(dtype):  # pylint: disable=too-many-return-statements
     """Returns equivalent tf dtype.
 
     Args:
@@ -68,14 +68,16 @@ def get_tf_dtype(dtype): # pylint: disable=too-many-return-statements
     raise ValueError(
         "Unsupported conversion from type {} to tf dtype".format(str(dtype)))
 
+
 def is_callable(x):
     """Return `True` if :attr:`x` is callable.
     """
     try:
         _is_callable = callable(x)
-    except: # pylint: disable=bare-except
+    except:  # pylint: disable=bare-except
         _is_callable = hasattr(x, '__call__')
     return _is_callable
+
 
 def is_str(x):
     """Returns `True` if :attr:`x` is either a str or unicode. Returns `False`
@@ -83,14 +85,16 @@ def is_str(x):
     """
     return isinstance(x, six.string_types)
 
+
 def is_placeholder(x):
     """Returns `True` if :attr:`x` is a :tf_main:`tf.placeholder <placeholder>`
     or :tf_main:`tf.placeholder_with_default <placeholder_with_default>`.
     """
     try:
         return x._ops.type in ['Placeholder', 'PlaceholderWithDefault']
-    except: # pylint: disable=bare-except
+    except:  # pylint: disable=bare-except
         return False
+
 
 def maybe_hparams_to_dict(hparams):
     """If :attr:`hparams` is an instance of :class:`~vitaFlow.HParams`,
@@ -103,6 +107,7 @@ def maybe_hparams_to_dict(hparams):
         return hparams
     return hparams.todict()
 
+
 def _maybe_list_to_array(str_list, dtype_as):
     if isinstance(dtype_as, (list, tuple)):
         return type(dtype_as)(str_list)
@@ -110,6 +115,7 @@ def _maybe_list_to_array(str_list, dtype_as):
         return np.array(str_list)
     else:
         return str_list
+
 
 def compat_as_text(str_):
     """Converts strings into `unicode` (Python 2) or `str` (Python 3).
@@ -121,6 +127,7 @@ def compat_as_text(str_):
     Returns:
         The converted strings of the same structure/shape as :attr:`str_`.
     """
+
     def _recur_convert(s):
         if isinstance(s, (list, tuple, np.ndarray)):
             s_ = [_recur_convert(si) for si in s]

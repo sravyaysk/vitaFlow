@@ -15,6 +15,7 @@
 
 """
 
+
 class TwoFeatures():
     def __init__(self):
         self.NUM_FEATURES = 2
@@ -28,6 +29,7 @@ class TwoFeatures():
     def __eq__(self, other):
         """Override the default Equals behavior"""
         return self.FEATURE_TYPE == other.FEATURE_NAME and self.NUM_FEATURES == other.NUM_FEATURES
+
 
 class ITextFeature(TwoFeatures):
     def __init__(self):

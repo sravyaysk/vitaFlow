@@ -30,6 +30,7 @@ from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
 from vitaflow.helpers.tf_data_helper import get_sequence_length
 from vitaflow.helpers.print_helper import *
 
+
 class BiLSTMCrf(ModelBase, ITextFeature):
     """
 
@@ -62,7 +63,8 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         - https://github.com/tensorflow/tensorflow/issues/14018
 
     """
-    def __init__(self, hparams=None, data_iterator: CoNLLCsvInMemory=None):
+
+    def __init__(self, hparams=None, data_iterator: CoNLLCsvInMemory = None):
         ITextFeature.__init__(self)
         self._hparams = HParams(hparams,
                                 self.default_hparams(),
@@ -94,7 +96,6 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         self.WORD_LEVEL_LSTM_HIDDEN_SIZE = self._hparams.word_level_lstm_hidden_size
         self.CHAR_LEVEL_LSTM_HIDDEN_SIZE = self._hparams.char_level_lstm_hidden_size
         self.NUM_LSTM_LAYERS = self._hparams.num_lstm_layers
-
 
     @staticmethod
     def default_hparams():
@@ -147,8 +148,8 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         :return: A dictionary of hyperparameters with default values
         """
         hparams = {
-            "model_directory" : os.path.expanduser("~") + "/vitaFlow/",
-            "experiment_name" : "default",
+            "model_directory": os.path.expanduser("~") + "/vitaFlow/",
+            "experiment_name": "default",
             # hyper parameters
             "use_char_embd": False,
             "learning_rate": 0.001,
@@ -167,7 +168,10 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         Returns model directory `model_directory`/`experiment_name`/BiLSTMCrf
         :return:
         """
-        return self._hparams.model_directory + "/" + self._hparams.experiment_name + "/" + type(self).__name__
+        return os.path.join(self._hparams.model_directory,
+                            self._hparams.experiment_name,
+                            type(self).__name__)
+
 
     def _build_layers(self, features, mode):
 
@@ -190,7 +194,8 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         with tf.variable_scope("sentence-words-2-ids"):
             word_table = lookup.index_table_from_file(vocabulary_file=self.WORDS_VOCAB_FILE,
                                                       num_oov_buckets=0,  # TODO use this for Out of Vocab
-                                                      default_value=SpecialTokens.UNK_WORD_ID,  # id of <UNK>  w.r.t WORD VOCAB
+                                                      default_value=SpecialTokens.UNK_WORD_ID,
+                                                      # id of <UNK>  w.r.t WORD VOCAB
                                                       name="table")
             tf.logging.info('word_table info: {}'.format(word_table))
 
@@ -426,7 +431,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
 
         tf.logging.info("viterbi_seq: {}".format(viterbi_seq))
 
-        predictions = { #TODO features class
+        predictions = {  # TODO features class
             "classes": tf.cast(tf.argmax(logits, axis=-1),
                                tf.int32),
             # [BATCH_SIZE, SEQ_LEN]
@@ -451,20 +456,19 @@ class BiLSTMCrf(ModelBase, ITextFeature):
 
     def _get_eval_metrics(self, predictions, labels):
         return {
-                'Accuracy': tf.metrics.accuracy(
-                    labels=labels,
-                    predictions=predictions["viterbi_seq"],
-                    name='accuracy'),
-                'Precision': tf.metrics.precision(
-                    labels=labels,
-                    predictions=predictions["viterbi_seq"],
-                    name='Precision'),
-                'Recall': tf.metrics.recall(
-                    labels=labels,
-                    predictions=predictions["viterbi_seq"],
-                    name='Recall')
-            }
-
+            'Accuracy': tf.metrics.accuracy(
+                labels=labels,
+                predictions=predictions["viterbi_seq"],
+                name='accuracy'),
+            'Precision': tf.metrics.precision(
+                labels=labels,
+                predictions=predictions["viterbi_seq"],
+                name='Precision'),
+            'Recall': tf.metrics.recall(
+                labels=labels,
+                predictions=predictions["viterbi_seq"],
+                name='Recall')
+        }
 
     @overrides
     def _build(self, features, labels, params, mode, config=None):
@@ -473,7 +477,6 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         loss = None
         optimizer = None
         eval_metric_ops = {}
-
 
         with tf.variable_scope("ner-tags-2-ids"):
             if mode != ModeKeys.INFER:
@@ -512,7 +515,6 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         trans_params = trans_params  # need to evaluate it for decoding
         tf.logging.info("trans_params: =====> {}".format(trans_params))
 
-
         predictions = self._get_predictions(logits=logits, trans_params=trans_params)
 
         eval_metric_ops = {}
@@ -524,7 +526,6 @@ class BiLSTMCrf(ModelBase, ITextFeature):
             loss = tf.reduce_mean(-log_likelihood, name="crf_loss")
             optimizer = self._get_optimizer(loss)
             eval_metric_ops = self._get_eval_metrics(predictions=predictions, labels=ner_ids)
-
 
         return tf.estimator.EstimatorSpec(
             mode=mode,
