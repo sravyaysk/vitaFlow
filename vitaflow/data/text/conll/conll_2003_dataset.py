@@ -77,9 +77,14 @@ class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
         self._hparams = HParams(hparams, self.default_hparams())
-        self._download_path =  self._hparams.experiment_root_directory + \
-                         "/" + self._hparams.experiment_name + \
-                        "/raw_data/"
+        # self._download_path =  self._hparams.experiment_root_directory + \
+        #                  "/" + self._hparams.experiment_name + \
+        #                 "/raw_data/"
+        self._download_path = os.path.join(
+            self._hparams.experiment_root_directory,
+            self._hparams.experiment_name,
+            "raw_data/"
+        )
         self._link = "https://drive.google.com/open?id=1tdwxPJnnkyO-s1oHDETj89cfgLC2xp0c"
 
         maybe_download(urls=self._link,

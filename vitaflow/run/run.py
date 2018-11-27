@@ -11,6 +11,8 @@ sys.path.append(os.path.abspath('.'))
 
 from vitaflow.run.experiments import Experiments
 
+# TODO: Use ArgParse
+# tf.args works just like argparse
 flags = tf.flags
 flags.DEFINE_string("config_python_file", "config_python_file", "The config to use.")
 flags.DEFINE_string("mode", "train", "train/retrain/predict")
@@ -18,6 +20,10 @@ FLAGS = flags.FLAGS
 config = FLAGS.config_python_file.replace("/", ".")
 config = config.replace(".py", "")
 config = importlib.import_module(config)
+
+import pdb
+pdb.set_trace()
+
 
 if __name__ == "__main__":
     print(' -' * 35)

@@ -35,15 +35,15 @@ from vitaflow.data.internal import IPreprocessor
 from vitaflow.data.text.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, vocab_to_tsv
 from vitaflow.helpers.print_helper import *
 
+
 class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
     def __init__(self, hparams=None, dataset=None):
-        '''
+        """
         Data Iterators with different features type are expected to
         implement this interface, exposing the input functions and their hooks
         :param experiment_dir:
         :param batch_size:
-
-        '''
+        """
         IIteratorBase.__init__(self, hparams=hparams, dataset=dataset)
         ITextFeature.__init__(self)
         self._hparams = HParams(hparams, self.default_hparams())
@@ -51,30 +51,27 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         #
         # def _init(self):
 
-        self.EXPERIMENT_ROOT_DIR = self._hparams.experiment_root_directory + \
-                                   "/" + self._hparams.experiment_name
-
-        self.PREPROCESSED_DATA_OUT_DIR = self.EXPERIMENT_ROOT_DIR + "/" + \
-                                         self._hparams.preprocessed_data_path + "/"
-
-        self.TRAIN_OUT_PATH = self.PREPROCESSED_DATA_OUT_DIR + "/" + \
-                              self._hparams.train_data_path + "/"
-        self.VAL_OUT_PATH = self.PREPROCESSED_DATA_OUT_DIR + "/" + \
-                            self._hparams.validation_data_path + "/"
-        self.TEST_OUT_PATH = self.PREPROCESSED_DATA_OUT_DIR + "/" + \
-                             self._hparams.test_data_path + "/"
-
-        self.OUT_DIR = self.EXPERIMENT_ROOT_DIR + "/" + self._hparams.iterator_name + "/"
+        self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,
+                                                self._hparams.experiment_name)
+        self.PREPROCESSED_DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
+                                                      self._hparams.preprocessed_data_path + "/")
+        self.TRAIN_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
+                                           self._hparams.train_data_path + "/")
+        self.VAL_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
+                                         self._hparams.validation_data_path + "/")
+        self.TEST_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
+                                          self._hparams.test_data_path + "/")
+        self.OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
+                                    self._hparams.iterator_name + "/")
 
         # This rule is assumed to be correct if the previous stage is of IPreprocessor
-        self.TRAIN_FILES_IN_PATH = self.PREPROCESSED_DATA_OUT_DIR + "/train/"
-        self.VAL_FILES_IN_PATH = self.PREPROCESSED_DATA_OUT_DIR + "/val/"
-        self.TEST_FILES_IN_PATH = self.PREPROCESSED_DATA_OUT_DIR + "/test/"
+        self.TRAIN_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "/train/")
+        self.VAL_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "/val/")
+        self.TEST_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "/test/")
 
-
-        self.WORDS_VOCAB_FILE = self.OUT_DIR + "/" + self._hparams.text_col + "_" + "vocab.tsv"
-        self.CHARS_VOCAB_FILE = self.OUT_DIR + "/" + self._hparams.text_col + "_" + "chars_vocab.tsv"
-        self.ENTITY_VOCAB_FILE = self.OUT_DIR + "/" + self._hparams.entity_col + "_vocab.tsv"
+        self.WORDS_VOCAB_FILE = os.path.join(self.OUT_DIR, self._hparams.text_col + "_" + "vocab.tsv")
+        self.CHARS_VOCAB_FILE = os.path.join(self.OUT_DIR, self._hparams.text_col + "_" + "chars_vocab.tsv")
+        self.ENTITY_VOCAB_FILE = os.path.join(self.OUT_DIR, self._hparams.entity_col + "_vocab.tsv")
 
         check_n_makedirs(self.OUT_DIR)
 

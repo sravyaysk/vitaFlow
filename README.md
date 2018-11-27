@@ -12,7 +12,8 @@ of handling such projects alike across the domains.
 Be it business environment or in any online competitions, the main challenge is  
 how we can reuse the code base what we have developed for one requirement/problem 
 statement and use it to a slightly different new requirement/problem statement. 
-We are incubating a ideation to solve this typical software design problem for 
+
+We are incubating an ideation to solve this typical software design problem for 
 Deep Learning projects, which would simplify the whole process of data preparation, 
 modelling and serving in a easy configurable plug and play framework.
 
@@ -22,12 +23,12 @@ To come up with a framework that enables a fast prototyping of Deep Learning
 models that handles Video/Image/Text/Audio and provide an seamless way serving them
 in different end points.
 
-- **A Navie Developer** : Can I get an experimentation play ground, with some set of 
+- **A Navie Developer**: Can I get an experimentation play ground, with some set of 
 open datasets, data iterators and models? to learn by doing?
-- **A Data Scientist** : Can I build a model with an avaiable open dataset and later switch 
+- **A Data Scientist**: Can I build a model with an avaiable open dataset and later switch 
 to production dataset when the Data Engineering team bring in the production data?
-- **A Data Engineer** : Can I use any available model and run through my data during my data preparation cycle?
-- **Online Competitioner** : Can I reuse the models and pieces of modules that I have developed for my last competition 
+- **A Data Engineer**: Can I use any available model and run through my data during my data preparation cycle?
+- **An Online competitioner**: Can I reuse the models and pieces of modules that I have developed for my last competition 
 in my current competition? 
 - **Business Deadlines** : We had spend few months of effort while addressing a clients proposals and build a prototype.
 Can we showcase the prototype developed to upcoming project proposals as quick as possible? 
@@ -38,15 +39,16 @@ project to another, while improving on existing capabilities without breaking it
  
 ## Proposed Solution
 
-**Data Science wisdom comes only through failed experimentation - Damian Mingle**
+> **Data Science wisdom comes only through failed experimentation - Damian Mingle**
 
 The thought process is to come up with following modular components which then can be then glued through
 configuration:
+
  - Data Collection and Cleansing
  - Dataset modules with pre-processing modules
  - DataIterator modules (backed by [TF Data](https://www.tensorflow.org/guide/datasets))
- - Tensorflow Models (backed by [Estimators](https://www.tensorflow.org/guide/estimators))
- - A Engine to run the models
+ - Tensorflow Models (backed by [TF Estimators](https://www.tensorflow.org/guide/estimators))
+ - An Engine to run the models
  - Tensorflow model serving using [TFLite](https://www.tensorflow.org/lite/)
     - Web app
     - Mobile
@@ -89,7 +91,7 @@ to derive the best insights of given dataset, while exposing right sets of  conf
 
 With that in place, we hope it would reduce lot of efforts when we have to address any future requirements.
 
-**As an example:**: 
+**As an example**: 
 We currently have Sequence to Sequence model(s) (text and character level embeddings) based on CoNLL dataset.
 With that model and iterator in place, we can address any Seq2Seq model requirements, once we write a Dataset 
 module for the new data that gives some predefined intermediate data for the data iterator.
