@@ -36,8 +36,8 @@ from vitaflow.run.executor import Executor
 log = logging.getLogger('tensorflow')
 log.setLevel(logging.DEBUG)
 
-CGREEN2  = '\33[92m'
-CEND      = '\33[0m'
+CGREEN2 = '\33[92m'
+CEND = '\33[0m'
 
 
 class Experiments(object):
@@ -68,8 +68,8 @@ class Experiments(object):
         """
 
         print_debug("Dynamically importing dataset : " + dataset_name)
-        dataset =  DatasetFactory.get(dataset_file_name=dataset_name)
-        return  dataset
+        dataset = DatasetFactory.get(dataset_file_name=dataset_name)
+        return dataset
 
     def get_iterator_reference(self, iterator_name):
         """
@@ -79,8 +79,8 @@ class Experiments(object):
         """
 
         print_debug("Dynamically importing iterator : " + iterator_name)
-        iterator =  DataIteratorFactory.get(iterator_name=iterator_name)
-        return  iterator
+        iterator = DataIteratorFactory.get(iterator_name=iterator_name)
+        return iterator
 
     def get_model_reference(self, model_name):
         """
@@ -90,13 +90,13 @@ class Experiments(object):
         """
 
         print_debug("Dynamically importing model : " + model_name)
-        model =  ModelsFactory.get(model_name=model_name)
+        model = ModelsFactory.get(model_name=model_name)
         return  model
 
     def check_interoperability_n_import(self):
         # Using factory classes get the handle for the actual classes from string
         self._dataset = self.get_dataset_reference(self._hparams['dataset_name'])
-        self._data_iterator  = self.get_iterator_reference(self._hparams['data_iterator_name'])
+        self._data_iterator = self.get_iterator_reference(self._hparams['data_iterator_name'])
         self._model = self.get_model_reference(self._hparams['model_name'])
 
         # if not self._data_iterator.dataset_type == self._dataset.dataset_type:
@@ -128,7 +128,7 @@ class Experiments(object):
         self.check_interoperability_n_import()
         # Initialize the handles and call any user specific init() methods
         self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_name']])
-        self._data_iterator  = self._data_iterator(hparams=self._hparams[self._hparams['data_iterator_name']], dataset = self._dataset)
+        self._data_iterator = self._data_iterator(hparams=self._hparams[self._hparams['data_iterator_name']], dataset = self._dataset)
         self._model = self._model(hparams=self._hparams[self._hparams['model_name']], data_iterator=self._data_iterator)
 
     def test_dataset(self):

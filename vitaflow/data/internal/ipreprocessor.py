@@ -47,18 +47,16 @@ class IPreprocessor():
         '''
         self._hparams = HParams(hparams, self.default_hparams())
 
-        self.EXPERIMENT_ROOT_DIR = self._hparams.experiment_root_directory + \
-                                   "/" + self._hparams.experiment_name
-
-        self.DATA_OUT_DIR = self.EXPERIMENT_ROOT_DIR + "/" + \
-                            self._hparams.preprocessed_data_path + "/"
-
-        self.TRAIN_OUT_PATH = self.DATA_OUT_DIR + "/" + \
-                              self._hparams.train_data_path + "/"
-        self.VAL_OUT_PATH = self.DATA_OUT_DIR + "/" + \
-                            self._hparams.validation_data_path + "/"
-        self.TEST_OUT_PATH = self.DATA_OUT_DIR + "/" + \
-                             self._hparams.test_data_path + "/"
+        self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,
+                                                self._hparams.experiment_name)
+        self.DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
+                                         self._hparams.preprocessed_data_path + "/")
+        self.TRAIN_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
+                                           self._hparams.train_data_path + "/")
+        self.VAL_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
+                                         self._hparams.validation_data_path + "/")
+        self.TEST_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
+                                          self._hparams.test_data_path + "/")
 
 
     @staticmethod

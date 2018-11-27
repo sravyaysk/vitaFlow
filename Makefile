@@ -20,7 +20,7 @@ build: ## building docker image
 	docker build --rm -t vitaflow:${IMAGE_VERSION} .
 
 run: # run the VitaFlow Docker
-	@echo "Running - RUN"
+	@echo "Running vitaflow/vitaflow-app - RUN"
 	docker run -d --name vitaflow vitaflow:${IMAGE_VERSION} /bin/bash
 
 rm: ## rm

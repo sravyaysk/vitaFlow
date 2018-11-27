@@ -32,12 +32,15 @@ def is_callable(x):
     """
     try:
         _is_callable = callable(x)
-    except: # pylint: disable=bare-except
+    except:
+        # pylint: disable=bare-except
         _is_callable = hasattr(x, '__call__')
     return _is_callable
 
+
 def _type_name(value):
     return type(value).__name__
+
 
 class HParams(object):
     """A class that maintains hyperparameters for configing vitaFlow modules.
