@@ -19,7 +19,6 @@ import sys
 from importlib import import_module
 
 
-
 class ModelsFactory():
     """
     Factory class to import the models dynamically.
@@ -27,13 +26,12 @@ class ModelsFactory():
     with the change of the filename
     """
     model_path = {
-        "bilstm_crf" : "vitaflow.models.text.seq2seq.bilstm_crf",
+        "bilstm_crf": "vitaflow.models.text.seq2seq.bilstm_crf",
     }
 
     models = {
-        "bilstm_crf" : "BiLSTMCrf"
+        "bilstm_crf": "BiLSTMCrf"
     }
-
 
     def __init__(self):
         pass
@@ -51,7 +49,6 @@ class ModelsFactory():
             raise NotImplemented("Given config file name not found: {}".format(name))
         # Return the model class
         return model
-
 
     @staticmethod
     def get(model_name):

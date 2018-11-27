@@ -38,6 +38,7 @@ __all__ = [
     # "Vocab"
 ]
 
+
 class SpecialTokens(object):
     """Special tokens, including :attr:`PAD`, :attr:`BOS`, :attr:`EOS`,
     :attr:`UNK`. These tokens will by default have token ids 0, 1, 3, 4,
@@ -83,7 +84,6 @@ def _make_defaultdict(keys, values, default_value):
         dict_[k] = v
 
     return dict_
-
 
 # class Vocab(object):
 #     """Vocabulary class that loads vocabulary from file, and maintains mapping

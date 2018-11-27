@@ -23,6 +23,7 @@ from tensorflow.python.platform import gfile
 from vitaflow.helpers.print_helper import *
 from vitaflow.data.text.vocabulary import SpecialTokens
 
+
 def naive_vocab_creater(out_file_name, lines, use_nlp):
     '''
     Given list of lines it extracts the vocab from each line and dumps it to the file.
@@ -58,7 +59,7 @@ def naive_vocab_creater(out_file_name, lines, use_nlp):
         # Create a file and store the words
         with gfile.Open(out_file_name, 'w') as f:
             for word in final_vocab:
-                    f.write("{}\n".format(word))
+                f.write("{}\n".format(word))
     else:
         with open(out_file_name) as file:
             lines = []
@@ -68,6 +69,7 @@ def naive_vocab_creater(out_file_name, lines, use_nlp):
         final_vocab = list(lines)
 
     return len(final_vocab), final_vocab
+
 
 def vocab_to_tsv(out_file_name, vocab_list):
     '''
@@ -94,6 +96,7 @@ def vocab_to_tsv(out_file_name, vocab_list):
 
     mapper = {c: i for i, c in enumerate(vocab_list)}
     return mapper
+
 
 def get_char_vocab(words_vocab):
     '''

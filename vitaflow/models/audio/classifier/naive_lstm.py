@@ -19,6 +19,7 @@ import tensorflow as tf
 from overrides import overrides
 from vitaflow.models.internal.classifer_base import ClassifierBase
 
+
 class NaiveLSTM(ClassifierBase):
     def __init__(self, hparams=None):
         super(NaiveLSTM, self).__init__(hparams=hparams)
@@ -29,8 +30,8 @@ class NaiveLSTM(ClassifierBase):
         """
         hparams = {
             "name": "lstm_naive",
-            "out_dim" : -1,
-            "learning_rate" : 0.001
+            "out_dim": -1,
+            "learning_rate": 0.001
         }
         return hparams
 
@@ -77,11 +78,11 @@ class NaiveLSTM(ClassifierBase):
 
             # [BATCH_SIZE, MAX_SEQ_LENGTH, 2*WORD_LEVEL_LSTM_HIDDEN_SIZE) TODO check MAX_SEQ_LENGTH?
             bilstm_out = tf.concat([fw_output_one,
-                                          bw_output_one], axis=-1, name="fw_bw")
+                                    bw_output_one], axis=-1, name="fw_bw")
 
             tf.logging.info('bilstm_out -----> {}'.format(bilstm_out))
 
-            encoded_data = tf.reshape(bilstm_out, shape=[-1, 128*64])
+            encoded_data = tf.reshape(bilstm_out, shape=[-1, 128 * 64])
 
             tf.logging.info('encoded_data -----> {}'.format(encoded_data))
 
@@ -97,5 +98,3 @@ class NaiveLSTM(ClassifierBase):
             tf.logging.info('combined_logits: ------> {}'.format(combined_logits))
 
             return combined_logits
-
-

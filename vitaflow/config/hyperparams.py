@@ -28,7 +28,7 @@ __all__ = [
 
 
 def is_callable(x):
-    """Return `True` if :attr:`x` is callable.
+    """Return `True` if provided `x` is callable.
     """
     try:
         _is_callable = callable(x)
@@ -149,6 +149,7 @@ class HParams(object):
             :attr:`default_hparams`, except for the case of :attr:`"kwargs"` as
             above.
     """
+
     # - The default hyperparameters in :attr:`"kwargs"` are used (for typecheck\
     # and complementing missing hyperparameters) only when :attr:`"type"` \
     # takes default value (i.e., missing in :attr:`hparams` or set to \
@@ -170,7 +171,7 @@ class HParams(object):
         super(HParams, self).__setattr__('_hparams', parsed_hparams)
 
     @staticmethod
-    def _parse(hparams, # pylint: disable=too-many-branches, too-many-statements
+    def _parse(hparams,  # pylint: disable=too-many-branches, too-many-statements
                default_hparams,
                allow_new_hparam=False):
         """Parses hyperparameters.
@@ -377,4 +378,3 @@ class HParams(object):
             if isinstance(value, HParams):
                 dict_[name] = value.todict()
         return dict_
-

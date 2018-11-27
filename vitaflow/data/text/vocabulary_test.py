@@ -14,6 +14,7 @@ import tensorflow as tf
 
 from vitaflow.data.text import vocabulary
 
+
 # pylint: disable=protected-access
 
 class VocabularyTest(tf.test.TestCase):
@@ -57,4 +58,3 @@ class VocabularyTest(tf.test.TestCase):
 
 if __name__ == "__main__":
     tf.test.main()
-

@@ -21,6 +21,7 @@ import numpy as np
 
 from vitaflow.config.hyperparams import HParams
 
+
 def dict_patch(tgt_dict, src_dict):
     """Recursively patch :attr:`tgt_dict` by adding items from :attr:`src_dict`
     that do not exist in :attr:`tgt_dict`.
@@ -45,6 +46,7 @@ def dict_patch(tgt_dict, src_dict):
             tgt_dict[key] = dict_patch(tgt_dict[key], value)
     return tgt_dict
 
+
 def dict_lookup(dict_, keys, default=None):
     """Looks up :attr:`keys` in the dict, returns the corresponding values.
 
@@ -64,6 +66,7 @@ def dict_lookup(dict_, keys, default=None):
         TypeError: If key is not in :attr:`dict_` and :attr:`default` is `None`.
     """
     return np.vectorize(lambda x: dict_.get(x, default))(keys)
+
 
 def dict_fetch(src_dict, tgt_dict_or_keys):
     """Fetches a sub dict of :attr:`src_dict` with the keys in
@@ -93,6 +96,7 @@ def dict_fetch(src_dict, tgt_dict_or_keys):
 
     return {k: src_dict[k] for k in keys if k in src_dict}
 
+
 def dict_pop(dict_, pop_keys, default=None):
     """Removes keys from a dict and returns their values.
 
@@ -110,6 +114,7 @@ def dict_pop(dict_, pop_keys, default=None):
         pop_keys = [pop_keys]
     ret_dict = {key: dict_.pop(key, default) for key in pop_keys}
     return ret_dict
+
 
 def flatten_dict(dict_, parent_key="", sep="."):
     """Flattens a nested dictionary. Namedtuples within the dictionary are

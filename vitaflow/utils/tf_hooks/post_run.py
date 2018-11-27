@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class PostRunTaskHook(tf.train.SessionRunHook):
     """Hook to initialise utils iterator after Session is created."""
 

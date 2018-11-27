@@ -18,11 +18,13 @@ Dataset type classes
 
 from vitaflow.config.hyperparams import HParams
 
+
 class IDatasetType():
     """
     `Datasets that follow CoNLL format <http://universaldependencies.org/docs/format.html>`_.
 
     """
+
     def __init__(self):
         pass
 
@@ -54,6 +56,7 @@ class ICoNLLType1(IDatasetType):
     Dataset consists of three CSV files for train//val/test respectively.
     Each CSV has four columns namely `WORD ENTITY_COL1 ENTITY_COL2 ENTITY_COL3`.
     """
+
     def __init__(self):
         IDatasetType.__init__(self)
         self.TEXT_COL = "0"

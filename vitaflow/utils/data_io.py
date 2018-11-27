@@ -8,11 +8,13 @@ from six.moves import urllib
 import requests
 import tensorflow as tf
 
+
 def maybe_create_dir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
         return True
     return False
+
 
 def maybe_download(urls, path, filenames=None, extract=False):
     """Downloads a set of files.
@@ -74,6 +76,7 @@ def maybe_download(urls, path, filenames=None, extract=False):
 
     return result
 
+
 def _download(url, filename, path):
     def _progress(count, block_size, total_size):
         percent = float(count * block_size) / float(total_size) * 100.
@@ -91,6 +94,7 @@ def _download(url, filename, path):
 
     return filepath
 
+
 def _extract_google_drive_file_id(url):
     # id is between `/d/` and '/'
     #     url_suffix = url[url.find('/d/')+3:]
@@ -99,10 +103,12 @@ def _extract_google_drive_file_id(url):
     file_id = url.split("=")[-1]
     return file_id
 
+
 def _download_from_google_drive(url, filename, path):
     """Adapted from `https://github.com/saurabhshri/gdrive-downloader`
     """
     print(url)
+
     def _get_confirm_token(response):
         for key, value in response.cookies.items():
             if key.startswith('download_warning'):

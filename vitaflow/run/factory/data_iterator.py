@@ -27,16 +27,15 @@ class DataIteratorFactory():
     """
 
     iterator_path = {
-        "conll_csv_iterator" : "vitaflow.data.text.iterators.conll_csv_iterator",
-        "conll_csv_in_memory" : "vitaflow.data.text.iterators.conll_csv_in_memory"
+        "conll_csv_iterator": "vitaflow.data.text.iterators.conll_csv_iterator",
+        "conll_csv_in_memory": "vitaflow.data.text.iterators.conll_csv_in_memory"
     }
 
     iterators = {
-        "conll_csv_iterator" : "CoNLLCsvDataIterator",
-        "conll_csv_in_memory" : "CoNLLCsvInMemory"
+        "conll_csv_iterator": "CoNLLCsvDataIterator",
+        "conll_csv_in_memory": "CoNLLCsvInMemory"
 
     }
-
 
     def __init__(self):
         pass
@@ -49,7 +48,8 @@ class DataIteratorFactory():
         :return:
         """
         try:
-            data_iterator = getattr(import_module(DataIteratorFactory.iterator_path[name]), DataIteratorFactory.iterators[name])
+            data_iterator = getattr(import_module(DataIteratorFactory.iterator_path[name]),
+                                    DataIteratorFactory.iterators[name])
         except KeyError:
             raise NotImplemented("Given data iterator file name not found: {}".format(name))
         # Return the model class
@@ -65,7 +65,6 @@ class DataIteratorFactory():
         iterator = DataIteratorFactory._get_iterator(iterator_name)
         return iterator
 
-
     @staticmethod
     def get_supported_data_iterators(dataset_type):
         possible_data_iterators = []
@@ -75,5 +74,3 @@ class DataIteratorFactory():
                 possible_data_iterators.append(iterator_name)
 
         return possible_data_iterators
-
-
