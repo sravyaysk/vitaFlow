@@ -21,9 +21,6 @@ config = FLAGS.config_python_file.replace("/", ".")
 config = config.replace(".py", "")
 config = importlib.import_module(config)
 
-import pdb
-
-pdb.set_trace()
 
 if __name__ == "__main__":
     print(' -' * 35)

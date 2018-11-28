@@ -1,0 +1,24 @@
+# TODO add version number
+# cython3 --install-option="--no-cython-compile"
+
+# Code Quality
+flake8
+
+# Standard Framework
+pandas
+numpy
+sklearn
+tqdm
+overrides
+
+# Deep Learning framework
+# .[tensorflow-cpu] --install-option='-e'
+
+#NLP
+spacy
+
+## Audio Libs
+# pyAudioAnalysis
+# eyed3
+# pydub
+# madmom
