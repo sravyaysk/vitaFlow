@@ -21,6 +21,7 @@ __version__ = '0.0.1'
 __author__ = 'Mageswaran Dhandapani <mageswaran1989@gmail.com>'
 
 import os
+
 from vitaflow.config.hyperparams import HParams
 
 
@@ -43,10 +44,10 @@ class IPreprocessor():
     """
 
     def __init__(self, hparams=None):
-        '''
+        """
 
-        :param
-        '''
+        :param hparams:
+        """
         self._hparams = HParams(hparams, self.default_hparams())
 
         self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,

@@ -18,19 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import sys
-import os
-import argparse
-from tqdm import tqdm
-import tensorflow as tf
 import logging
 
-from vitaflow.run.factory.dataset import DatasetFactory
-from vitaflow.run.factory.data_iterator import DataIteratorFactory
-from vitaflow.run.factory.model import ModelsFactory
-from vitaflow.helpers.print_helper import *
+import tensorflow as tf
+from tqdm import tqdm
+
 from vitaflow.config.hyperparams import HParams
+from vitaflow.helpers.print_helper import *
 from vitaflow.run.executor import Executor
+from vitaflow.run.factory.data_iterator import DataIteratorFactory
+from vitaflow.run.factory.dataset import DatasetFactory
+from vitaflow.run.factory.model import ModelsFactory
 
 # get TF logger
 log = logging.getLogger('tensorflow')
@@ -117,12 +115,12 @@ class Experiments(object):
         run_config.allow_soft_placement = True
         run_config.log_device_placement = False
         model_dir = self._model.model_dir
-        self._run_config = tf.contrib.learn.RunConfig(session_config=run_config,
-                                                      save_checkpoints_steps=50,
-                                                      keep_checkpoint_max=5,
-                                                      save_summary_steps=25,
-                                                      model_dir=model_dir,
-                                                      log_step_count_steps=10)
+        self._run_config = tf.estimator.RunConfig(session_config=run_config,
+                                                  save_checkpoints_steps=50,
+                                                  keep_checkpoint_max=5,
+                                                  save_summary_steps=25,
+                                                  model_dir=model_dir,
+                                                  log_step_count_steps=10)
         return run_config
 
     def setup(self):
@@ -134,7 +132,7 @@ class Experiments(object):
         self._model = self._model(hparams=self._hparams[self._hparams['model_name']], data_iterator=self._data_iterator)
 
     def test_dataset(self):
-        iterator = self._data_iterator.train_input_fn().make_initializable_iterator()
+        iterator = self._data_iterator.test_sentence_input_fn("@ º &").make_initializable_iterator()
         next_element = iterator.get_next()
         # print_debug(next_element)
         init_op = iterator.initializer
@@ -145,7 +143,6 @@ class Experiments(object):
             res = sess.run(next_element)
             print_debug(res[0])
             print_debug(res[1])
-            print_debug(res[2])
             # Move the iterator back to the beginning
             # sess.run(init_op)
             # print(sess.run(next_element))
@@ -153,13 +150,13 @@ class Experiments(object):
     def run(self):
         self.setup()
 
-        # self.test_dataset()
-        # return
         num_samples = self._data_iterator.num_train_samples
         batch_size = self._hparams[self._hparams['data_iterator_name']].batch_size
         num_epochs = self._hparams.num_epochs
         mode = self.mode
+
         self._init_tf_config()
+
         exec = Executor(model=self._model, data_iterator=self._data_iterator, config=self._run_config)
 
         if (mode == "train" or mode == "retrain"):

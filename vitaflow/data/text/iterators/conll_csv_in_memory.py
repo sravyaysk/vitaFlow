@@ -15,24 +15,22 @@
 CoNLL 2003 dataset iterator class
 """
 
-import sys
 import os
 import pickle
-from overrides import overrides
+
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 import tensorflow as tf
 from overrides import overrides
-import numpy as np
+from tqdm import tqdm
 
-from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
-from vitaflow.data.text.vocabulary import SpecialTokens
-from vitaflow.data.internal.iterator_base import IIteratorBase
 from vitaflow.config.hyperparams import HParams
-from vitaflow.helpers.os_helper import check_n_makedirs
 from vitaflow.data.internal import IPreprocessor
+from vitaflow.data.internal.iterator_base import IIteratorBase
+from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
 from vitaflow.data.text.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, vocab_to_tsv
+from vitaflow.data.text.vocabulary import SpecialTokens
+from vitaflow.helpers.os_helper import check_n_makedirs
 from vitaflow.helpers.print_helper import *
 
 
@@ -429,7 +427,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         char_ids_feature2 = []
 
         list_text = sentence.split()
-        list_char_ids = [[char_2_id_map.get(c, 0) for c in str(word)] for word in list_text]
+        list_char_ids = [[char_2_id_map.get(c, SpecialTokens.UNK_CHAR_ID) for c in str(word)] for word in list_text]
 
         sentence_feature1.append("{}".format(self._hparams.seperator).join(list_text))
         char_ids_feature2.append(list_char_ids)
@@ -442,7 +440,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
             sentence_feature1 = np.array(sentence_feature1)
 
             char_ids_feature2, seq_length = self._pad_sequences(char_ids_feature2, nlevels=2,
-                                                                pad_tok=int(SpecialTokens.PAD_CHAR_ID))
+                                                                pad_tok=SpecialTokens.PAD_CHAR_ID)
             char_ids_feature2 = np.array(char_ids_feature2)
             seq_length = np.array(seq_length)
 

@@ -70,6 +70,7 @@ class IIteratorBase():
     def set_dataset(self, dataset):
         """
         Inheriting class must check for the data set type and raise runtime error if not matched
+        :type dataset: object
         :param dataset:
         :return:
         """
@@ -99,6 +100,8 @@ class IIteratorBase():
     def _get_predict_text_input_function(self, sentence):
         """
 
+        :type sentence: str
+        :param sentence:
         :return:
         """
         raise NotImplementedError
@@ -127,6 +130,7 @@ class IIteratorBase():
     def test_sentence_input_fn(self, sentence):
         """
 
+        :param sentence:
         :return:
         """
         return self._get_predict_text_input_function(sentence)
@@ -142,9 +146,9 @@ class IIteratorBase():
 
     def predict_on_text(self, predict_fn):
         '''
-        Use this for user interaction on the fly
-        :param estimator: One of the models that support this data iterator
-        :param sentence: Text deliminated by space
-        :return:
+        
+        :type predict_fn: object
+        :param predict_fn: 
+        :return: 
         '''
         raise NotImplementedError
