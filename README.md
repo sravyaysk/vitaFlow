@@ -103,6 +103,7 @@ Change the line to
 ```python
 flags.DEFINE_string("mode", "predict", "train/retrain/predict")
 ```
+
 Things to remember 
 - Place all the files to be predicted in the test folder
 - Change the mode to predict
