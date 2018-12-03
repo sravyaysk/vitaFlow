@@ -84,35 +84,41 @@ dataset and data iterator modules.
 This level of configuration and project design will allows as to iterate the Deep Learning ideas as fast as possible to 
 meet the business demands.
 
-In order to perform train, retrain or prediction, the mode flag in file ~/vitaflow/run/experiments.py must be
-changed
+In order to perform train, retrain or prediction, the mode flag must be passed as an option.
 
-As an example we provide ~/vitaFlow/examples/conll2003/config.py file, which will have the location of the train, val and test files location. The locations will be used getting and storing files during the experiments.
+The mode can take option like "train", "retrain" and "predict"
 
-In order to train change the line to 
-```python
-flags.DEFINE_string("mode", "train", "train/retrain/predict")
-``` 
-For retraining or continuing from last checkpoint, change the line to 
-```python
-flags.DEFINE_string("mode", "retrain", "train/retrain/predict")
+In order to train, run the command
+
+``` bash
+cd /path/to/vitaflow/
+python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py --mode=train
+```
+
+For retraining or continuing from last checkpoint, change the commnad to 
+
+``` bash
+cd /path/to/vitaflow/
+python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py --mode=retrain
 ```
 After training the model, the prediction of the test files with the help of model will be done using predict mode.
 
 Change the line to 
-```python
-flags.DEFINE_string("mode", "predict", "train/retrain/predict")
+``` bash
+cd /path/to/vitaflow/
+python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py --mode=predict
 ```
 
 Things to remember 
 - Place all the files to be predicted in the test folder
-- Change the mode to predict
+- Run the run.py with the mode=predict
 - Run experiment as specified above
         
 The predictions will be placed in the folder ~/{experiment_root_directory}/{experiment_name}/{iterator_name}/predictions.
 
 In order to run prediction on single sentence (required for web demo) a function called predict_sentence is provided as member in the executor object.
 Calling this function with a sentence will return the the list of (token,tags).  
+
 ## Future Road Map
 
 Add support for set of open datasets across domains and corresponding models based on published papers, tweak the model
