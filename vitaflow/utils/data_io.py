@@ -3,10 +3,12 @@ import sys
 import tarfile
 import zipfile
 import collections
-import numpy as np
-from six.moves import urllib
 import requests
+import numpy as np
 import tensorflow as tf
+
+
+from six.moves import urllib
 
 
 def maybe_create_dir(directory):

@@ -44,10 +44,10 @@ class IPreprocessor():
     """
 
     def __init__(self, hparams=None):
-        """
+        '''
 
-        :param hparams:
-        """
+        :param
+        '''
         self._hparams = HParams(hparams, self.default_hparams())
 
         self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,

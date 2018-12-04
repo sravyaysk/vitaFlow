@@ -14,9 +14,9 @@
 """
 
 """
+import tensorflow as tf
 
 from tensorflow.python.platform import gfile
-import tensorflow as tf
 
 
 def tf_vocab_processor(lines, out_file_name, max_doc_length=1000, min_frequency=0):

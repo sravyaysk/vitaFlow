@@ -73,28 +73,30 @@ def naive_vocab_creater(out_file_name, lines, use_nlp):
 
 def vocab_to_tsv(out_file_name, vocab_list):
     '''
-    Stores the vocab list into a file or retrives if already present as a mapper
+    Stores the vocab list to a file & returns a vocab mapper(vocab -> id).
+    If the file is already available, retrives it from stored file.
     :param vocab_list: List of words/characters
     :return: Character to ID mapper
     '''
-
     if not os.path.exists(out_file_name):
         with gfile.Open(out_file_name, 'w') as file:
+            mapper = dict()
+            i = 0
             for word in tqdm(vocab_list):
                 if len(word) > 0:
                     file.write("{}\n".format(word))
-
-        nwords = len(vocab_list)
-        print('{} words into {}'.format(nwords, out_file_name))
+                    mapper[word] = i
+                    i += 1
+        print('{} words into {}'.format(len(vocab_list), out_file_name))
+        # mapper = {c: i for i, c in enumerate(vocab_list)}
     else:
+        # TODO: Reading a file is costlier than re-creating if from list.
         with open(out_file_name) as file:
-            lines = []
-            for line in file:
-                line = line.strip("\n")
-                lines.append(line)
-        vocab_list = list(lines)
-
-    mapper = {c: i for i, c in enumerate(vocab_list)}
+            # lines = []
+            # for line in file:
+            #     line = line.strip("\n")
+            #     lines.append(line)
+            mapper = {c.strip("\n"): i for i, c in enumerate(file)}
     return mapper
 
 
