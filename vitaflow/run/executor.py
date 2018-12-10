@@ -161,19 +161,17 @@ class Executor(object):
 
     def predict(self):
         '''
-
-        :param steps:
-        :param checkpoint_path:
+        Runs the prediction on list of file to be tagged
         :return:
         '''
-
         predict_fn = self._estimator.predict(input_fn=lambda: self._data_iterator.test_input_fn())
         self._data_iterator.predict_on_test_files(predict_fn)
 
     def predict_sentence(self, sentence):
         '''
-
-        :return:
+        Runs prediction on a single sentence
+        :param sentence: A single sentence whose tokens are separated by space
+        :return: tuple of (words_n,tags_n)
         '''
         predict_fn = self._estimator.predict(input_fn=lambda: self._data_iterator.test_sentence_input_fn(sentence))
         results = self._data_iterator.predict_on_text(predict_fn)

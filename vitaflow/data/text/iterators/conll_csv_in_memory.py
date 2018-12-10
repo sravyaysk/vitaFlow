@@ -36,12 +36,13 @@ from vitaflow.helpers.print_helper import *
 
 class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
     def __init__(self, hparams=None, dataset=None):
-        """
+        '''
         Data Iterators with different features type are expected to
         implement this interface, exposing the input functions and their hooks
-        :param experiment_dir:
-        :param batch_size:
-        """
+
+        :param hparams:
+        :param dataset:
+        '''
         IIteratorBase.__init__(self, hparams=hparams, dataset=dataset)
         ITextFeature.__init__(self)
         self._hparams = HParams(hparams, self.default_hparams())
@@ -320,9 +321,8 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         :param max_word_length:
         :return:
         '''
+        sequence_padded, sequence_length = [], []
         if nlevels == 1:
-            sequence_padded = []
-            sequence_length = []
             max_length = max(map(lambda x: len(x.split(self._hparams.seperator)), sequences))
             # sequence_padded, sequence_length = _pad_sequences(sequences,
             #                                                   pad_tok, max_length)
@@ -337,7 +337,6 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         elif nlevels == 2:
             # max_length_word = max([max(map(lambda x: len(x), seq))
             #                        for seq in sequences])
-            sequence_padded, sequence_length = [], []
             for seq in tqdm(sequences):
                 # all words are same length now
                 sp, sl = self.__pad_sequences(seq, pad_tok, max_word_length)
@@ -416,7 +415,7 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
     def _make_seq_pair_text(self, sentence, char_2_id_map, use_char_embd):
         '''
 
-        :param df_files_path: Path to read files that are compatible with Pandas
+        :param sentence:
         :param char_2_id_map:
         :param use_char_embd:
         :return:
@@ -451,22 +450,20 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
             return sentence_feature1, None, None
 
     def get_padded_data(self, file_name):
-        file_path = self.EXPERIMENT_ROOT_DIR + '/' + file_name
+        file_path = os.path.join(self.EXPERIMENT_ROOT_DIR , file_name)
         if os.path.exists(file_path):
             print_info("Reading the padded data...")
-            f = open(file_path, 'rb')
-            data = pickle.load(f)
-            f.close()
+            with open(file_path, 'rb') as f:
+                data = pickle.load(f)
             return data
         else:
             return None
 
     def store_padded_data(self, file_name, data):
-        file_path = self.EXPERIMENT_ROOT_DIR + '/' + file_name
+        file_path = os.path.join(self.EXPERIMENT_ROOT_DIR , file_name)
         print_info("Writing the padded data...")
-        f = open(file_path, 'wb')
-        pickle.dump(data, f)
-        f.close()
+        with open(file_path, 'wb') as f:
+            pickle.dump(data, f)
         return None
 
     @overrides
@@ -484,8 +481,8 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         else:
             train_sentences, train_char_ids, train_ner_tags = data
 
-        print_error(train_char_ids)
-        print_info(train_ner_tags)
+        # print_error(train_char_ids)
+        # print_info(train_ner_tags)
         if self._hparams.use_char_embd:
             dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences,
                                                            self.FEATURE_2_NAME: train_char_ids},
@@ -513,8 +510,8 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         else:
             train_sentences, train_char_ids, train_ner_tags = data
 
-        print_error(train_char_ids)
-        print_info(train_ner_tags)
+        # print_error(train_char_ids)
+        # print_info(train_ner_tags)
         if self._hparams.use_char_embd:
             dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences,
                                                            self.FEATURE_2_NAME: train_char_ids},
@@ -542,8 +539,8 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
         else:
             train_sentences, train_char_ids, train_ner_tags = data
 
-        print_error(train_char_ids)
-        print_info(train_ner_tags)
+        # print_error(train_char_ids)
+        # print_info(train_ner_tags)
         if self._hparams.use_char_embd:
             dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences,
                                                            self.FEATURE_2_NAME: train_char_ids},
@@ -566,8 +563,8 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
                                      char_2_id_map=self.CHAR_2_ID_MAP,
                                      use_char_embd=self._hparams.use_char_embd)
 
-        print_error(train_char_ids)
-        print_info(train_ner_tags)
+        # print_error(train_char_ids)
+        # print_info(train_ner_tags)
         if self._hparams.use_char_embd:
             dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: train_sentences,
                                                            self.FEATURE_2_NAME: train_char_ids}, np.zeros(1)))
@@ -582,18 +579,19 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
     def predict_on_test_files(self, predict_fn):
         '''
         Iterate through the files and use `predict_on_test_file`, for prediction
-        :param estimator: One of the models that support this data iterator
-        :param df_files_path: Files that can be opened by the pandas
+        :param predict_fn:
         :return: Creates a folder estimator.model_dir/predictions/ and adds the predicted files
         '''
+
         predictions = []
+
         for predict in predict_fn:
             predictions.append(predict)
 
         results = []
-        files = self._test_files_path
 
-        for each_prediction, file in zip(predictions, files):
+        # Get the files from test folder and zip it with predictions
+        for each_prediction, file in zip(predictions, self._test_files_path):
 
             df = pd.read_csv(file)
 
@@ -637,20 +635,21 @@ class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
 
             df["predicted_id"] = [j for i, j in
                                   zip(df[self._hparams.text_col].astype(str).values.tolist(), predicted_id)]
-            out_dir = self.OUT_DIR + "/predictions/"
+
+            out_dir = os.path.join(self.OUT_DIR ,"predictions")
             check_n_makedirs(out_dir)
-            df.to_csv(out_dir + ntpath.basename(file), index=False)
+            df.to_csv(out_dir + os.path.basename(file), index=False)
 
         return results
 
     @overrides
     def predict_on_text(self, predict_fn):
         '''
-        Use this for user interaction on the fly
-        :param estimator: One of the models that support this data iterator
-        :param sentence: Text deliminated by space
+
+        :param predict_fn:
         :return:
         '''
+
         predicted_id = []
         confidence = []
         for each_prediction in predict_fn:
