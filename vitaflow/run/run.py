@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import importlib
 import os
 import sys
-import importlib
+
 import tensorflow as tf
 
 # Appending vitaFlow main Path
@@ -24,7 +25,7 @@ config = importlib.import_module(config)
 
 if __name__ == "__main__":
     print(' -' * 35)
-    print('Running Experiment: Conll')
+    print('Running Experiment:',config.experiment_name)
     print(' -' * 35)
     import spacy
 
