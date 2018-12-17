@@ -84,41 +84,6 @@ dataset and data iterator modules.
 This level of configuration and project design will allows as to iterate the Deep Learning ideas as fast as possible to 
 meet the business demands.
 
-In order to perform train, retrain or prediction, the mode flag must be passed as an option.
-
-The mode can take option like "train", "retrain" and "predict"
-
-In order to train, run the command
-
-``` bash
-cd /path/to/vitaflow/
-python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py --mode=train
-```
-
-For retraining or continuing from last checkpoint, change the commnad to 
-
-``` bash
-cd /path/to/vitaflow/
-python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py --mode=retrain
-```
-After training the model, the prediction of the test files with the help of model will be done using predict mode.
-
-Change the line to 
-``` bash
-cd /path/to/vitaflow/
-python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py --mode=predict
-```
-
-Things to remember 
-- Place all the files to be predicted in the test folder
-- Run the run.py with the mode=predict
-- Run experiment as specified above
-        
-The predictions will be placed in the folder ~/{experiment_root_directory}/{experiment_name}/{iterator_name}/predictions.
-
-In order to run prediction on single sentence (required for web demo) a function called predict_sentence is provided as member in the executor object.
-Calling this function with a sentence will return the the list of (token,tags).  
-
 ## Future Road Map
 
 Add support for set of open datasets across domains and corresponding models based on published papers, tweak the model
@@ -129,4 +94,4 @@ With that in place, we hope it would reduce lot of efforts when we have to addre
 **As an example**: 
 We currently have Sequence to Sequence model(s) (text and character level embeddings) based on CoNLL dataset.
 With that model and iterator in place, we can address any Seq2Seq model requirements, once we write a Dataset 
-module for the new data that gives some predefined intermediate data for the data iterator.
+module for the new data that gives some predefined intermediate data for the data iterator. For a working example refer [conll2003](examples/conll2003/README.md) folder
