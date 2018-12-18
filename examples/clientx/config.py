@@ -9,6 +9,10 @@ experiments = {
     "dataset_class_with_path": "examples.clientx.clientx_dataset.CLIENTXDataset",
     "iterator_class_with_path": "vitaflow.data.text.iterators.CSVSeqToSeqIterator",
     "model_class_with_path": "vitaflow.models.text.seq2seq.BiLSTMCrf",
+    "save_checkpoints_steps" : 50,
+    "keep_checkpoint_max" : 5,
+    "save_summary_steps" : 25,
+    "log_step_count_steps" : 10,
 
     # dataset - details
     "clientx_dataset": {

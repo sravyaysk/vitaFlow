@@ -143,10 +143,6 @@ class Experiments(object):
         return run_config
 
     def setup(self):
-
-        print_warn(self._hparams)
-        print_error(self._hparams[self._hparams['dataset_class_with_path']])
-
         self.check_interoperability_n_import()
         # Initialize the handles and call any user specific init() methods
         self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_class_with_path']])

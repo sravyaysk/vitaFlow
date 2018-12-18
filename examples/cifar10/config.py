@@ -11,9 +11,9 @@ experiment_name = "asariri_dataset"
 
 experiments = {
     "num_epochs": 5,
-    "dataset_name": "Cifar10Dataset",
-    "data_iterator_name": "Cifar10BasicIterator",
-    "model_name": "vitaflow.models.image.gan.vanilla_gan.VanillaGAN",
+    "dataset_class_with_path": "examples.cifar10.dataset.Cifar10Dataset",
+    "iterator_class_with_path": "examples.cifar10.cifar10_basic_iterator.Cifar10BasicIterator",
+    "model_class_with_path": "vitaflow.models.image.gan.vanilla_gan.VanillaGAN",
     "save_checkpoints_steps" : 1000,
     "keep_checkpoint_max" : 5,
     "save_summary_steps" : 25,
