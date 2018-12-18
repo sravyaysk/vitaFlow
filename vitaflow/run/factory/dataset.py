@@ -33,11 +33,13 @@ class DatasetFactory():
     dataset_path = {
         # file_name : package
         "conll_2003_dataset": "vitaflow.data.text.conll.conll_2003_dataset",
+        "clientx_dataset": "vitaflow.data.text.clientx.client_dataset",
     }
 
     datasets = {
         # file_name : class_name
-        "conll_2003_dataset": "CoNLL2003Dataset"
+        "conll_2003_dataset": "CoNLL2003Dataset",
+        "clinetx_dataset": "CLIENTXDataset"
     }
 
     @staticmethod
