@@ -24,9 +24,9 @@ import shutil
 import pandas as pd
 from tqdm import tqdm
 
-from vitaflow.core.ipreprocessor import IPreprocessor
-from vitaflow.core.dataset_types.dataset_types import ICoNLLType1
-from vitaflow.core.hyperparams import HParams
+from vitaflow.core import IPreprocessor
+from vitaflow.core.dataset_types import ICoNLLType1
+from vitaflow.core import HParams
 from vitaflow.data.text.vocabulary import SpecialTokens
 from vitaflow.utils.data_io import maybe_download
 from vitaflow.helpers.print_helper import *

@@ -15,6 +15,10 @@
 
 """
 
+class SingleFeature():
+    def __init__(self):
+        self.FEATURE_NAME = None
+        self.LABEL_NAME = None
 
 class TwoFeatures:
     def __init__(self):
@@ -29,6 +33,13 @@ class TwoFeatures:
     def __eq__(self, other):
         """Override the default Equals behavior"""
         return self.FEATURE_TYPE == other.FEATURE_NAME and self.NUM_FEATURES == other.NUM_FEATURES
+
+
+class ImageFeature(SingleFeature):
+    def __init__(self):
+        SingleFeature.__init__(self)
+        self.FEATURE_NAME = "image"
+        self.LABEL_NAME = "label"
 
 
 class ITextFeature(TwoFeatures):

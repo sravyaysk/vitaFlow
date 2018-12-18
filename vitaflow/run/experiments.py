@@ -51,7 +51,16 @@ class Experiments(object):
 
     @staticmethod
     def default_hparams():
-        return None
+        return {
+            "num_epochs": 5,
+            "dataset_class_with_path": None,
+            "iterator_class_with_path": None,
+            "model_class_with_path": None,
+            "save_checkpoints_steps" : 50,
+            "keep_checkpoint_max" : 5,
+            "save_summary_steps" : 25,
+            "log_step_count_steps" : 10
+        }
 
     def _get_class(self, package, name):
         """
@@ -126,11 +135,11 @@ class Experiments(object):
         run_config.log_device_placement = False
         model_dir = self._model.model_dir
         self._run_config = tf.estimator.RunConfig(session_config=run_config,
-                                                  save_checkpoints_steps=50,
-                                                  keep_checkpoint_max=5,
-                                                  save_summary_steps=25,
+                                                  save_checkpoints_steps=self._hparams.save_checkpoints_steps,
+                                                  keep_checkpoint_max=self._hparams.keep_checkpoint_max,
+                                                  save_summary_steps=self._hparams.save_summary_steps,
                                                   model_dir=model_dir,
-                                                  log_step_count_steps=10)
+                                                  log_step_count_steps=self._hparams.log_step_count_steps)
         return run_config
 
     def setup(self):
