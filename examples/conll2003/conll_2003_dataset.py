@@ -12,39 +12,92 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-CLIENTX Dataset Class
+CoNLL Dataset Class
 """
 
-__all__ = ["CLIENTXDataset"]
+__all__ = ["CoNLL2003Dataset"]
 __version__ = '0.0.1'
-__author__ = 'Gaurish Thakkar'
+__author__ = 'Mageswaran Dhandapani <mageswaran1989@gmail.com>'
 
 import os
 import shutil
 import pandas as pd
 from tqdm import tqdm
 
-from vitaflow.data.internal.ipreprocessor import IPreprocessor
-from vitaflow.data.text.iterators.internal.dataset_types import ICLIENTXType1
-from vitaflow.config.hyperparams import HParams
+from vitaflow.core.ipreprocessor import IPreprocessor
+from vitaflow.core.dataset_types.dataset_types import ICoNLLType1
+from vitaflow.core.hyperparams import HParams
 from vitaflow.data.text.vocabulary import SpecialTokens
 from vitaflow.utils.data_io import maybe_download
 from vitaflow.helpers.print_helper import *
 
 
-class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
+class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
     """
-    Converts the given train, val, test folder to IOB format
+    Downloads the data and converts the text file into CSV file for each sentence along with its tags.
+        - CoNLL dataset : https://github.com/synalp/NER/tree/master/corpus/CoNLL-2003
+        - GDrive : https://drive.google.com/open?id=1tdwxPJnnkyO-s1oHDETj89cfgLC2xp0c
 
     .. code-block:: text
 
+        Sample Raw Data:
 
+            EU NNP B-NP B-ORG
+            rejects VBZ B-VP O
+            German JJ B-NP B-MISC
+            call NN I-NP O
+            to TO B-VP O
+            boycott VB I-VP O
+            British JJ B-NP B-MISC
+            lamb NN I-NP O
+            . . O O
+
+        Preprocessed Data:
+
+            0,1,2,3
+            EU,NNP,B-NP,B-ORG
+            rejects,VBZ,B-VP,O
+            German,JJ,B-NP,B-MISC
+            call,NN,I-NP,O
+            to,TO,B-VP,O
+            boycott,VB,I-VP,O
+            British,JJ,B-NP,B-MISC
+            lamb,NN,I-NP,O
+            .,.,O,O
+
+        ~/vitaflow/CoNLL2003Dataset/
+                raw_data/
+                    train.txt
+                    test.txt
+                    val.txt
+                preprocessed_data/
+                    train/
+                    val/
+                    test/
     """
 
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
         self._hparams = HParams(hparams, self.default_hparams())
+        # self._download_path =  self._hparams.experiment_root_directory + \
+        #                  "/" + self._hparams.experiment_name + \
+        #                 "/raw_data/"
+        self._download_path = os.path.join(
+            self._hparams.experiment_root_directory,
+            self._hparams.experiment_name,
+            "raw_data/"
+        )
+        self._link = "https://drive.google.com/open?id=1tdwxPJnnkyO-s1oHDETj89cfgLC2xp0c"
 
+        maybe_download(urls=self._link,
+                       path=self._download_path,
+                       filenames="conll2003.zip",
+                       extract=True)
+
+        self._prepare_data()
+
+    @staticmethod
+    def default_hparams():
         """
         .. role:: python(code)
            :language: python
@@ -96,9 +149,9 @@ class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
         hparams = IPreprocessor.default_hparams()
 
         hparams.update({
-            "experiment_name": "CLIENTXDataset",
+            "experiment_name": "CoNLL2003Dataset",
             "minimum_num_words": 5,
-            "over_write": False
+            "over_write": False,
         })
 
         return hparams
@@ -120,7 +173,7 @@ class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
             print_info("Creating data folder: {}".format(self.DATA_OUT_DIR))
             os.makedirs(self.DATA_OUT_DIR)
 
-    def _place_dataset(self, origin_file_path, out_dir):
+    def _conll_to_csv(self, txt_file_path, out_dir):
         """
         Converts CoNLL 2003 data set text files into CSV file for each
         example/statement.
@@ -128,11 +181,6 @@ class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
         :param out_dir: Output directory to store CSV files
         :return: Creates files in the specified train/val/test paths
         """
-        from distutils.dir_util import copy_tree
-
-        # copy subdirectory example
-        copy_tree(origin_file_path, out_dir)
-
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
         else:
@@ -141,22 +189,41 @@ class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
 
         print_info("Writing data to {}...".format(out_dir))
 
+        # Read the text file
+        df = pd.read_csv(txt_file_path,
+                         sep=" ",
+                         skip_blank_lines=False,
+                         header=None).fillna(SpecialTokens.UNK_WORD)
 
+        # Filter out the DOCSTART lines
+        df = df[~df[0].str.contains("DOCSTART")]
+
+        current_file = []
+
+        for i in tqdm(range(len(df))):
+            row = df.values[i]
+            if row[0] != SpecialTokens.UNK_WORD:
+                current_file.append(row)
+            else:
+                # Consider dumping files with size 2
+                if len(current_file) > self._hparams.minimum_num_words:
+                    current_file = pd.DataFrame(current_file)
+                    current_file.to_csv(out_dir + "/{}.csv".format(i), index=False)
+                    current_file = []
 
     def _prepare_data(self):
         """
-        Prepares the data for training
-        :return:
+        Prepares the data for training 
+        :return: 
         """
-        #TODO hardcoded values need to change
         print_info("Preprocessing the train data...")
-        self._place_dataset(os.path.join("/home/gaurishk/vita-temp", "train"),
+        self._conll_to_csv(os.path.join(self._download_path, "train.txt"),
                            self.TRAIN_OUT_PATH)
 
         print_info("Preprocessing the test data...")
-        self._place_dataset(os.path.join("/home/gaurishk/vita-temp", "test"),
+        self._conll_to_csv(os.path.join(self._download_path, "test.txt"),
                            self.TEST_OUT_PATH)
 
         print_info("Preprocessing the validation data...")
-        self._place_dataset(os.path.join("/home/gaurishk/vita-temp", "val"),
+        self._conll_to_csv(os.path.join(self._download_path, "val.txt"),
                            self.VAL_OUT_PATH)

@@ -105,7 +105,8 @@ class Executor(object):
             hooks=self._eval_hooks)
 
     def train(self, max_steps=None):
-        """Trains the model. See :tf_main:`tf.estimator.Estimator.train
+        """
+        Trains the model. See :tf_main:`tf.estimator.Estimator.train
         <estimator/Estimator#train>` for more details.
 
         Args:
@@ -121,7 +122,8 @@ class Executor(object):
             max_steps=train_spec.max_steps)
 
     def evaluate(self, steps=None, checkpoint_path=None):
-        """Evaluates the model. See :tf_main:`tf.estimator.Estimator.evaluate
+        """
+        Evaluates the model. See :tf_main:`tf.estimator.Estimator.evaluate
         <estimator/Estimator#evaluate>` for more details.
 
         Args:
@@ -142,7 +144,8 @@ class Executor(object):
             checkpoint_path=checkpoint_path)
 
     def train_and_evaluate(self, max_train_steps=None, eval_steps=None):
-        """Trains and evaluates the model. See
+        """
+        Trains and evaluates the model. See
         :tf_main:`tf.estimator.train_and_evaluate
         <estimator/train_and_evaluate>` for more details.
 
@@ -160,19 +163,19 @@ class Executor(object):
         tf.estimator.train_and_evaluate(self._estimator, train_spec, eval_spec)
 
     def predict(self):
-        '''
+        """
         Runs the prediction on list of file to be tagged
         :return:
-        '''
+        """
         predict_fn = self._estimator.predict(input_fn=lambda: self._data_iterator.test_input_fn())
         self._data_iterator.predict_on_test_files(predict_fn)
 
     def predict_sentence(self, sentence):
-        '''
+        """
         Runs prediction on a single sentence
         :param sentence: A single sentence whose tokens are separated by space
         :return: tuple of (words_n,tags_n)
-        '''
+        """
         predict_fn = self._estimator.predict(input_fn=lambda: self._data_iterator.test_sentence_input_fn(sentence))
         results = self._data_iterator.predict_on_text(predict_fn)
         print(list(zip(sentence.split(), results)))

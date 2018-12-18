@@ -14,4 +14,4 @@
 """
 Modules of vitaflow library iterators.
 """
-from vitaflow.data.text.iterators.conll_csv_in_memory import CoNLLCsvInMemory
+from vitaflow.data.text.iterators.csv_seq_to_seq_iterator import CSVSeqToSeqIterator

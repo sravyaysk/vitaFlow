@@ -22,11 +22,11 @@ import tensorflow as tf
 from tensorflow.contrib.learn import ModeKeys
 from tensorflow.contrib import lookup
 
-from vitaflow.config.hyperparams import HParams
-from vitaflow.data.text.iterators.conll_csv_in_memory import CoNLLCsvInMemory
+from vitaflow.core.hyperparams import HParams
+from vitaflow.data.text.iterators.csv_seq_to_seq_iterator import CSVSeqToSeqIterator
 from vitaflow.data.text.vocabulary import SpecialTokens
-from vitaflow.models.internal.model_base import ModelBase
-from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
+from vitaflow.core.models.model_base import ModelBase
+from vitaflow.core.features.feature_types import ITextFeature
 from vitaflow.helpers.tf_data_helper import get_sequence_length
 from vitaflow.helpers.print_helper import *
 
@@ -64,7 +64,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
 
     """
 
-    def __init__(self, hparams=None, data_iterator: CoNLLCsvInMemory = None):
+    def __init__(self, hparams=None, data_iterator: CSVSeqToSeqIterator = None):
         ITextFeature.__init__(self)
         self._hparams = HParams(hparams,
                                 self.default_hparams(),
@@ -161,16 +161,6 @@ class BiLSTMCrf(ModelBase, ITextFeature):
             "keep_propability": 0.5,
         }
         return hparams
-
-    @property
-    def model_dir(self):
-        """
-        Returns model directory `model_directory`/`experiment_name`/BiLSTMCrf
-        :return:
-        """
-        return os.path.join(self._hparams.model_directory,
-                            self._hparams.experiment_name,
-                            type(self).__name__)
 
 
     def _build_layers(self, features, mode):

@@ -51,7 +51,7 @@ def predict_api():
     model_api = serve.get_model_api(model_dir, abs_fpath)
     os.remove(abs_fpath)
 
-    if (len(model_api) == 0):
+    if not model_api:
         return '''Not Supported.<a href="/predict">Click here to go back.</a>'''
     else:
         return model_api[0].to_json(orient='records', lines=True) + '''

@@ -17,7 +17,7 @@ Naive LSTM Audio classifier
 
 import tensorflow as tf
 from overrides import overrides
-from vitaflow.models.internal.classifer_base import ClassifierBase
+from vitaflow.core.models.classifer_base import ClassifierBase
 
 
 class NaiveLSTM(ClassifierBase):

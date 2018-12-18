@@ -6,12 +6,12 @@ use_char_embd = True
 
 experiments = {
     "num_epochs": 5,
-    "dataset_name": "conll_2003_dataset",
-    "data_iterator_name": "conll_csv_in_memory",
-    "model_name": "bilstm_crf",
+    "dataset_class_with_path": "examples.conll2003.conll_2003_dataset.CoNLL2003Dataset",
+    "iterator_class_with_path": "vitaflow.data.text.iterators.CSVSeqToSeqIterator",
+    "model_class_with_path": "vitaflow.models.text.seq2seq.BiLSTMCrf",
 
     # dataset - details
-    "conll_2003_dataset": {
+    "examples.conll2003.conll_2003_dataset.CoNLL2003Dataset": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "preprocessed_data_path": "preprocessed_data",
@@ -23,7 +23,7 @@ experiments = {
     },
 
     # data iterator
-    "conll_csv_in_memory": {
+    "vitaflow.data.text.iterators.CSVSeqToSeqIterator": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "iterator_name": "conll_data_iterator",
@@ -41,7 +41,7 @@ experiments = {
     },
 
     # data model
-    "bilstm_crf": {
+    "vitaflow.models.text.seq2seq.BiLSTMCrf": {
         "model_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "use_char_embd": use_char_embd,

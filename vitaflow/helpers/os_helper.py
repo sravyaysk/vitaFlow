@@ -28,8 +28,7 @@ def check_n_makedirs(path):
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
-    if not os.path.exists(dst):
-        os.makedirs(dst)
+    check_n_makedirs(dst)
     for item in tqdm(os.listdir(src)):
         s = os.path.join(src, item)
         d = os.path.join(dst, item)

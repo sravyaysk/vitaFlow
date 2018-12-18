@@ -16,10 +16,12 @@
 Data iterator base class
 """
 
-from vitaflow.config.hyperparams import HParams
+from abc import ABC
+
+from vitaflow.core.hyperparams import HParams
 
 
-class IIteratorBase():
+class IIteratorBase(ABC):
     def __init__(self, hparams=None, dataset=None):
         self._hparams = HParams(hparams, self.default_hparams())
         # self.set_dataset(dataset=dataset)

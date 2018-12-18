@@ -14,21 +14,15 @@
 """
 Experiments class that allows easy plug n play of modules
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import logging
+from importlib import import_module
 
 import tensorflow as tf
 from tqdm import tqdm
 
-from vitaflow.config.hyperparams import HParams
+from vitaflow.core.hyperparams import HParams
 from vitaflow.helpers.print_helper import *
 from vitaflow.run.executor import Executor
-from vitaflow.run.factory.data_iterator import DataIteratorFactory
-from vitaflow.run.factory.dataset import DatasetFactory
-from vitaflow.run.factory.model import ModelsFactory
 
 # get TF logger
 log = logging.getLogger('tensorflow')
@@ -47,7 +41,7 @@ class Experiments(object):
     """
 
     def __init__(self, hparams, mode='train'):
-        self._hparams = HParams(hparams, self.default_hparams())
+        self._hparams = HParams(hparams, self.default_hparams(), allow_new_hparam=True)
 
         self.mode = mode
 
@@ -59,44 +53,60 @@ class Experiments(object):
     def default_hparams():
         return None
 
-    def get_dataset_reference(self, dataset_name):
+    def _get_class(self, package, name):
+        """
+        Import the givenpackage and the class dynmaically
+        :param package: Pacakage path of the class
+        :param name: Name of the class
+        :return: Instance of the class object
+        """
+        return getattr(import_module(package), name)
+
+    def get_dataset_reference(self, dataset_class_with_path):
         """
         Uses the dataset name to get the reference from the dataset factory class
-        :param dataset_name:
+        :param dataset_class_with_path:
         :return:
+        Eg: vitaflow.data.text.conll.conll_2003_dataset.CoNLL2003Dataset
         """
 
-        print_debug("Dynamically importing dataset : " + dataset_name)
-        dataset = DatasetFactory.get(dataset_file_name=dataset_name)
+        print_debug("Dynamically importing dataset : " + dataset_class_with_path)
+        package, name = dataset_class_with_path.rsplit(".", 1)
+        # dataset = DatasetFactory.get(dataset_file_name=dataset_name)
+        dataset = self._get_class(package=package, name=name)
         return dataset
 
-    def get_iterator_reference(self, iterator_name):
+    def get_iterator_reference(self, iterator_class_with_path):
         """
         Uses the iterator name to get the reference from the iterator factory class
-        :param iterator_name:
+        :param iterator_class_with_path:
         :return:
         """
 
-        print_debug("Dynamically importing iterator : " + iterator_name)
-        iterator = DataIteratorFactory.get(iterator_name=iterator_name)
+        print_debug("Dynamically importing iterator : " + iterator_class_with_path)
+        # iterator = DataIteratorFactory.get(iterator_name=iterator_name)
+        package, name = iterator_class_with_path.rsplit(".", 1)
+        iterator = self._get_class(package=package, name=name)
         return iterator
 
-    def get_model_reference(self, model_name):
+    def get_model_reference(self, model_class_with_path):
         """
         Uses the model name to get the reference from the model factory class
-        :param model_name:
+        :param model_class_with_path:
         :return:
         """
 
-        print_debug("Dynamically importing model : " + model_name)
-        model = ModelsFactory.get(model_name=model_name)
+        print_debug("Dynamically importing model : " + model_class_with_path)
+        package, name = model_class_with_path.rsplit(".", 1)
+        model = self._get_class(package=package, name=name)
+        # model = ModelsFactory.get(model_name=model_name)
         return model
 
     def check_interoperability_n_import(self):
-        # Using factory classes get the handle for the actual classes from string
-        self._dataset = self.get_dataset_reference(self._hparams['dataset_name'])
-        self._data_iterator = self.get_iterator_reference(self._hparams['data_iterator_name'])
-        self._model = self.get_model_reference(self._hparams['model_name'])
+        #Using factory classes get the handle for the actual classes from string
+        self._dataset = self.get_dataset_reference(self._hparams['dataset_class_with_path'])
+        self._data_iterator = self.get_iterator_reference(self._hparams['iterator_class_with_path'])
+        self._model = self.get_model_reference(self._hparams['model_class_with_path'])
 
         # if not self._data_iterator.dataset_type == self._dataset.dataset_type:
         #     print_info("Possible data iterators are: {}".
@@ -124,12 +134,16 @@ class Experiments(object):
         return run_config
 
     def setup(self):
+
+        print_warn(self._hparams)
+        print_error(self._hparams[self._hparams['dataset_class_with_path']])
+
         self.check_interoperability_n_import()
         # Initialize the handles and call any user specific init() methods
-        self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_name']])
-        self._data_iterator = self._data_iterator(hparams=self._hparams[self._hparams['data_iterator_name']],
+        self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_class_with_path']])
+        self._data_iterator = self._data_iterator(hparams=self._hparams[self._hparams['iterator_class_with_path']],
                                                   dataset=self._dataset)
-        self._model = self._model(hparams=self._hparams[self._hparams['model_name']], data_iterator=self._data_iterator)
+        self._model = self._model(hparams=self._hparams[self._hparams['model_class_with_path']], data_iterator=self._data_iterator)
 
     def test_dataset(self):
         iterator = self._data_iterator.test_sentence_input_fn("@ º &").make_initializable_iterator()
@@ -151,7 +165,7 @@ class Experiments(object):
         self.setup()
 
         num_samples = self._data_iterator.num_train_samples
-        batch_size = self._hparams[self._hparams['data_iterator_name']].batch_size
+        batch_size = self._hparams[self._hparams['iterator_class_with_path']].batch_size
         num_epochs = self._hparams.num_epochs
         mode = self.mode
 

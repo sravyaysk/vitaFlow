@@ -6,9 +6,9 @@ use_char_embd = True
 
 experiments = {
     "num_epochs": 6,
-    "dataset_name": "clientx_dataset",
-    "data_iterator_name": "conll_csv_in_memory",
-    "model_name": "bilstm_crf",
+    "dataset_class_with_path": "examples.clientx.clientx_dataset.CLIENTXDataset",
+    "iterator_class_with_path": "vitaflow.data.text.iterators.CSVSeqToSeqIterator",
+    "model_class_with_path": "vitaflow.models.text.seq2seq.BiLSTMCrf",
 
     # dataset - details
     "clientx_dataset": {

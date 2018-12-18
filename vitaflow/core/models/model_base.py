@@ -14,12 +14,9 @@
 """
 Base class for models.
 """
+import os
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from vitaflow.config.hyperparams import HParams
+from vitaflow.core.hyperparams import HParams
 
 # pylint: disable=too-many-arguments
 
@@ -98,3 +95,13 @@ class ModelBase(object):
         of the model.
         """
         return self._hparams
+
+    @property
+    def model_dir(self):
+        """
+        Returns model directory `model_directory`/`experiment_name`/VanillaGAN
+        :return:
+        """
+        return os.path.join(self._hparams.model_directory,
+                            self._hparams.experiment_name,
+                            type(self).__name__)

@@ -21,7 +21,7 @@ from tensorflow.python.platform import gfile
 
 def tf_vocab_processor(lines, out_file_name, max_doc_length=1000, min_frequency=0):
     # Create vocabulary
-    # min_frequency -> consider a word if and only it repeats for fiven count
+    # min_frequency -> consider a word if and only it repeats for given count
     vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(max_doc_length,
                                                                          min_frequency=min_frequency)
     vocab_processor.fit(lines)

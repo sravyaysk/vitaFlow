@@ -16,19 +16,7 @@
 Helper functions and classes for vocabulary processing.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
-import warnings
 from collections import defaultdict
-
-import tensorflow as tf
-from tensorflow import gfile
-import numpy as np
-
-from vitaflow.config.hyperparams_utils import dict_lookup
 
 # pylint: disable=too-few-public-methods, invalid-name
 # pylint: disable=too-many-instance-attributes, too-many-arguments

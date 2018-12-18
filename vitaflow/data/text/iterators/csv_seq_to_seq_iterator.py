@@ -24,22 +24,19 @@ import tensorflow as tf
 from overrides import overrides
 from tqdm import tqdm
 
-from vitaflow.config.hyperparams import HParams
-from vitaflow.data.internal import IPreprocessor
-from vitaflow.data.internal.iterator_base import IIteratorBase
-from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
-from vitaflow.data.text.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, vocab_to_tsv
+from vitaflow.core import HParams
+from vitaflow.core import IPreprocessor
+from vitaflow.core import IIteratorBase
+from vitaflow.core.features import ITextFeature
+from vitaflow.core.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, vocab_to_tsv
 from vitaflow.data.text.vocabulary import SpecialTokens
 from vitaflow.helpers.os_helper import check_n_makedirs
-from vitaflow.helpers.print_helper import *
+from vitaflow.helpers.print_helper import print_info
 
 
-class CoNLLCsvInMemory(IIteratorBase, ITextFeature):
+class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):
     def __init__(self, hparams=None, dataset=None):
         '''
-        Data Iterators with different features type are expected to
-        implement this interface, exposing the input functions and their hooks
-
         :param hparams:
         :param dataset:
         '''

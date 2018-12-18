@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Modules of vitaFlow library config.
+Modules of vitaflow library core.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-# pylint: disable=wildcard-import
-
-from vitaflow.config.hyperparams import *
+from vitaflow.core.hyperparams import HParams
+from vitaflow.core.ipreprocessor import IPreprocessor
+from vitaflow.core.iterator_base import IIteratorBase
+from vitaflow.core.features.feature_types import ITextFeature

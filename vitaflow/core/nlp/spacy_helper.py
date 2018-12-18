@@ -20,7 +20,7 @@ import os
 from tqdm import tqdm
 from tensorflow.python.platform import gfile
 
-from vitaflow.helpers.print_helper import *
+from vitaflow.helpers.print_helper import print_warn
 from vitaflow.data.text.vocabulary import SpecialTokens
 
 

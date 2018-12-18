@@ -16,8 +16,6 @@
 Dataset type classes
 """
 
-from vitaflow.config.hyperparams import HParams
-
 
 class IDatasetType():
     """

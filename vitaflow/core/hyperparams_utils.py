@@ -19,7 +19,7 @@ import copy
 import collections
 import numpy as np
 
-from vitaflow.config.hyperparams import HParams
+from vitaflow.core.hyperparams import HParams
 
 
 def dict_patch(tgt_dict, src_dict):

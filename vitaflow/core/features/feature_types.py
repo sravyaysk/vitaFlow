@@ -16,7 +16,7 @@
 """
 
 
-class TwoFeatures():
+class TwoFeatures:
     def __init__(self):
         self.NUM_FEATURES = 2
         self.FEATURE_TYPE = None

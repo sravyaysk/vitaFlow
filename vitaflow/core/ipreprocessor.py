@@ -22,7 +22,7 @@ __author__ = 'Mageswaran Dhandapani <mageswaran1989@gmail.com>'
 
 import os
 
-from vitaflow.config.hyperparams import HParams
+from vitaflow.core.hyperparams import HParams
 
 
 class IPreprocessor():

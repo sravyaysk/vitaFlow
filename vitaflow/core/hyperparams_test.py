@@ -25,7 +25,7 @@ import pickle
 import tempfile
 import tensorflow as tf
 
-from vitaflow.config.hyperparams import HParams
+from vitaflow.core.hyperparams import HParams
 
 
 # pylint: disable=no-member
