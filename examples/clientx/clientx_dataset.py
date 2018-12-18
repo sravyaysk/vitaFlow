@@ -22,9 +22,9 @@ __author__ = 'Gaurish Thakkar'
 import os
 import shutil
 
-from vitaflow.core.ipreprocessor import IPreprocessor
 from vitaflow.core.dataset_types.dataset_types import ICLIENTXType1
 from vitaflow.core.hyperparams import HParams
+from vitaflow.core.ipreprocessor import IPreprocessor
 from vitaflow.helpers.print_helper import *
 
 
@@ -40,7 +40,9 @@ class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
         self._hparams = HParams(hparams, self.default_hparams())
-
+        self._prepare_data()
+    @staticmethod
+    def default_hparams():
         """
         .. role:: python(code)
            :language: python
@@ -94,9 +96,9 @@ class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
         hparams.update({
             "experiment_name": "CLIENTXDataset",
             "minimum_num_words": 5,
-            "over_write": False
+            "over_write": False,
+            "temp-data": os.path.join(os.path.expanduser("~"), "vita-temp/"),
         })
-
         return hparams
 
     def _create_target_directories(self):
@@ -146,13 +148,13 @@ class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
         """
         #TODO hardcoded values need to change
         print_info("Preprocessing the train data...")
-        self._place_dataset(os.path.join("/home/gaurishk/vita-temp", "train"),
+        self._place_dataset(os.path.join(self._hparams["temp-data"], "train"),
                            self.TRAIN_OUT_PATH)
 
         print_info("Preprocessing the test data...")
-        self._place_dataset(os.path.join("/home/gaurishk/vita-temp", "test"),
+        self._place_dataset(os.path.join(self._hparams["temp-data"], "test"),
                            self.TEST_OUT_PATH)
 
         print_info("Preprocessing the validation data...")
-        self._place_dataset(os.path.join("/home/gaurishk/vita-temp", "val"),
+        self._place_dataset(os.path.join(self._hparams["temp-data"], "val"),
                            self.VAL_OUT_PATH)

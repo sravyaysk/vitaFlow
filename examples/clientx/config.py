@@ -15,7 +15,7 @@ experiments = {
     "log_step_count_steps" : 10,
 
     # dataset - details
-    "clientx_dataset": {
+    "examples.clientx.clientx_dataset.CLIENTXDataset": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "preprocessed_data_path": "preprocessed_data",
@@ -27,7 +27,7 @@ experiments = {
     },
 
     # data iterator
-    "conll_csv_in_memory": {
+    "vitaflow.data.text.iterators.CSVSeqToSeqIterator": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "iterator_name": "conll_data_iterator",
@@ -45,7 +45,7 @@ experiments = {
     },
 
     # data model
-    "bilstm_crf": {
+    "vitaflow.models.text.seq2seq.BiLSTMCrf": {
         "model_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "use_char_embd": use_char_embd,
