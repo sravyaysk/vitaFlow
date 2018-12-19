@@ -25,8 +25,8 @@ from overrides import overrides
 from tqdm import tqdm
 
 from vitaflow.core import HParams
-from vitaflow.core import IPreprocessor
 from vitaflow.core import IIteratorBase
+from vitaflow.core import IPreprocessor
 from vitaflow.core.features import ITextFeature
 from vitaflow.core.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, vocab_to_tsv
 from vitaflow.data.text.vocabulary import SpecialTokens
@@ -635,7 +635,7 @@ class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):
 
             out_dir = os.path.join(self.OUT_DIR ,"predictions")
             check_n_makedirs(out_dir)
-            df.to_csv(out_dir + os.path.basename(file), index=False)
+            df.to_csv(os.path.join(out_dir ,os.path.basename(file)), index=False)
 
         return results
 

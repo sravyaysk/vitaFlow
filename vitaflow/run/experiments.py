@@ -181,7 +181,9 @@ class Experiments(object):
         if (mode == "train" or mode == "retrain"):
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
+                print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
                 exec.train(max_steps=current_max_steps)  # , eval_steps=None)
+                print("\n\n Evaluating for epoch\n\n", current_epoch)
                 exec.evaluate(steps=200)
 
         elif (mode == "predict"):
