@@ -30,7 +30,7 @@ experiments = {
     "vitaflow.data.text.iterators.CSVSeqToSeqIterator": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
-        "iterator_name": "conll_data_iterator",
+        "iterator_name": "clientx_data_iterator",
         "preprocessed_data_path": "preprocessed_data",
         "train_data_path": "train",
         "validation_data_path": "val",
