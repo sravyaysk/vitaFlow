@@ -185,10 +185,10 @@ Place all the files to be predicted in the val folder
 
 ```reStructuredText
 $HOME
-	├── {experiment_root_directory}
-		├──	{experiment_name}
-			├── {iterator_name}
-				├── predictions
+├──{experiment_root_directory}
+    ├──{experiment_name}
+       ├── {iterator_name}
+          └── predictions
 ```
 
 
@@ -199,10 +199,10 @@ In current scenario, the location of the prediction folder would be the followin
 
 ```reStructuredText
 $HOME
-	├──vitaFlow
-		├──conll_2003_dataset
-			├──conll_data_iterator
-				├──predictions
+├──vitaFlow
+    ├──conll_2003_dataset
+        ├──conll_data_iterator
+            └──predictions
 ​```
 ```
 
