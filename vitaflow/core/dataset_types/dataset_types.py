@@ -35,7 +35,7 @@ class IDatasetType():
         return type(self).__name__
 
 
-class ICoNLLType1(IDatasetType):
+class ICSVSeq2SeqType1(IDatasetType):
     """
     Datasets with `WORD ENTITY_COL1 ENTITY_COL2 ENTITY_COL3`.
     There will be three labels for given sentence which is broken into words.
@@ -94,62 +94,62 @@ class ICoNLLType1(IDatasetType):
     def entity_col3(self, entity_col3):
         self.ENTITY_COL3 = entity_col3
 
-
-class ICLIENTXType1(IDatasetType):
-    """
-    Datasets with `WORD ENTITY_COL1 ENTITY_COL2 ENTITY_COL3`.
-    There will be three labels for given sentence which is broken into words.
-    .. code-block:: text
-
-        By IN B-PP O
-        stumps NNS B-NP O
-        Kent NNP B-NP B-ORG
-        had VBD B-VP O
-        reached VBN I-VP O
-        108 CD B-NP O
-        for IN B-PP O
-        three CD B-NP O
-        . . O O
-
-    Dataset consists of three CSV files for train//val/test respectively.
-    Each CSV has four columns namely `WORD ENTITY_COL1 ENTITY_COL2 ENTITY_COL3`.
-    """
-
-    def __init__(self):
-        IDatasetType.__init__(self)
-        self.TEXT_COL = "word"
-        self.ENTITY_COL1 = "1"
-        self.ENTITY_COL2 = "2"
-        self.ENTITY_COL3 = "3"
-
-    @property
-    def text_col(self):
-        return self.TEXT_COL
-
-    @text_col.setter
-    def text_col(self, text_col):
-        self.TEXT_COL = text_col
-
-    @property
-    def entity_col1(self):
-        return self.ENTITY_COL1
-
-    @entity_col1.setter
-    def entity_col1(self, entity_col1):
-        self.ENTITY_COL1 = entity_col1
-
-    @property
-    def entity_col2(self):
-        return self.ENTITY_COL2
-
-    @entity_col2.setter
-    def entity_col2(self, entity_col2):
-        self.ENTITY_COL2 = entity_col2
-
-    @property
-    def entity_col3(self):
-        return self.ENTITY_COL3
-
-    @entity_col3.setter
-    def entity_col3(self, entity_col3):
-        self.ENTITY_COL3 = entity_col3
+#
+# class ICLIENTXType1(IDatasetType):
+#     """
+#     Datasets with `WORD ENTITY_COL1 ENTITY_COL2 ENTITY_COL3`.
+#     There will be three labels for given sentence which is broken into words.
+#     .. code-block:: text
+#
+#         By IN B-PP O
+#         stumps NNS B-NP O
+#         Kent NNP B-NP B-ORG
+#         had VBD B-VP O
+#         reached VBN I-VP O
+#         108 CD B-NP O
+#         for IN B-PP O
+#         three CD B-NP O
+#         . . O O
+#
+#     Dataset consists of three CSV files for train//val/test respectively.
+#     Each CSV has four columns namely `WORD ENTITY_COL1 ENTITY_COL2 ENTITY_COL3`.
+#     """
+#
+#     def __init__(self):
+#         IDatasetType.__init__(self)
+#         self.TEXT_COL = "word"
+#         self.ENTITY_COL1 = "1"
+#         self.ENTITY_COL2 = "2"
+#         self.ENTITY_COL3 = "3"
+#
+#     @property
+#     def text_col(self):
+#         return self.TEXT_COL
+#
+#     @text_col.setter
+#     def text_col(self, text_col):
+#         self.TEXT_COL = text_col
+#
+#     @property
+#     def entity_col1(self):
+#         return self.ENTITY_COL1
+#
+#     @entity_col1.setter
+#     def entity_col1(self, entity_col1):
+#         self.ENTITY_COL1 = entity_col1
+#
+#     @property
+#     def entity_col2(self):
+#         return self.ENTITY_COL2
+#
+#     @entity_col2.setter
+#     def entity_col2(self, entity_col2):
+#         self.ENTITY_COL2 = entity_col2
+#
+#     @property
+#     def entity_col3(self):
+#         return self.ENTITY_COL3
+#
+#     @entity_col3.setter
+#     def entity_col3(self, entity_col3):
+#         self.ENTITY_COL3 = entity_col3

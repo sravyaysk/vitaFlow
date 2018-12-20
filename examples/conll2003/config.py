@@ -9,10 +9,10 @@ experiments = {
     "dataset_class_with_path": "examples.conll2003.conll_2003_dataset.CoNLL2003Dataset",
     "iterator_class_with_path": "vitaflow.data.text.iterators.CSVSeqToSeqIterator",
     "model_class_with_path": "vitaflow.models.text.seq2seq.BiLSTMCrf",
-    "save_checkpoints_steps" : 50,
-    "keep_checkpoint_max" : 5,
-    "save_summary_steps" : 25,
-    "log_step_count_steps" : 10,
+    "save_checkpoints_steps": 50,
+    "keep_checkpoint_max": 5,
+    "save_summary_steps": 25,
+    "log_step_count_steps": 10,
 
     # dataset - details
     "examples.conll2003.conll_2003_dataset.CoNLL2003Dataset": {

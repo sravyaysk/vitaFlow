@@ -21,18 +21,19 @@ __author__ = 'Mageswaran Dhandapani <mageswaran1989@gmail.com>'
 
 import os
 import shutil
+
 import pandas as pd
 from tqdm import tqdm
 
-from vitaflow.core import IPreprocessor
-from vitaflow.core.dataset_types import ICoNLLType1
 from vitaflow.core import HParams
+from vitaflow.core import IPreprocessor
+from vitaflow.core.dataset_types import ICSVSeq2SeqType1
 from vitaflow.data.text.vocabulary import SpecialTokens
-from vitaflow.utils.data_io import maybe_download
 from vitaflow.helpers.print_helper import *
+from vitaflow.utils.data_io import maybe_download
 
 
-class CoNLL2003Dataset(IPreprocessor, ICoNLLType1):
+class CoNLL2003Dataset(IPreprocessor, ICSVSeq2SeqType1):
     """
     Downloads the data and converts the text file into CSV file for each sentence along with its tags.
         - CoNLL dataset : https://github.com/synalp/NER/tree/master/corpus/CoNLL-2003

@@ -10,7 +10,7 @@
 # import tensorflow as tf
 #
 # from vitaflow.config.hyperparams import HParams
-# from vitaflow.data.text.iterators.internal.dataset_types import ICoNLLType1
+# from vitaflow.data.text.iterators.internal.dataset_types import ICSVSeq2SeqType1
 # from vitaflow.data.text.iterators.internal.iconll_iterator import ICoNLLIterator
 # from vitaflow.data.text.iterators.internal.feature_types import ITextFeature
 #
@@ -65,9 +65,9 @@
 #         return hparams
 #
 #     def set_dataset(self, dataset):
-#         if not isinstance(dataset, ICoNLLType1):
+#         if not isinstance(dataset, ICSVSeq2SeqType1):
 #             raise RuntimeError("Given Dataset cant be used with this iterator")
-#         self._dataset: ICoNLLType1 = dataset
+#         self._dataset: ICSVSeq2SeqType1 = dataset
 #
 #     def _extract_vocab(self):
 #         if not os.path.exists(self.WORDS_VOCAB_FILE) \

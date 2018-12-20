@@ -15,4 +15,4 @@
 Modules of vitaflow library dataset_types.
 """
 
-from vitaflow.core.dataset_types.dataset_types import IDatasetType, ICoNLLType1, ICLIENTXType1
+from vitaflow.core.dataset_types.dataset_types import IDatasetType, ICSVSeq2SeqType1
