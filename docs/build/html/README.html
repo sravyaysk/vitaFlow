@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vitaFlow - VideoImageTextAudioFlow &mdash; vitaFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom_theme.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developers" href="api/developers.html" />
+    <link rel="prev" title="Welcome to vitaFlow’s documentation!" href="index.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> vitaFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">vitaFlow - VideoImageTextAudioFlow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#proposed-solution">Proposed Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vitaflow-in-action">vitaFlow in Action</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#future-road-map">Future Road Map</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/developers.html">Developers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/core/core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data/data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/models/models.html">Models</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="audio/AudioBasics.html">Audio Basics</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">vitaFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>vitaFlow - VideoImageTextAudioFlow</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/README.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="vitaflow-videoimagetextaudioflow">
+<span id="vitaflow-videoimagetextaudioflow"></span><h1>vitaFlow - VideoImageTextAudioFlow<a class="headerlink" href="#vitaflow-videoimagetextaudioflow" title="Permalink to this headline">¶</a></h1>
+<p><img alt="" src="_images/vitaflow-icon.png" /></p>
+<div class="section" id="introduction">
+<span id="introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Deep Learning projects are increasing exponentially in recent times and the complexity of handling such projects alike across the domains. Be it business environment or in any online competitions, the main challenge is how we can reuse the code base what we have developed for one requirement/problem statement and use it to a slightly different new requirement/problem statement.</p>
+<p>We are incubating an ideation to solve this typical software design problem for Deep Learning projects, which would simplify the whole process of data preparation, modelling and serving in a easy configurable plug and play framework.</p>
+</div>
+<div class="section" id="problem-statement">
+<span id="problem-statement"></span><h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>To come up with a framework that enables a fast prototyping of Deep Learning models that handles Video/Image/Text/Audio and provide an seamless way of serving them in different end points.</p>
+<ul class="simple">
+<li><strong>A Navie Developer</strong>: Can I get an experimentation play ground, with some set of open datasets, data iterators and models? to learn by doing?</li>
+<li><strong>A Data Scientist</strong>: Can I build a model with an avaiable open dataset and later switch to production dataset when the Data Engineering team bring in the production data?</li>
+<li><strong>A Data Engineer</strong>: Can I use any available model and run through my data during my data preparation cycle?</li>
+<li><strong>An Online competitioner</strong>: Can I reuse the models and pieces of modules that I have developed for my last competition in my current competition?</li>
+<li><strong>Business Deadlines</strong> : We had spend few months of effort while addressing a clients proposals and build a prototype.Can we showcase the prototype developed to upcoming project proposals as quick as possible?</li>
+</ul>
+<p>In our Deep Learning exploration/projects we wanted to build a framework that is modular as much as possible, plug ang play architecture for main modules and reuse our experience (hours of development and testing) from one project to another, while improving on existing capabilities without breaking it.</p>
+</div>
+<div class="section" id="proposed-solution">
+<span id="proposed-solution"></span><h2>Proposed Solution<a class="headerlink" href="#proposed-solution" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><strong>Data Science wisdom comes only through failed experimentation - Damian Mingle</strong></div></blockquote>
+<p>The thought process is to come up with following modular components which then can be then glued through
+configuration:</p>
+<ul class="simple">
+<li>Data Collection and Cleansing</li>
+<li>Dataset modules with pre-processing modules</li>
+<li>DataIterator modules (backed by <a class="reference external" href="https://www.tensorflow.org/guide/datasets">TF Data</a>)</li>
+<li>Tensorflow Models (backed by <a class="reference external" href="https://www.tensorflow.org/guide/estimators">TF Estimators</a>)</li>
+<li>An Engine to run the models</li>
+<li>Tensorflow model serving using <a class="reference external" href="https://www.tensorflow.org/lite/">TFLite</a><ul>
+<li>Web app</li>
+<li>Mobile</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="architecture">
+<span id="architecture"></span><h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<p><img alt="" src="_images/vitaflow_stack.png" /></p>
+</div>
+<div class="section" id="vitaflow-in-action">
+<span id="vitaflow-in-action"></span><h2>vitaFlow in Action<a class="headerlink" href="#vitaflow-in-action" title="Permalink to this headline">¶</a></h2>
+<p>CoNLL 2003 data set is considered since the data size small and easy to test:</p>
+<p>Run a experiment pointing to this <a class="reference external" href="examples/conll2003/config.py">config</a>,
+which uses this <a class="reference external" href="https://imaginea.github.io/vitaFlow/build/html/api/data/text/conll/conll_2003_dataset.html">dataset</a>,
+and this <a class="reference external" href="https://imaginea.github.io/vitaFlow/build/html/api/data/text/iterators/conll_csv_in_memory.html">data iterator</a>,
+and this <a class="reference external" href="https://imaginea.github.io/vitaFlow/build/html/api/models/text/seq2seq/bilstm_crf.html">model</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /path/to/vitaflow/
+python vitaflow/run/run.py --config_python_file<span class="o">=</span>examples/conll2003/config.py
+</pre></div>
+</div>
+<ul class="simple">
+<li>The whole experimentation is configured from once place, based on the string names and corresponding config params - The <code class="docutils literal notranslate"><span class="pre">experiment</span> <span class="pre">run</span> <span class="pre">engine</span></code> takes care of setting up the modules which includes but not limited to, downloading the dataset, pre-processing the dataset, iterator initialization and finally running the model with check pointing the modle data as configured.</li>
+</ul>
+<p>The big difference comes from the way the whole experiment can be configured. Say, if the model needs to replaced based on a latest paper published, it is simple as writing a model (that adheres some rules) and plugin into the vitaFlow, you are good to go with new model with old tested dataset and data iterator modules.</p>
+<p>This level of configuration and project design will allows as to iterate the Deep Learning ideas as fast as possible to meet the business demands.</p>
+</div>
+<div class="section" id="future-road-map">
+<span id="future-road-map"></span><h2>Future Road Map<a class="headerlink" href="#future-road-map" title="Permalink to this headline">¶</a></h2>
+<p>Add support for set of open datasets across domains and corresponding models based on published papers, tweak the model to derive the best insights of given dataset, while exposing right sets of  configurations for any new incoming datasets.</p>
+<p>With that in place, we hope it would reduce lot of efforts when we have to address any future requirements.</p>
+<p><strong>As an example</strong>:
+We currently have Sequence to Sequence model(s) (text and character level embeddings) based on CoNLL dataset. With that model and iterator in place, we can address any Seq2Seq model requirements, once we write a Dataset module for the new data that gives some predefined intermediate data for the data iterator. For a working example refer <a class="reference external" href="examples/conll2003/README.md">conll2003</a> folder</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api/developers.html" class="btn btn-neutral float-right" title="Developers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to vitaFlow’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, vitaFlow Team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
