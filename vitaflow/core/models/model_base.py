@@ -44,7 +44,8 @@ class ModelBase(object):
 
     @staticmethod
     def default_hparams():
-        """Returns a dictionary of hyperparameters with default values.
+        """
+        Returns a dictionary of hyperparameters with default values.
         """
         hparams = {
             "name": "modelbase"
@@ -77,21 +78,18 @@ class ModelBase(object):
         raise NotImplementedError
 
     def _build(self, features, labels, params, mode, config=None):
-        """Used for the :tf_main:`model_fn <estimator/Estimator#__init__>`
+        """
+        Used for the :tf_main:`model_fn <estimator/Estimator#__init__>`
         argument when constructing
         :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
         """
         raise NotImplementedError
 
-    # def get_input_fn(self, *args, **kwargs):
-    #     """Returns the :attr:`input_fn` function that constructs the input
-    #     data, used in :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
-    #     """
-    #     raise NotImplementedError
 
     @property
     def hparams(self):
-        """A :class:`~shabda.HParams` instance. The hyperparameters
+        """
+        A :class:`~vitaflow.core.HParams` instance. The hyperparameters
         of the model.
         """
         return self._hparams

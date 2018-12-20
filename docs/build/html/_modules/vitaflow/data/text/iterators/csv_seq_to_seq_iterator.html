@@ -1,0 +1,894 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vitaflow.data.text.iterators.csv_seq_to_seq_iterator &mdash; vitaFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/css/custom_theme.css" type="text/css" />
+    <link rel="author" title="About these documents" href="../../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> vitaFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/developers.html">Developers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/core/core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/data/data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/data/text/vocabulary.html">Vocabulary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/models/models.html">Models</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../audio/AudioBasics.html">Audio Basics</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">vitaFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vitaflow.data.text.iterators.csv_seq_to_seq_iterator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vitaflow.data.text.iterators.csv_seq_to_seq_iterator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2018 The vitFlow Authors. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">CoNLL 2003 dataset iterator class</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">overrides</span> <span class="k">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">vitaflow.core</span> <span class="k">import</span> <span class="n">HParams</span>
+<span class="kn">from</span> <span class="nn">vitaflow.core</span> <span class="k">import</span> <span class="n">IIteratorBase</span>
+<span class="kn">from</span> <span class="nn">vitaflow.core</span> <span class="k">import</span> <span class="n">IPreprocessor</span>
+<span class="kn">from</span> <span class="nn">vitaflow.core.features</span> <span class="k">import</span> <span class="n">ITextFeature</span>
+<span class="kn">from</span> <span class="nn">vitaflow.core.nlp.spacy_helper</span> <span class="k">import</span> <span class="n">naive_vocab_creater</span><span class="p">,</span> <span class="n">get_char_vocab</span><span class="p">,</span> <span class="n">vocab_to_tsv</span>
+<span class="kn">from</span> <span class="nn">vitaflow.data.text.vocabulary</span> <span class="k">import</span> <span class="n">SpecialTokens</span>
+<span class="kn">from</span> <span class="nn">vitaflow.helpers.os_helper</span> <span class="k">import</span> <span class="n">check_n_makedirs</span>
+<span class="kn">from</span> <span class="nn">vitaflow.helpers.print_helper</span> <span class="k">import</span> <span class="n">print_info</span>
+
+
+<div class="viewcode-block" id="CSVSeqToSeqIterator"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator">[docs]</a><span class="k">class</span> <span class="nc">CSVSeqToSeqIterator</span><span class="p">(</span><span class="n">IIteratorBase</span><span class="p">,</span> <span class="n">ITextFeature</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param hparams:</span>
+<span class="sd">        :param dataset:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">IIteratorBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="n">hparams</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">ITextFeature</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span> <span class="o">=</span> <span class="n">HParams</span><span class="p">(</span><span class="n">hparams</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">())</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># def _init(self):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">experiment_root_directory</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PREPROCESSED_DATA_OUT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">preprocessed_data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PREPROCESSED_DATA_OUT_DIR</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">train_data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VAL_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PREPROCESSED_DATA_OUT_DIR</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">validation_data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TEST_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PREPROCESSED_DATA_OUT_DIR</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">test_data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">iterator_name</span><span class="p">)</span>
+
+        <span class="c1"># This rule is assumed to be correct if the previous stage is of IPreprocessor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_FILES_IN_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PREPROCESSED_DATA_OUT_DIR</span><span class="p">,</span> <span class="s2">&quot;train/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VAL_FILES_IN_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PREPROCESSED_DATA_OUT_DIR</span><span class="p">,</span> <span class="s2">&quot;val/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TEST_FILES_IN_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PREPROCESSED_DATA_OUT_DIR</span><span class="p">,</span> <span class="s2">&quot;test/&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">WORDS_VOCAB_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OUT_DIR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">text_col</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="s2">&quot;vocab.tsv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CHARS_VOCAB_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OUT_DIR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">text_col</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="s2">&quot;chars_vocab.tsv&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ENTITY_VOCAB_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OUT_DIR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">entity_col</span> <span class="o">+</span> <span class="s2">&quot;_vocab.tsv&quot;</span><span class="p">)</span>
+
+        <span class="n">check_n_makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OUT_DIR</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">padded_shapes</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">([</span><span class="kc">None</span><span class="p">]),</span>  <span class="c1"># sentence of unknown size</span>
+                              <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">([</span><span class="kc">None</span><span class="p">]),</span>
+                              <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">([</span><span class="kc">None</span><span class="p">]))</span>  <span class="c1"># labels of unknown size</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">padding_values</span> <span class="o">=</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_WORD</span><span class="p">,</span>
+                               <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_CHAR</span><span class="p">,</span>  <span class="c1"># sentence padded on the right with id_pad_word</span>
+                               <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_TAG</span><span class="p">)</span>  <span class="c1"># labels padded on the right with id_pad_tag</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extract_vocab</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CSVSeqToSeqIterator.default_hparams"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.default_hparams">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">default_hparams</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        .. role:: python(code)</span>
+<span class="sd">           :language: python</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;experiment_root_directory&quot; : os.path.expanduser(&quot;~&quot;) + &quot;/vitaFlow/&quot;,</span>
+<span class="sd">                &quot;experiment_name&quot; : &quot;test_experiment&quot;,</span>
+<span class="sd">                &quot;iterator_name&quot; : &quot;conll_data_iterator&quot;,</span>
+<span class="sd">                &quot;preprocessed_data_path&quot; : &quot;preprocessed_data&quot;,</span>
+<span class="sd">                &quot;train_data_path&quot; : &quot;train&quot;,</span>
+<span class="sd">                &quot;validation_data_path&quot; : &quot;val&quot;,</span>
+<span class="sd">                &quot;test_data_path&quot; : &quot;test&quot;,</span>
+<span class="sd">                &quot;batch_size&quot; : 32,</span>
+<span class="sd">                &quot;text_col&quot; : 0,</span>
+<span class="sd">                &quot;entity_col&quot; : 3,</span>
+<span class="sd">            }</span>
+
+<span class="sd">        Here:</span>
+
+<span class="sd">        &quot;experiment_root_directory&quot; : str</span>
+<span class="sd">            Root directory where the data is downloaded or copied, also</span>
+<span class="sd">            acts as the folder for any subsequent experimentation</span>
+
+<span class="sd">        &quot;experiment_name&quot; : str</span>
+<span class="sd">            Name for the current experiment</span>
+
+<span class="sd">        &quot;iterator_name&quot; : str</span>
+<span class="sd">            Name of the data iterator</span>
+
+<span class="sd">        &quot;preprocessed_data_path&quot; : str</span>
+<span class="sd">            Folder path under `experiment_root_directory` where the preprocessed data</span>
+<span class="sd">            should be stored</span>
+
+<span class="sd">        &quot;train_data_path&quot; : str</span>
+<span class="sd">            Folder path under `experiment_root_directory` where the train data is stored</span>
+
+<span class="sd">        &quot;validation_data_path&quot; : str</span>
+<span class="sd">            Folder path under `experiment_root_directory` where the validation data is stored</span>
+
+<span class="sd">        &quot;test_data_path&quot; : str</span>
+<span class="sd">            Folder path under `experiment_root_directory` where the test data is stored</span>
+
+<span class="sd">        &quot;batch_size&quot; : int</span>
+<span class="sd">            Batch size for the current iterator</span>
+
+<span class="sd">        &quot;text_col&quot; : str</span>
+<span class="sd">            Text column to be referred in the preprocessed CoNLL data CSV files</span>
+
+<span class="sd">        &quot;entity_col&quot; : str</span>
+<span class="sd">            Entity/Label column to be referred in the preprocessed CoNLL data CSV files</span>
+
+<span class="sd">        &quot;seperator&quot; : str</span>
+<span class="sd">            Seprator character to be used while joining the words from CSV</span>
+
+<span class="sd">        &quot;max_word_length&quot; : int</span>
+<span class="sd">            Maximum word length to be considerd while padding at character level</span>
+
+<span class="sd">        &quot;use_char_embd&quot; : boolean</span>
+<span class="sd">            Flag to enable character index as one of the feature</span>
+
+<span class="sd">        :return: A dictionary of hyperparameters with default values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">hparams</span> <span class="o">=</span> <span class="n">IPreprocessor</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">()</span>
+        <span class="n">hparams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">IIteratorBase</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">())</span>
+        <span class="n">hparams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s2">&quot;iterator_name&quot;</span><span class="p">:</span> <span class="s2">&quot;conll_data_iterator&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;text_col&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;entity_col&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;seperator&quot;</span><span class="p">:</span> <span class="s2">&quot;~&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;quotechar&quot;</span><span class="p">:</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;max_word_length&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+            <span class="s2">&quot;use_char_embd&quot;</span><span class="p">:</span> <span class="kc">False</span>
+        <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">hparams</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">word_vocab_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of words in current data set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">WORD_VOCAB_SIZE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">char_vocab_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of characters in the current data set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHAR_VOCAB_SIZE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_lables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of out put tags in the current data set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">NUM_TAGS</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_train_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of training samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_files_path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_val_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">       Number of training samples</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_val_files_path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_test_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">       Number of training samples</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_test_files_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_extract_vocab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses the preprocessed data from the configured location and extracts</span>
+<span class="sd">        the word and character level vocab.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">WORDS_VOCAB_FILE</span><span class="p">)</span> \
+                <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ENTITY_VOCAB_FILE</span><span class="p">)</span> \
+                <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CHARS_VOCAB_FILE</span><span class="p">):</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Preparing the vocab for the text col: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">text_col</span><span class="p">))</span>
+
+            <span class="n">lines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">entities</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">df_file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_FILES_IN_PATH</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;mergining lines&quot;</span><span class="p">):</span>
+                <span class="n">df_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_FILES_IN_PATH</span><span class="p">,</span> <span class="n">df_file</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">df_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">df_file</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">UNK_WORD</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span>
+
+                <span class="n">lines</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">text_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+                <span class="n">entities</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">entity_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">WORD_VOCAB_SIZE</span><span class="p">,</span> <span class="n">words_vocab</span> <span class="o">=</span> <span class="n">naive_vocab_creater</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="n">lines</span><span class="p">,</span>
+                                                                    <span class="n">out_file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">WORDS_VOCAB_FILE</span><span class="p">,</span>
+                                                                    <span class="n">use_nlp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Preparing the character vocab for the text col: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">text_col</span><span class="p">))</span>
+
+            <span class="c1"># Get char level vocab</span>
+            <span class="n">char_vocab</span> <span class="o">=</span> <span class="p">[</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_CHAR</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">UNK_CHAR</span><span class="p">]</span>
+            <span class="n">_vocab</span> <span class="o">=</span> <span class="n">get_char_vocab</span><span class="p">(</span><span class="n">words_vocab</span><span class="p">)</span>
+            <span class="n">char_vocab</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_vocab</span><span class="p">)</span>
+
+            <span class="c1"># Create char2id map</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span> <span class="o">=</span> <span class="n">vocab_to_tsv</span><span class="p">(</span><span class="n">vocab_list</span><span class="o">=</span><span class="n">char_vocab</span><span class="p">,</span>
+                                              <span class="n">out_file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHARS_VOCAB_FILE</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">CHAR_VOCAB_SIZE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span><span class="p">)</span>
+
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Preparing the vocab for the entity col: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">entity_col</span><span class="p">))</span>
+
+            <span class="c1"># NUM_TAGS, tags_vocab = tf_vocab_processor(lines, ENTITY_VOCAB_FILE)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">NUM_TAGS</span><span class="p">,</span> <span class="n">tags_vocab</span> <span class="o">=</span> <span class="n">naive_vocab_creater</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="n">entities</span><span class="p">,</span>
+                                                            <span class="n">out_file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ENTITY_VOCAB_FILE</span><span class="p">,</span>
+                                                            <span class="n">use_nlp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Reusing the vocab&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">WORD_VOCAB_SIZE</span><span class="p">,</span> <span class="n">words_vocab</span> <span class="o">=</span> <span class="n">naive_vocab_creater</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                                    <span class="n">out_file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">WORDS_VOCAB_FILE</span><span class="p">,</span>
+                                                                    <span class="n">use_nlp</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span> <span class="o">=</span> <span class="n">vocab_to_tsv</span><span class="p">(</span><span class="n">out_file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHARS_VOCAB_FILE</span><span class="p">,</span>
+                                              <span class="n">vocab_list</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">CHAR_VOCAB_SIZE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">NUM_TAGS</span><span class="p">,</span> <span class="n">tags_vocab</span> <span class="o">=</span> <span class="n">naive_vocab_creater</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                            <span class="n">out_file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ENTITY_VOCAB_FILE</span><span class="p">,</span>
+                                                            <span class="n">use_nlp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span> <span class="o">=</span> <span class="p">{</span><span class="n">id_num</span><span class="p">:</span> <span class="n">tag</span> <span class="k">for</span> <span class="n">id_num</span><span class="p">,</span> <span class="n">tag</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tags_vocab</span><span class="p">)}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_train_files_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">csv_file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_FILES_IN_PATH</span><span class="p">)):</span>
+            <span class="n">csv_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_FILES_IN_PATH</span><span class="p">,</span> <span class="n">csv_file</span><span class="p">)</span>
+            <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">files</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_val_files_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">csv_file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VAL_FILES_IN_PATH</span><span class="p">)):</span>
+            <span class="n">csv_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VAL_FILES_IN_PATH</span><span class="p">,</span> <span class="n">csv_file</span><span class="p">)</span>
+            <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">files</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_test_files_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">csv_file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEST_FILES_IN_PATH</span><span class="p">)):</span>
+            <span class="n">csv_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEST_FILES_IN_PATH</span><span class="p">,</span> <span class="n">csv_file</span><span class="p">)</span>
+            <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">files</span>
+
+    <span class="k">def</span> <span class="nf">__pad_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">pad_tok</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param sequences:</span>
+<span class="sd">        :param pad_tok:</span>
+<span class="sd">        :param max_length:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">sequence_padded</span><span class="p">,</span> <span class="n">sequence_length</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">:</span>
+            <span class="n">seq</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+            <span class="n">seq_</span> <span class="o">=</span> <span class="n">seq</span><span class="p">[:</span><span class="n">max_length</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">pad_tok</span><span class="p">]</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">sequence_padded</span> <span class="o">+=</span> <span class="p">[</span><span class="n">seq_</span><span class="p">]</span>
+            <span class="n">sequence_length</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">),</span> <span class="n">max_length</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="n">sequence_padded</span><span class="p">,</span> <span class="n">sequence_length</span>
+
+    <span class="k">def</span> <span class="nf">_pad_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">pad_tok</span><span class="p">,</span> <span class="n">nlevels</span><span class="p">,</span> <span class="n">max_word_length</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param sequences:</span>
+<span class="sd">        :param pad_tok:</span>
+<span class="sd">        :param nlevels:</span>
+<span class="sd">        :param max_word_length:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">sequence_padded</span><span class="p">,</span> <span class="n">sequence_length</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">nlevels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">seperator</span><span class="p">)),</span> <span class="n">sequences</span><span class="p">))</span>
+            <span class="c1"># sequence_padded, sequence_length = _pad_sequences(sequences,</span>
+            <span class="c1">#                                                   pad_tok, max_length)</span>
+            <span class="c1"># breaking the code to pad the string instead on its ids</span>
+            <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">:</span>
+                <span class="n">current_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">seperator</span><span class="p">))</span>
+                <span class="n">diff</span> <span class="o">=</span> <span class="n">max_length</span> <span class="o">-</span> <span class="n">current_length</span>
+                <span class="n">pad_data</span> <span class="o">=</span> <span class="n">pad_tok</span> <span class="o">*</span> <span class="n">diff</span>
+                <span class="n">sequence_padded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span> <span class="o">+</span> <span class="n">pad_data</span><span class="p">)</span>
+                <span class="n">sequence_length</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_length</span><span class="p">)</span>  <span class="c1"># assumed</span>
+
+        <span class="k">elif</span> <span class="n">nlevels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># max_length_word = max([max(map(lambda x: len(x), seq))</span>
+            <span class="c1">#                        for seq in sequences])</span>
+            <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">sequences</span><span class="p">):</span>
+                <span class="c1"># all words are same length now</span>
+                <span class="n">sp</span><span class="p">,</span> <span class="n">sl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pad_sequences</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">pad_tok</span><span class="p">,</span> <span class="n">max_word_length</span><span class="p">)</span>
+                <span class="n">sequence_padded</span> <span class="o">+=</span> <span class="p">[</span><span class="n">sp</span><span class="p">]</span>
+                <span class="n">sequence_length</span> <span class="o">+=</span> <span class="p">[</span><span class="n">sl</span><span class="p">]</span>
+
+            <span class="n">max_length_sentence</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">sequences</span><span class="p">))</span>
+            <span class="n">sequence_padded</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pad_sequences</span><span class="p">(</span><span class="n">sequence_padded</span><span class="p">,</span>
+                                                      <span class="p">[</span><span class="n">pad_tok</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_word_length</span><span class="p">,</span>
+                                                      <span class="n">max_length_sentence</span><span class="p">)</span>
+            <span class="n">sequence_length</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pad_sequences</span><span class="p">(</span><span class="n">sequence_length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                                                      <span class="n">max_length_sentence</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sequence_padded</span><span class="p">),</span> <span class="n">sequence_length</span>
+
+    <span class="k">def</span> <span class="nf">_make_seq_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_files_path</span><span class="p">,</span> <span class="n">char_2_id_map</span><span class="p">,</span> <span class="n">use_char_embd</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param df_files_path: Path to read files that are compatible with Pandas</span>
+<span class="sd">        :param char_2_id_map:</span>
+<span class="sd">        :param use_char_embd:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># [feature1 ,feature2, label]</span>
+        <span class="n">sentence_feature1</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">char_ids_feature2</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tag_label</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">df_file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">df_files_path</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;make_seq_pair&quot;</span><span class="p">):</span>
+
+            <span class="c1"># Make the container empty</span>
+            <span class="n">list_text</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">list_char_ids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">list_tag</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">df_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df_files_path</span><span class="p">,</span> <span class="n">df_file</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">df_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>  <span class="c1"># TODO start and stop tags</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">df_file</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">UNK_WORD</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">df_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">df_file</span><span class="p">)</span><span class="o">.</span><span class="n">filla</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">UNK_WORD</span><span class="p">)</span>
+
+            <span class="n">list_text</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">text_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">list_char_ids</span> <span class="o">=</span> <span class="p">[[</span><span class="n">char_2_id_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">word</span><span class="p">)]</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">list_text</span><span class="p">]</span>
+            <span class="n">list_tag</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">entity_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+            <span class="n">sentence_feature1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">seperator</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">list_text</span><span class="p">))</span>
+            <span class="n">char_ids_feature2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_char_ids</span><span class="p">)</span>
+            <span class="n">tag_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">seperator</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">list_tag</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">use_char_embd</span><span class="p">:</span>
+            <span class="n">sentence_feature1</span><span class="p">,</span> <span class="n">seq_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_sequences</span><span class="p">(</span><span class="n">sentence_feature1</span><span class="p">,</span>
+                                                                <span class="n">nlevels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                                                <span class="n">pad_tok</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">seperator</span><span class="p">,</span>
+                                                                                      <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_WORD</span><span class="p">))</span>  <span class="c1"># space is used so that it can append to the string sequence</span>
+            <span class="n">sentence_feature1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sentence_feature1</span><span class="p">)</span>
+
+            <span class="n">char_ids_feature2</span><span class="p">,</span> <span class="n">seq_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_sequences</span><span class="p">(</span><span class="n">char_ids_feature2</span><span class="p">,</span> <span class="n">nlevels</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                                                <span class="n">pad_tok</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_CHAR_ID</span><span class="p">))</span>
+            <span class="n">char_ids_feature2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">char_ids_feature2</span><span class="p">)</span>
+            <span class="n">seq_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">seq_length</span><span class="p">)</span>
+            <span class="n">tag_label</span><span class="p">,</span> <span class="n">seq_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_sequences</span><span class="p">(</span><span class="n">tag_label</span><span class="p">,</span>
+                                                        <span class="n">nlevels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                                        <span class="n">pad_tok</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">seperator</span><span class="p">,</span>
+                                                                              <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_WORD</span><span class="p">))</span>
+            <span class="n">tag_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tag_label</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">sentence_feature1</span><span class="p">,</span> <span class="n">char_ids_feature2</span><span class="p">,</span> <span class="n">tag_label</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sentence_feature1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sentence_feature1</span><span class="p">)</span>
+            <span class="n">tag_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tag_label</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sentence_feature1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tag_label</span>
+
+    <span class="k">def</span> <span class="nf">_make_seq_pair_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">char_2_id_map</span><span class="p">,</span> <span class="n">use_char_embd</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param sentence:</span>
+<span class="sd">        :param char_2_id_map:</span>
+<span class="sd">        :param use_char_embd:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># [feature1 ,feature2, label]</span>
+        <span class="n">sentence_feature1</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">char_ids_feature2</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">list_text</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">list_char_ids</span> <span class="o">=</span> <span class="p">[[</span><span class="n">char_2_id_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">UNK_CHAR_ID</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">word</span><span class="p">)]</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">list_text</span><span class="p">]</span>
+
+        <span class="n">sentence_feature1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">seperator</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">list_text</span><span class="p">))</span>
+        <span class="n">char_ids_feature2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_char_ids</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">use_char_embd</span><span class="p">:</span>
+            <span class="n">sentence_feature1</span><span class="p">,</span> <span class="n">seq_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_sequences</span><span class="p">(</span><span class="n">sentence_feature1</span><span class="p">,</span>
+                                                                <span class="n">nlevels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                                                <span class="n">pad_tok</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">seperator</span><span class="p">,</span>
+                                                                                      <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_WORD</span><span class="p">))</span>  <span class="c1"># space is used so that it can append to the string sequence</span>
+            <span class="n">sentence_feature1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sentence_feature1</span><span class="p">)</span>
+
+            <span class="n">char_ids_feature2</span><span class="p">,</span> <span class="n">seq_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_sequences</span><span class="p">(</span><span class="n">char_ids_feature2</span><span class="p">,</span> <span class="n">nlevels</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                                                <span class="n">pad_tok</span><span class="o">=</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_CHAR_ID</span><span class="p">)</span>
+            <span class="n">char_ids_feature2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">char_ids_feature2</span><span class="p">)</span>
+            <span class="n">seq_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">seq_length</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">sentence_feature1</span><span class="p">,</span> <span class="n">char_ids_feature2</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sentence_feature1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sentence_feature1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sentence_feature1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">get_padded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span> <span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Reading the padded data...&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">store_padded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span> <span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Writing the padded data...&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">_get_train_input_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;train_padded_data_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.p&quot;</span>
+        <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_padded_data</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_make_seq_pair</span><span class="p">(</span><span class="n">df_files_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_FILES_IN_PATH</span><span class="p">,</span>
+                                    <span class="n">char_2_id_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span><span class="p">,</span>
+                                    <span class="n">use_char_embd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store_padded_data</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span><span class="p">),</span> <span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="c1"># print_error(train_char_ids)</span>
+        <span class="c1"># print_info(train_ner_tags)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(({</span><span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_1_NAME</span><span class="p">:</span> <span class="n">train_sentences</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_2_NAME</span><span class="p">:</span> <span class="n">train_char_ids</span><span class="p">},</span>
+                                                          <span class="n">train_ner_tags</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(({</span><span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_1_NAME</span><span class="p">:</span> <span class="n">train_sentences</span><span class="p">},</span>
+                                                          <span class="n">train_ner_tags</span><span class="p">))</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Dataset output sizes are: &quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">output_shapes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+
+    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">_get_val_input_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;val_padded_data_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.p&quot;</span>
+        <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_padded_data</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_make_seq_pair</span><span class="p">(</span><span class="n">df_files_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VAL_FILES_IN_PATH</span><span class="p">,</span>
+                                    <span class="n">char_2_id_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span><span class="p">,</span>
+                                    <span class="n">use_char_embd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store_padded_data</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span><span class="p">),</span> <span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="c1"># print_error(train_char_ids)</span>
+        <span class="c1"># print_info(train_ner_tags)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(({</span><span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_1_NAME</span><span class="p">:</span> <span class="n">train_sentences</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_2_NAME</span><span class="p">:</span> <span class="n">train_char_ids</span><span class="p">},</span>
+                                                          <span class="n">train_ner_tags</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(({</span><span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_1_NAME</span><span class="p">:</span> <span class="n">train_sentences</span><span class="p">},</span>
+                                                          <span class="n">train_ner_tags</span><span class="p">))</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Dataset output sizes are: &quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">output_shapes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+
+    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">_get_test_input_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;test_padded_data_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.p&quot;</span>
+        <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_padded_data</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_make_seq_pair</span><span class="p">(</span><span class="n">df_files_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TEST_FILES_IN_PATH</span><span class="p">,</span>
+                                    <span class="n">char_2_id_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span><span class="p">,</span>
+                                    <span class="n">use_char_embd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store_padded_data</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span><span class="p">),</span> <span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="c1"># print_error(train_char_ids)</span>
+        <span class="c1"># print_info(train_ner_tags)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(({</span><span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_1_NAME</span><span class="p">:</span> <span class="n">train_sentences</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_2_NAME</span><span class="p">:</span> <span class="n">train_char_ids</span><span class="p">},</span>
+                                                          <span class="n">train_ner_tags</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(({</span><span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_1_NAME</span><span class="p">:</span> <span class="n">train_sentences</span><span class="p">},</span>
+                                                          <span class="n">train_ner_tags</span><span class="p">))</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Dataset output sizes are: &quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">output_shapes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+
+    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">_get_predict_text_input_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>
+
+        <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_make_seq_pair_text</span><span class="p">(</span><span class="n">sentence</span><span class="o">=</span><span class="n">sentence</span><span class="p">,</span>
+                                     <span class="n">char_2_id_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span><span class="p">,</span>
+                                     <span class="n">use_char_embd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span>
+
+        <span class="c1"># print_error(train_char_ids)</span>
+        <span class="c1"># print_info(train_ner_tags)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(({</span><span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_1_NAME</span><span class="p">:</span> <span class="n">train_sentences</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_2_NAME</span><span class="p">:</span> <span class="n">train_char_ids</span><span class="p">},</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">(({</span><span class="bp">self</span><span class="o">.</span><span class="n">FEATURE_1_NAME</span><span class="p">:</span> <span class="n">train_sentences</span><span class="p">},</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Dataset output sizes are: &quot;</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">output_shapes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+
+<div class="viewcode-block" id="CSVSeqToSeqIterator.predict_on_test_files"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_on_test_files">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">predict_on_test_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predict_fn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Iterate through the files and use `predict_on_test_file`, for prediction</span>
+<span class="sd">        :param predict_fn:</span>
+<span class="sd">        :return: Creates a folder estimator.model_dir/predictions/ and adds the predicted files</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">predict</span> <span class="ow">in</span> <span class="n">predict_fn</span><span class="p">:</span>
+            <span class="n">predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predict</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Get the files from test folder and zip it with predictions</span>
+        <span class="k">for</span> <span class="n">each_prediction</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_files_path</span><span class="p">):</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+            <span class="n">predicted_id</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">confidence</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">tag_score</span> <span class="ow">in</span> <span class="n">each_prediction</span><span class="p">[</span><span class="s2">&quot;confidence&quot;</span><span class="p">]:</span>
+                <span class="n">confidence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag_score</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tag_id</span> <span class="ow">in</span> <span class="n">each_prediction</span><span class="p">[</span><span class="s2">&quot;viterbi_seq&quot;</span><span class="p">]:</span>
+                <span class="n">predicted_id</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span><span class="p">[</span><span class="n">tag_id</span><span class="p">])</span>
+            <span class="n">top_3_predicted_indices</span> <span class="o">=</span> <span class="n">each_prediction</span><span class="p">[</span><span class="s2">&quot;top_3_indices&quot;</span><span class="p">]</span>
+            <span class="n">top_3_predicted_confidence</span> <span class="o">=</span> <span class="n">each_prediction</span><span class="p">[</span><span class="s2">&quot;top_3_confidence&quot;</span><span class="p">]</span>
+
+            <span class="c1"># print(top_3_predicted_indices)</span>
+
+            <span class="n">pred_1</span> <span class="o">=</span> <span class="n">top_3_predicted_indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">pred_1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">pred_1</span><span class="p">))</span>
+
+            <span class="n">pred_2</span> <span class="o">=</span> <span class="n">top_3_predicted_indices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">pred_2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">pred_2</span><span class="p">))</span>
+
+            <span class="n">pred_3</span> <span class="o">=</span> <span class="n">top_3_predicted_indices</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">pred_3</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">pred_3</span><span class="p">))</span>
+
+            <span class="n">pred_1_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">pred_2_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">pred_3_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span>
+
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">text_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                <span class="s2">&quot;predicted_id&quot;</span><span class="p">:</span> <span class="n">predicted_id</span><span class="p">,</span>
+                <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="n">confidence</span><span class="p">,</span>
+                <span class="s2">&quot;pred_1&quot;</span><span class="p">:</span> <span class="n">pred_1</span><span class="p">,</span>
+                <span class="s2">&quot;pred_1_confidence&quot;</span><span class="p">:</span> <span class="n">pred_1_confidence</span><span class="p">,</span>
+                <span class="s2">&quot;pred_2&quot;</span><span class="p">:</span> <span class="n">pred_2</span><span class="p">,</span>
+                <span class="s2">&quot;pred_2_confidence&quot;</span><span class="p">:</span> <span class="n">pred_2_confidence</span><span class="p">,</span>
+                <span class="s2">&quot;pred_3&quot;</span><span class="p">:</span> <span class="n">pred_3</span><span class="p">,</span>
+                <span class="s2">&quot;pred_3_confidence&quot;</span><span class="p">:</span> <span class="n">pred_3_confidence</span><span class="p">,</span>
+
+            <span class="p">})</span>
+
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;predicted_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span>
+                                  <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">text_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">predicted_id</span><span class="p">)]</span>
+
+            <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OUT_DIR</span> <span class="p">,</span><span class="s2">&quot;predictions&quot;</span><span class="p">)</span>
+            <span class="n">check_n_makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span> <span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="CSVSeqToSeqIterator.predict_on_text"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_on_text">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">predict_on_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predict_fn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param predict_fn:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">predicted_id</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">confidence</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">each_prediction</span> <span class="ow">in</span> <span class="n">predict_fn</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag_score</span> <span class="ow">in</span> <span class="n">each_prediction</span><span class="p">[</span><span class="s2">&quot;confidence&quot;</span><span class="p">]:</span>
+                <span class="n">confidence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag_score</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tag_id</span> <span class="ow">in</span> <span class="n">each_prediction</span><span class="p">[</span><span class="s2">&quot;viterbi_seq&quot;</span><span class="p">]:</span>
+                <span class="n">predicted_id</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span><span class="p">[</span><span class="n">tag_id</span><span class="p">])</span>
+            <span class="n">top_3_predicted_indices</span> <span class="o">=</span> <span class="n">each_prediction</span><span class="p">[</span><span class="s2">&quot;top_3_indices&quot;</span><span class="p">]</span>
+            <span class="n">top_3_predicted_confidence</span> <span class="o">=</span> <span class="n">each_prediction</span><span class="p">[</span><span class="s2">&quot;top_3_confidence&quot;</span><span class="p">]</span>
+
+            <span class="c1"># print(top_3_predicted_indices)</span>
+
+            <span class="n">pred_1</span> <span class="o">=</span> <span class="n">top_3_predicted_indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">pred_1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">pred_1</span><span class="p">))</span>
+
+            <span class="n">pred_2</span> <span class="o">=</span> <span class="n">top_3_predicted_indices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">pred_2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">pred_2</span><span class="p">))</span>
+
+            <span class="n">pred_3</span> <span class="o">=</span> <span class="n">top_3_predicted_indices</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">pred_3</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">TAGS_2_ID</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">pred_3</span><span class="p">))</span>
+
+            <span class="n">pred_1_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">pred_2_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">pred_3_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span>
+
+        <span class="k">return</span> <span class="n">predicted_id</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, vitaFlow Team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

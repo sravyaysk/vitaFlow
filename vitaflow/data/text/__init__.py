@@ -12,5 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-
+Modules of vitaflow library data.text.
 """
+
+from vitaflow.data.text.vocabulary import Vocab

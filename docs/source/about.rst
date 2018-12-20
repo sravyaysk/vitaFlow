@@ -1,0 +1,4 @@
+About
+-----
+
+.. mdinclude:: ../../README.md

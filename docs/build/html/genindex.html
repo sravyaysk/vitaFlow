@@ -27,6 +27,8 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom_theme.css" type="text/css" />
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -85,24 +87,18 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/developers.html">Developers</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/developers.html">Developers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/config/hparams.html">HParams</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/data/internal/ipreprocessor.html">IPreprocessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/core/core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data/data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data/text/vocabulary.html">Vocabulary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/models/models.html">Models</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Dataset:</span></p>
+<p class="caption"><span class="caption-text">Examples:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/data/text/conll/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
-</ul>
-<p class="caption"><span class="caption-text">DataIterators:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api/data/text/iterators/conll_csv_in_memory.html">CoNLLCsvInMemory</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Models:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api/models/text/seq2seq/bilstm_crf.html">BiLSTMCrf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
@@ -173,25 +169,43 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#A"><strong>A</strong></a>
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/core/ipreprocessor.html#vitaflow.core.IPreprocessor._create_target_directories">_create_target_directories() (vitaflow.core.IPreprocessor method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/core/ipreprocessor.html#vitaflow.core.IPreprocessor._prepare_data">_prepare_data() (vitaflow.core.IPreprocessor method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config/hparams.html#vitaflow.config.HParams.add_hparam">add_hparam() (vitaflow.config.HParams method)</a>
+      <li><a href="api/core/hparams.html#vitaflow.core.HParams.add_hparam">add_hparam() (vitaflow.core.HParams method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -202,18 +216,24 @@
       <li><a href="api/models/text/seq2seq/bilstm_crf.html#vitaflow.models.text.seq2seq.BiLSTMCrf">BiLSTMCrf (class in vitaflow.models.text.seq2seq)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.bos_token">bos_token (vitaflow.data.text.Vocab attribute)</a>
+</li>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.bos_token_id">bos_token_id (vitaflow.data.text.Vocab attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.char_vocab_size">char_vocab_size (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.char_vocab_size">char_vocab_size (vitaflow.data.text.iterators.CSVSeqToSeqIterator attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data/text/conll/conll_2003_dataset.html#vitaflow.data.text.conll.CoNLL2003Dataset">CoNLL2003Dataset (class in vitaflow.data.text.conll)</a>
+      <li><a href="examples/conll_2003_dataset.html#examples.conll2003.conll_2003_dataset.CoNLL2003Dataset">CoNLL2003Dataset (class in examples.conll2003.conll_2003_dataset)</a>
 </li>
-      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory">CoNLLCsvInMemory (class in vitaflow.data.text.iterators)</a>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator">CSVSeqToSeqIterator (class in vitaflow.data.text.iterators)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -221,12 +241,12 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data/internal/ipreprocessor.html#vitaflow.data.internal.IPreprocessor.default_hparams">default_hparams() (vitaflow.data.internal.IPreprocessor static method)</a>
+      <li><a href="examples/conll_2003_dataset.html#examples.conll2003.conll_2003_dataset.CoNLL2003Dataset.default_hparams">default_hparams() (examples.conll2003.conll_2003_dataset.CoNLL2003Dataset static method)</a>
 
       <ul>
-        <li><a href="api/data/text/conll/conll_2003_dataset.html#vitaflow.data.text.conll.CoNLL2003Dataset.default_hparams">(vitaflow.data.text.conll.CoNLL2003Dataset static method)</a>
+        <li><a href="api/core/ipreprocessor.html#vitaflow.core.IPreprocessor.default_hparams">(vitaflow.core.IPreprocessor static method)</a>
 </li>
-        <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.default_hparams">(vitaflow.data.text.iterators.CoNLLCsvInMemory static method)</a>
+        <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.default_hparams">(vitaflow.data.text.iterators.CSVSeqToSeqIterator static method)</a>
 </li>
         <li><a href="api/models/text/seq2seq/bilstm_crf.html#vitaflow.models.text.seq2seq.BiLSTMCrf.default_hparams">(vitaflow.models.text.seq2seq.BiLSTMCrf static method)</a>
 </li>
@@ -234,10 +254,22 @@
   </ul></td>
 </tr></table>
 
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.eos_token">eos_token (vitaflow.data.text.Vocab attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.eos_token_id">eos_token_id (vitaflow.data.text.Vocab attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config/hparams.html#vitaflow.config.HParams.get">get() (vitaflow.config.HParams method)</a>
+      <li><a href="api/core/hparams.html#vitaflow.core.HParams.get">get() (vitaflow.core.HParams method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -245,7 +277,7 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config/hparams.html#vitaflow.config.HParams">HParams (class in vitaflow.config)</a>
+      <li><a href="api/core/hparams.html#vitaflow.core.HParams">HParams (class in vitaflow.core)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -253,11 +285,15 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data/internal/ipreprocessor.html#vitaflow.data.internal.IPreprocessor">IPreprocessor (class in vitaflow.data.internal)</a>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.id_to_token_map">id_to_token_map (vitaflow.data.text.Vocab attribute)</a>
+</li>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.id_to_token_map_py">id_to_token_map_py (vitaflow.data.text.Vocab attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config/hparams.html#vitaflow.config.HParams.items">items() (vitaflow.config.HParams method)</a>
+      <li><a href="api/core/ipreprocessor.html#vitaflow.core.IPreprocessor">IPreprocessor (class in vitaflow.core)</a>
+</li>
+      <li><a href="api/core/hparams.html#vitaflow.core.HParams.items">items() (vitaflow.core.HParams method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -265,7 +301,15 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config/hparams.html#vitaflow.config.HParams.keys">keys() (vitaflow.config.HParams method)</a>
+      <li><a href="api/core/hparams.html#vitaflow.core.HParams.keys">keys() (vitaflow.core.HParams method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.load">load() (vitaflow.data.text.Vocab method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -273,7 +317,15 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/models/text/seq2seq/bilstm_crf.html#vitaflow.models.text.seq2seq.BiLSTMCrf.model_dir">model_dir (vitaflow.models.text.seq2seq.BiLSTMCrf attribute)</a>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.map_ids_to_tokens">map_ids_to_tokens() (vitaflow.data.text.Vocab method)</a>
+</li>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.map_ids_to_tokens_py">map_ids_to_tokens_py() (vitaflow.data.text.Vocab method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.map_tokens_to_ids">map_tokens_to_ids() (vitaflow.data.text.Vocab method)</a>
+</li>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.map_tokens_to_ids_py">map_tokens_to_ids_py() (vitaflow.data.text.Vocab method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -281,15 +333,15 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.num_lables">num_lables (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.num_lables">num_lables (vitaflow.data.text.iterators.CSVSeqToSeqIterator attribute)</a>
 </li>
-      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.num_test_samples">num_test_samples (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.num_test_samples">num_test_samples (vitaflow.data.text.iterators.CSVSeqToSeqIterator attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.num_train_samples">num_train_samples (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.num_train_samples">num_train_samples (vitaflow.data.text.iterators.CSVSeqToSeqIterator attribute)</a>
 </li>
-      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.num_val_samples">num_val_samples (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.num_val_samples">num_val_samples (vitaflow.data.text.iterators.CSVSeqToSeqIterator attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -297,7 +349,29 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data/internal/ipreprocessor.html#vitaflow.data.internal.IPreprocessor.preprocess_prepare">preprocess_prepare() (vitaflow.data.internal.IPreprocessor method)</a>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.pad_token">pad_token (vitaflow.data.text.Vocab attribute)</a>
+</li>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.pad_token_id">pad_token_id (vitaflow.data.text.Vocab attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_on_test_files">predict_on_test_files() (vitaflow.data.text.iterators.CSVSeqToSeqIterator method)</a>
+</li>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_on_text">predict_on_text() (vitaflow.data.text.iterators.CSVSeqToSeqIterator method)</a>
+</li>
+      <li><a href="api/core/ipreprocessor.html#vitaflow.core.IPreprocessor.preprocess_prepare">preprocess_prepare() (vitaflow.core.IPreprocessor method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.size">size (vitaflow.data.text.Vocab attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.special_tokens">special_tokens (vitaflow.data.text.Vocab attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -305,7 +379,33 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config/hparams.html#vitaflow.config.HParams.todict">todict() (vitaflow.config.HParams method)</a>
+      <li><a href="api/core/hparams.html#vitaflow.core.HParams.todict">todict() (vitaflow.core.HParams method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.token_to_id_map">token_to_id_map (vitaflow.data.text.Vocab attribute)</a>
+</li>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.token_to_id_map_py">token_to_id_map_py (vitaflow.data.text.Vocab attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.unk_token">unk_token (vitaflow.data.text.Vocab attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab.unk_token_id">unk_token_id (vitaflow.data.text.Vocab attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data/text/vocabulary.html#vitaflow.data.text.Vocab">Vocab (class in vitaflow.data.text)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -313,7 +413,7 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data/text/iterators/conll_csv_in_memory.html#vitaflow.data.text.iterators.CoNLLCsvInMemory.word_vocab_size">word_vocab_size (vitaflow.data.text.iterators.CoNLLCsvInMemory attribute)</a>
+      <li><a href="api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.word_vocab_size">word_vocab_size (vitaflow.data.text.iterators.CSVSeqToSeqIterator attribute)</a>
 </li>
   </ul></td>
 </tr></table>

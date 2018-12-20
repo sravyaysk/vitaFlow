@@ -41,6 +41,12 @@ class ImageFeature(SingleFeature):
         self.FEATURE_NAME = "image"
         self.LABEL_NAME = "label"
 
+class GANFeature(TwoFeatures):
+    def __init__(self):
+        super(GANFeature, self).__init__()
+        self.FEATURE_TYPE = "image+noise"
+        self.FEATURE_1_NAME = "image"
+        self.FEATURE_2_NAME = "noise"
 
 class ITextFeature(TwoFeatures):
     def __init__(self):

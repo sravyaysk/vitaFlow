@@ -1,0 +1,544 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vitaflow.data.text.vocabulary &mdash; vitaFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/custom_theme.css" type="text/css" />
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> vitaFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/developers.html">Developers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/core/core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/data/data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/data/text/vocabulary.html">Vocabulary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/models/models.html">Models</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../audio/AudioBasics.html">Audio Basics</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">vitaFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vitaflow.data.text.vocabulary</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vitaflow.data.text.vocabulary</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># Copyright 2018 The vitaFlow Authors. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Helper functions and classes for vocabulary processing.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="k">import</span> <span class="n">gfile</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">vitaflow.utils.utils</span> <span class="k">import</span> <span class="n">dict_lookup</span>
+
+<span class="c1"># pylint: disable=too-few-public-methods, invalid-name</span>
+<span class="c1"># pylint: disable=too-many-instance-attributes, too-many-arguments</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;SpecialTokens&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Vocab&quot;</span>
+<span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">SpecialTokens</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Special tokens, including</span>
+<span class="sd">    :attr:`PAD_WORD`</span>
+<span class="sd">    :attr:`BOS_WORD`</span>
+<span class="sd">    :attr:`EOS_WORD`</span>
+<span class="sd">    :attr:`UNK_WORD`</span>
+<span class="sd">    These tokens will by default have token ids 0, 1, 2, 3,</span>
+<span class="sd">    respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">PAD_WORD</span> <span class="o">=</span> <span class="s2">&quot;&lt;PAD&gt;&quot;</span>
+    <span class="n">BOS_WORD</span> <span class="o">=</span> <span class="s2">&quot;&lt;BOS&gt;&quot;</span>
+    <span class="n">EOS_WORD</span> <span class="o">=</span> <span class="s2">&quot;&lt;EOS&gt;&quot;</span>
+    <span class="n">UNK_WORD</span> <span class="o">=</span> <span class="s2">&quot;&lt;UNK&gt;&quot;</span>
+    <span class="n">PAD_WORD_ID</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">BOS_WORD_ID</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">EOS_WORD_ID</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">UNK_WORD_ID</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="n">PAD_TAG</span> <span class="o">=</span> <span class="s2">&quot;&lt;TAG&gt;&quot;</span>
+    <span class="n">PAD_TAG_ID</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">PAD_CHAR</span> <span class="o">=</span> <span class="s2">&quot;&lt;P&gt;&quot;</span>
+    <span class="n">BOS_CHAR</span> <span class="o">=</span> <span class="s2">&quot;&lt;B&gt;&quot;</span>
+    <span class="n">EOS_CHAR</span> <span class="o">=</span> <span class="s2">&quot;&lt;E&gt;&quot;</span>
+    <span class="n">UNK_CHAR</span> <span class="o">=</span> <span class="s2">&quot;&lt;U&gt;&quot;</span>
+    <span class="n">PAD_CHAR_ID</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">BOS_CHAR_ID</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">EOS_CHAR_ID</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">UNK_CHAR_ID</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<span class="k">def</span> <span class="nf">_make_defaultdict</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a python defaultdict.</span>
+<span class="sd">    :param keys (list): Keys of the dictionary.</span>
+<span class="sd">    :param values (list): Values correspond to keys. The two lists :attr:`keys` and</span>
+<span class="sd">            :attr:`values` must be of the same length.</span>
+<span class="sd">    :param default_value: default value returned when key is missing.</span>
+<span class="sd">    :return: defaultdict: A python `defaultdict` instance that maps keys to values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dict_</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">default_value</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">dict_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="k">return</span> <span class="n">dict_</span>
+
+<div class="viewcode-block" id="Vocab"><a class="viewcode-back" href="../../../../api/data/text/vocabulary.html#vitaflow.data.text.Vocab">[docs]</a><span class="k">class</span> <span class="nc">Vocab</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Vocabulary class that loads vocabulary from file, and maintains mapping</span>
+<span class="sd">    tables between token strings and indexes.</span>
+
+<span class="sd">    Provides both way if accessing defaul pythonic way and as tensor.</span>
+
+<span class="sd">    Each line of the vocab file should contains one vocabulary token, e.g.,::</span>
+
+<span class="sd">        vocab_token_1</span>
+<span class="sd">        vocab token 2</span>
+<span class="sd">        vocab   token | 3 .</span>
+<span class="sd">        ...</span>
+
+<span class="sd">    :param filename (str): Path to the vocabulary file where each line contains</span>
+<span class="sd">            one token.</span>
+<span class="sd">    :param bos_token (str): A special token that will be added to the beginning of</span>
+<span class="sd">            sequences.</span>
+<span class="sd">    :param eos_token (str): A special token that will be added to the end of</span>
+<span class="sd">            sequences.</span>
+<span class="sd">    :param unk_token (str): A special token that will replace all unknown tokens</span>
+<span class="sd">            (tokens not included in the vocabulary).</span>
+<span class="sd">    :param pad_token (str): A special token that is used to do padding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">filename</span><span class="p">,</span>
+                 <span class="n">pad_token</span><span class="o">=</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">PAD_WORD</span><span class="p">,</span>
+                 <span class="n">bos_token</span><span class="o">=</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">BOS_WORD</span><span class="p">,</span>
+                 <span class="n">eos_token</span><span class="o">=</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">EOS_WORD</span><span class="p">,</span>
+                 <span class="n">unk_token</span><span class="o">=</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">UNK_WORD</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pad_token</span> <span class="o">=</span> <span class="n">pad_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bos_token</span> <span class="o">=</span> <span class="n">bos_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eos_token</span> <span class="o">=</span> <span class="n">eos_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span> <span class="o">=</span> <span class="n">unk_token</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id_to_token_map</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_to_id_map</span><span class="p">,</span> \
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id_to_token_map_py</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_to_id_map_py</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Vocab.load"><a class="viewcode-back" href="../../../../api/data/text/vocabulary.html#vitaflow.data.text.Vocab.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the vocabulary from the file.</span>
+<span class="sd">        :param filename: (str): Path to the vocabulary file.</span>
+<span class="sd">        :returns : A tuple of TF and python mapping tables between word string and index,</span>
+<span class="sd">        (:attr:`id_to_token_map`, :attr:`token_to_id_map`, :attr:`id_to_token_map_py`, :attr:`token_to_id_map_py`),</span>
+<span class="sd">        where :attr:`id_to_token_map` and :attr:`token_to_id_map` are TF :tf_main:`HashTable &lt;contrib/lookup/HashTable&gt;`</span>
+<span class="sd">        instances, and :attr:`id_to_token_map_py` and :attr:`token_to_id_map_py` are python `defaultdict` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">gfile</span><span class="o">.</span><span class="n">GFile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">vocab_file</span><span class="p">:</span>
+            <span class="c1"># Converts to &#39;unicode&#39; (Python 2) or &#39;str&#39; (Python 3)</span>
+            <span class="n">vocab</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">as_text</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">vocab_file</span><span class="p">)</span>
+
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="ne">UnicodeWarning</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bos_token</span> <span class="ow">in</span> <span class="n">vocab</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Special begin-of-seq token already exists in the &quot;</span>
+                             <span class="s2">&quot;vocabulary: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bos_token</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eos_token</span> <span class="ow">in</span> <span class="n">vocab</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Special end-of-seq token already exists in the &quot;</span>
+                             <span class="s2">&quot;vocabulary: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eos_token</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span> <span class="ow">in</span> <span class="n">vocab</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Special UNK token already exists in the &quot;</span>
+                             <span class="s2">&quot;vocabulary: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_token</span> <span class="ow">in</span> <span class="n">vocab</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Special padding token already exists in the &quot;</span>
+                             <span class="s2">&quot;vocabulary: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_token</span><span class="p">)</span>
+
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="ne">UnicodeWarning</span><span class="p">)</span>
+
+        <span class="c1"># Places _pad_token at the beginning to make sure it take index 0.</span>
+        <span class="n">vocab</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bos_token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eos_token</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span><span class="p">]</span> <span class="o">+</span> <span class="n">vocab</span>
+        <span class="c1"># Must make sure this is consistent with the above line</span>
+        <span class="n">unk_token_idx</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span>
+        <span class="n">vocab_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">)</span>
+
+        <span class="c1"># Creates TF maps</span>
+        <span class="n">id_to_token_map</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">lookup</span><span class="o">.</span><span class="n">HashTable</span><span class="p">(</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">lookup</span><span class="o">.</span><span class="n">KeyValueTensorInitializer</span><span class="p">(</span>
+                <span class="n">vocab_idx</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">key_dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">value_dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">string</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span><span class="p">)</span>
+
+        <span class="n">token_to_id_map</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">lookup</span><span class="o">.</span><span class="n">HashTable</span><span class="p">(</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">lookup</span><span class="o">.</span><span class="n">KeyValueTensorInitializer</span><span class="p">(</span>
+                <span class="n">vocab</span><span class="p">,</span> <span class="n">vocab_idx</span><span class="p">,</span> <span class="n">key_dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">string</span><span class="p">,</span> <span class="n">value_dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">unk_token_idx</span><span class="p">)</span>
+
+        <span class="c1"># Creates python maps to interface with python code</span>
+        <span class="n">id_to_token_map_py</span> <span class="o">=</span> <span class="n">_make_defaultdict</span><span class="p">(</span>
+            <span class="n">vocab_idx</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span><span class="p">)</span>
+        <span class="n">token_to_id_map_py</span> <span class="o">=</span> <span class="n">_make_defaultdict</span><span class="p">(</span>
+            <span class="n">vocab</span><span class="p">,</span> <span class="n">vocab_idx</span><span class="p">,</span> <span class="n">unk_token_idx</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">id_to_token_map</span><span class="p">,</span> <span class="n">token_to_id_map</span><span class="p">,</span> \
+               <span class="n">id_to_token_map_py</span><span class="p">,</span> <span class="n">token_to_id_map_py</span></div>
+
+<div class="viewcode-block" id="Vocab.map_ids_to_tokens"><a class="viewcode-back" href="../../../../api/data/text/vocabulary.html#vitaflow.data.text.Vocab.map_ids_to_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">map_ids_to_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maps ids into text tokens.</span>
+<span class="sd">        :param ids: An `int` tensor of token ids.</span>
+<span class="sd">        :return: A tensor of text tokens of the same shape.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_to_token_map</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">to_int64</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Vocab.map_tokens_to_ids"><a class="viewcode-back" href="../../../../api/data/text/vocabulary.html#vitaflow.data.text.Vocab.map_tokens_to_ids">[docs]</a>    <span class="k">def</span> <span class="nf">map_tokens_to_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maps text tokens into ids.</span>
+<span class="sd">        The returned ids are a Tensor.</span>
+
+<span class="sd">        :param tokens: An tensor of text tokens.</span>
+<span class="sd">        :returns: A tensor of token ids of the same shape.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_to_id_map</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Vocab.map_ids_to_tokens_py"><a class="viewcode-back" href="../../../../api/data/text/vocabulary.html#vitaflow.data.text.Vocab.map_ids_to_tokens_py">[docs]</a>    <span class="k">def</span> <span class="nf">map_ids_to_tokens_py</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maps ids into text tokens.</span>
+<span class="sd">        The input :attr:`ids` and returned tokens are both python arrays or list.</span>
+
+<span class="sd">        :param ids: An `int` numpy arry or (possibly nested) list of token ids.</span>
+<span class="sd">        :returns A numpy array of text tokens of the same shape as :attr:`ids`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dict_lookup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_to_token_map_py</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unk_token</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Vocab.map_tokens_to_ids_py"><a class="viewcode-back" href="../../../../api/data/text/vocabulary.html#vitaflow.data.text.Vocab.map_tokens_to_ids_py">[docs]</a>    <span class="k">def</span> <span class="nf">map_tokens_to_ids_py</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maps text tokens into ids.</span>
+<span class="sd">        The input :attr:`tokens` and returned ids are both python arrays or list.</span>
+
+<span class="sd">        :param tokens: A numpy array or (possibly nested) list of text tokens.</span>
+<span class="sd">        :returns : A numpy array of token ids of the same shape as :attr:`tokens`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dict_lookup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token_to_id_map_py</span><span class="p">,</span> <span class="n">tokens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unk_token_id</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">id_to_token_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The :tf_main:`HashTable &lt;contrib/lookup/HashTable&gt;` instance that maps from token index to the string form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_to_token_map</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">token_to_id_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The :tf_main:`HashTable &lt;contrib/lookup/HashTable&gt;` instance that maps from token string to the index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_to_id_map</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">id_to_token_map_py</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The python `defaultdict` instance that maps from token index to the</span>
+<span class="sd">        string form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_to_token_map_py</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">token_to_id_map_py</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The python `defaultdict` instance that maps from token string to the</span>
+<span class="sd">        index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_to_id_map_py</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The vocabulary size.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token_to_id_map_py</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bos_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A string of the special token indicating the beginning of sequence.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bos_token</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bos_token_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The `int` index of the special token indicating the beginning</span>
+<span class="sd">        of sequence.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_to_id_map_py</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_bos_token</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eos_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A string of the special token indicating the end of sequence.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eos_token</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eos_token_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The `int` index of the special token indicating the end</span>
+<span class="sd">        of sequence.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_to_id_map_py</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_eos_token</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">unk_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A string of the special token indicating unknown token.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">unk_token_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The `int` index of the special token indicating unknown token.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_to_id_map_py</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pad_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A string of the special token indicating padding token. The</span>
+<span class="sd">        default padding token is an empty string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_token</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pad_token_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The `int` index of the special token indicating padding token.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_to_id_map_py</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_token</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">special_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The list of special tokens</span>
+<span class="sd">        [:attr:`pad_token`, :attr:`bos_token`, :attr:`eos_token`,</span>
+<span class="sd">        :attr:`unk_token`].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bos_token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eos_token</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_unk_token</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, vitaFlow Team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

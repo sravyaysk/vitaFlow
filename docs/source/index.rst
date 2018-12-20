@@ -10,33 +10,23 @@ Welcome to vitaFlow's documentation!
    :maxdepth: 1
    :caption: Contents:
 
-   about.md
+   about.rst
+   api/developers.md
 
 .. toctree::
    :maxdepth: 1
    :caption: API:
 
-   api/developers.md
-   api/config/hparams.rst
-   api/data/internal/ipreprocessor.rst
+   api/core/core.rst
+   api/data/data.rst
+   api/data/text/vocabulary.rst
+   api/models/models.rst
 
 .. toctree::
    :maxdepth: 1
-   :caption: Dataset:
+   :caption: Examples:
 
-   api/data/text/conll/conll_2003_dataset.rst
-
-.. toctree::
-   :maxdepth: 1
-   :caption: DataIterators:
-
-   api/data/text/iterators/conll_csv_in_memory.rst
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Models:
-
-   api/models/text/seq2seq/bilstm_crf.rst
+   examples/conll_2003_dataset.rst
 
 .. toctree::
    :maxdepth: 1

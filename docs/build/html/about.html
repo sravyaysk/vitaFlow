@@ -26,6 +26,8 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom_theme.css" type="text/css" />
     <link rel="author" title="About these documents" href="#" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -85,34 +87,19 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">About</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#vitaflow-videoimagetextaudioflow">vitaFlow - VideoImageTextAudioFlow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#proposed-solution">Proposed Solution</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#python-environment">Python Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#a-simple-demo">A Simple Demo</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/developers.html">Developers</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/developers.html">Developers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/config/hparams.html">HParams</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/data/internal/ipreprocessor.html">IPreprocessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/core/core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data/data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data/text/vocabulary.html">Vocabulary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/models/models.html">Models</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Dataset:</span></p>
+<p class="caption"><span class="caption-text">Examples:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/data/text/conll/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
-</ul>
-<p class="caption"><span class="caption-text">DataIterators:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api/data/text/iterators/conll_csv_in_memory.html">CoNLLCsvInMemory</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Models:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api/models/text/seq2seq/bilstm_crf.html">BiLSTMCrf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
@@ -168,7 +155,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/about.md.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/about.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -182,56 +169,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="about">
-<span id="about"></span><h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="vitaflow-videoimagetextaudioflow">
-<span id="vitaflow-videoimagetextaudioflow"></span><h2>vitaFlow - VideoImageTextAudioFlow<a class="headerlink" href="#vitaflow-videoimagetextaudioflow" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="introduction">
-<span id="introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Deep Learning projects are increasing exponentially in recent times and the complexity
-of handling such projects alike. We are incubating a ideation which would simplify the whole
-process of data preparation, modelling and serving in a easy configurable plug and play framework.</p>
-</div>
-<div class="section" id="problem-statement">
-<span id="problem-statement"></span><h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">¶</a></h2>
-<p>To come up with a framework that enables a fast prototyping of Deep Learning
-models that handles Video/Image/Text/Audio and provide an seamless way serving them
-in different end points.</p>
-</div>
-<div class="section" id="proposed-solution">
-<span id="proposed-solution"></span><h2>Proposed Solution<a class="headerlink" href="#proposed-solution" title="Permalink to this headline">¶</a></h2>
-<p>Come up with following modular components which can be then used as plug and play components:</p>
-<ul class="simple">
-<li>Dataset modules with preprocessing modules</li>
-<li>DataIterator modules</li>
-<li>Tensorflow Models (Estimators)</li>
-<li>Engine to run the models</li>
-<li>Tensorflow model serving using TFLite<ul>
-<li>Web app</li>
-<li>Mobile</li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="section" id="architecture">
-<span id="architecture"></span><h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
-<p><img alt="" src="_images/vitaflow_stack.png" /></p>
-</div>
-<div class="section" id="python-environment">
-<span id="python-environment"></span><h2>Python Environment<a class="headerlink" href="#python-environment" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">vitaflow</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.6</span>
-<span class="n">source</span> <span class="n">activate</span> <span class="n">vitaflow</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="a-simple-demo">
-<span id="a-simple-demo"></span><h2>A Simple Demo<a class="headerlink" href="#a-simple-demo" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">vitaflow</span><span class="o">/</span>
-<span class="n">python</span> <span class="n">vitaflow</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">config_python_file</span><span class="o">=</span><span class="n">examples</span><span class="o">/</span><span class="n">conll2003</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-</div>
+<h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
 </div>
 
 

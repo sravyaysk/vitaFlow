@@ -40,14 +40,14 @@ sys.path.insert(0, os.path.abspath('../../'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages']
+              'sphinx.ext.doctest',
+              'sphinx.ext.intersphinx',
+              'sphinx.ext.todo',
+              'sphinx.ext.coverage',
+              'sphinx.ext.mathjax',
+              'sphinx.ext.ifconfig',
+              'sphinx.ext.viewcode',
+              'sphinx.ext.githubpages']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -113,6 +113,13 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_context = {
+    'css_files': [
+        'https://fonts.googleapis.com/css?family=Lato',
+        '_static/css/custom_theme.css'
+    ],
+}
 
 
 # -- Options for HTMLHelp output ------------------------------------------
@@ -199,16 +206,9 @@ intersphinx_mapping = {
     'numpy': ('http://docs.scipy.org/docs/numpy/', None),
 }
 
-extlinks = {'tf_main': (
-    'https://www.tensorflow.org/api_docs/python/tf/%s',
-    None),
-    'tf_r0.12': (
-        'https://www.tensorflow.org/versions/r0.12/api_docs/python/%s',
-        None),
-    'tf_hmpg': (
-        'https://www.tensorflow.org/%s',
-        None),
-    'gym': (
-        'https://gym.openai.com/docs/%s',
-        None),
+extlinks = {
+    'tf_main': ('https://www.tensorflow.org/api_docs/python/tf/%s', None),
+    'tf_r0.12': ('https://www.tensorflow.org/versions/r0.12/api_docs/python/%s', None),
+    'tf_hmpg': ('https://www.tensorflow.org/%s', None),
+    'gym': ('https://gym.openai.com/docs/%s', None),
 }

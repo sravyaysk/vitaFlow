@@ -33,6 +33,8 @@ class IPreprocessor():
 
     Some rules are enforced here, such that it follows following directory structure:
 
+    :param hparams (vitaflow.core.HParams): See :func:`default_hparams()`
+
     .. code-block:: text
 
         default_experiment/
@@ -44,10 +46,10 @@ class IPreprocessor():
     """
 
     def __init__(self, hparams=None):
-        '''
+        """
 
-        :param
-        '''
+
+        """
         self._hparams = HParams(hparams, self.default_hparams())
 
         self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,
@@ -113,25 +115,26 @@ class IPreprocessor():
         }
 
     def _create_target_directories(self):
-        """Inheriting class must take care of creating experiment folder and all needed
+        """
+        Inheriting class must take care of creating experiment folder and all needed
         sub directories to store the preprocessed training and test data
-        :return: 
+        :return: None
         """
         raise NotImplementedError
 
     def _prepare_data(self):
-        """Inheriting class must implement this class.
-        Which not limited to, but includes:
-        - Downloading or copying the data
-        - Pre processing the data
-        - Storing the preprocessed data as train/val/test
-        :return:
+        """
+        Inheriting class must implement this class.
+        Which not limited to, but includes: Downloading or copying the data, Preprocessing the data,
+        Storing the preprocessed data as train/val/test
+        :return: None
         """
         raise NotImplementedError
 
     def preprocess_prepare(self):
-        """Pre-process and prepares the data for training
-        :return:
+        """
+        Pre-process and prepares the data for training
+        :return: None
         """
         self._create_target_directories()
         self._prepare_data()
