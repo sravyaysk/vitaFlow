@@ -25,7 +25,7 @@ In order to setup and install dependencies kindly refer the [this](examples/conl
 The focus on folder named examples. Perform the following steps.
 
 1. Create  a new folder called **clientx** 
-2. Create a config.py. This file can be a copy of **conll2003 config.py** 
+2. Create a config.py. This file can be a copy of **conll2003/config.py** 
 3. Change the necessary values like entity column and word column. 
 4. Change the experiment and dataset name to match out *clientx* affix
 
@@ -193,4 +193,41 @@ hparams.update({
 
 ## Experimentation
 
-## 
+### 1. Train
+
+```bash
+python vitaflow/run/run.py \
+	--mode=train \
+	--config_python_file=examples/clientx/config.py 
+```
+
+### 2. Retrain
+
+```bash
+python vitaflow/run/run.py \
+	--mode=retrain \
+	--config_python_file=examples/clientx/config.py 
+```
+
+### 3. Predict
+
+<!-- TODO: Tree -->
+
+Place all the files to be predicted in the val folder 
+
+1. ```reStructuredText
+   clientx_dataset
+       ├── BiLSTMCrf    
+       ├── clientx_data_iterator
+       ├── preprocessed_data
+       │   ├── test
+       │   ├── train
+       │   └── **val**
+   ```
+
+2. ```bash
+   python vitaflow/run/run.py \
+   	--mode=predict \
+   	--config_python_file=examples/clientx/config.py 	
+   ```
+
