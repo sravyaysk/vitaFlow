@@ -8,9 +8,8 @@ Welcome to vitaFlow's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
 
-   about.rst
+   README.md
    api/developers.md
 
 .. toctree::
@@ -19,7 +18,6 @@ Welcome to vitaFlow's documentation!
 
    api/core/core.rst
    api/data/data.rst
-   api/data/text/vocabulary.rst
    api/models/models.rst
 
 .. toctree::
@@ -27,6 +25,7 @@ Welcome to vitaFlow's documentation!
    :caption: Examples:
 
    examples/conll_2003_dataset.rst
+   examples/example.rst
 
 .. toctree::
    :maxdepth: 1
