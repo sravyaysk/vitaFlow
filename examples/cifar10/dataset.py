@@ -96,6 +96,7 @@ class Cifar10Dataset(IPreprocessor):
 
         hparams.update({
             "experiment_name": "Cifiar10Dataset",
+            "over_write" : False
         })
 
         return hparams
@@ -121,6 +122,8 @@ class Cifar10Dataset(IPreprocessor):
         path, file_name = os.path.split(in_path)
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
+            print_info("Copying the file {} to {}".format(in_path, out_dir))
+            shutil.copy(src=in_path, dst=out_dir)
         else:
             if not os.path.exists(os.path.join(out_dir, file_name)):
                 print_info("Copying the file {} to {}".format(in_path, out_dir))

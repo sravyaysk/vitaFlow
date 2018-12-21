@@ -23,7 +23,7 @@ from tensorflow.python.training import session_run_hook
 from tensorflow.python.training import training_util
 from tensorflow.contrib.learn import ModeKeys
 
-from vitaflow.core.features import ImageFeature
+from vitaflow.core.features import GANFeature
 from vitaflow.helpers.print_helper import print_info, print_error
 from vitaflow.core.models import ModelBase
 from vitaflow.utils.image_utils import images_square_grid
@@ -96,7 +96,7 @@ class GANTrainSteps(
     """
 
 
-class BEGAN(ModelBase, ImageFeature):
+class BEGAN(ModelBase, GANFeature):
     """
     Paper:
         - https://arxiv.org/abs/1703.10717
@@ -419,7 +419,10 @@ class BEGAN(ModelBase, ImageFeature):
         self.k = tf.Variable(0., trainable=False)
 
         # z_placeholder = features[self._feature_type.AUDIO_OR_NOISE]  # Audio/Noise Placeholder to the discriminator
-        z_placeholder = tf.random_normal(shape=[self._data_iterator.batch_size, 30])#features[self.FEATURE_NAME]  # Audio/Noise Placeholder to the discriminator
+        # z_placeholder = tf.random_normal(shape=[self._data_iterator.batch_size, 30])#features[self.FEATURE_NAME]  # Audio/Noise Placeholder to the discriminator
+
+        # z_placeholder = tf.random_normal(shape=[self._data_iterator.batch_size, 30])
+        z_placeholder = features[self.FEATURE_2_NAME]  # Audio/Noise Placeholder to the discriminator
 
         tf.logging.info("=========> {}".format(z_placeholder))
 
@@ -429,7 +432,7 @@ class BEGAN(ModelBase, ImageFeature):
 
         if is_training:
 
-            x_placeholder = features[self.FEATURE_NAME]  # Placeholder for input image vectors to the generator
+            x_placeholder = features[self.FEATURE_1_NAME]  # Placeholder for input image vectors to the generator
             tf.logging.info("=========> {}".format(x_placeholder))
 
             x_placeholder = tf.cast(x_placeholder, tf.float32, name="x_placeholder")

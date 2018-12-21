@@ -23,7 +23,7 @@ from tensorflow.python.training import session_run_hook
 from tensorflow.python.training import training_util
 from tensorflow.contrib.learn import ModeKeys
 
-from vitaflow.core.features import ImageFeature
+from vitaflow.core.features import GANFeature
 from vitaflow.helpers.print_helper import print_info, print_error
 from vitaflow.core.models import ModelBase
 from vitaflow.utils.image_utils import images_square_grid
@@ -96,7 +96,7 @@ class GANTrainSteps(
     """
 
 
-class CGAN(ModelBase, ImageFeature):
+class CGAN(ModelBase, GANFeature):
     """
         https://github.com/hwalsuklee/tensorflow-generative-model-collections/blob/master/CGAN.py
     """
@@ -376,7 +376,9 @@ class CGAN(ModelBase, ImageFeature):
         self.global_step = training_util.get_or_create_global_step()
         self.global_step_inc = self.global_step.assign_add(0)
 
-        z_placeholder = tf.random_normal(shape=[self._data_iterator.batch_size, 30])#features[self.FEATURE_NAME]  # Audio/Noise Placeholder to the discriminator
+        # z_placeholder = tf.random_normal(shape=[self._data_iterator.batch_size, 30])
+        z_placeholder = features[self.FEATURE_2_NAME]  # Audio/Noise Placeholder to the discriminator
+
         tf.logging.info("=========> {}".format(z_placeholder))
 
         z_placeholder = tf.cast(z_placeholder, tf.float32)
@@ -385,7 +387,7 @@ class CGAN(ModelBase, ImageFeature):
 
         if mode != ModeKeys.INFER:
 
-            x_placeholder = features[self.FEATURE_NAME]  # Placeholder for input image vectors to the generator
+            x_placeholder = features[self.FEATURE_1_NAME]  # Placeholder for input image vectors to the generator
             tf.logging.info("=========> {}".format(x_placeholder))
 
             x_placeholder = tf.cast(x_placeholder, tf.float32)
