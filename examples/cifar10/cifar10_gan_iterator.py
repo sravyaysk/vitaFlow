@@ -21,20 +21,20 @@ import tensorflow as tf
 from overrides import overrides
 
 from vitaflow.core import HParams
-from vitaflow.core.features import ImageFeature
 from vitaflow.core import IPreprocessor
 from vitaflow.core import IIteratorBase
+from vitaflow.core.features import GANFeature
 from vitaflow.helpers.os_helper import check_n_makedirs, print_info, print_error
 
 
-class Cifar10BasicIterator(IIteratorBase, ImageFeature):
+class Cifar10GanIterator(IIteratorBase, GANFeature):
     """
     References: https://github.com/Hvass-Labs/TensorFlow-Tutorials/blob/master/cifar10.py
     https://cntk.ai/pythondocs/CNTK_201A_CIFAR-10_DataLoader.html
     """
 
     def __init__(self, hparams=None, dataset=None):
-        ImageFeature.__init__(self)
+        GANFeature.__init__(self)
         IIteratorBase.__init__(self, dataset=dataset)
 
         self._hparams = HParams(hparams, self.default_hparams())
@@ -79,7 +79,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         # This is used to pre-allocate arrays for efficiency.
         self._num_images_train = self._num_files_train * self._images_per_file
 
-
+        self._images, self._labels = self._load_training_data()
 
     @staticmethod
     def default_hparams():
@@ -128,6 +128,9 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         "batch_size" : int
             Batch size for the current iterator
 
+        "noise_dim" : int
+            1D Dimension of noise signal
+
 
         :return: A dictionary of hyperparameters with default values
         """
@@ -135,7 +138,8 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         hparams = IPreprocessor.default_hparams()
         hparams.update(IIteratorBase.default_hparams())
         hparams.update({
-            "iterator_name": "Cifar10BasicIterator"
+            "iterator_name": "Cifar10GanIterator",
+            "noise_dim" : 30
         })
         return hparams
 
@@ -206,7 +210,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
 
         return np.eye(num_classes, dtype=float)[class_numbers]
 
-    def _load_training_data(self):
+    def _yield_training_data(self):
         """
         Load all the training-data for the CIFAR-10 data-set.
         The data-set is split into 5 data-files which are merged here.
@@ -243,8 +247,12 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
 
         yield images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
 
+    def _load_training_data(self):
+        generator = self._yield_training_data()
+        return next(generator)
 
-    def _load_test_data(self):
+
+    def _yield_test_data(self):
         """
         Load all the test-data for the CIFAR-10 data-set.
         Returns the images, class-numbers and one-hot encoded class-labels.
@@ -254,13 +262,16 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
 
         yield images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
 
+    def _load_test_data(self):
+        generator = self._yield_test_data()
+        return next(generator)
+
     @overrides
     def _get_train_input_fn(self):
 
-        images, labels = self._load_training_data()
-
-        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_NAME: images[:45000]},
-                                                      labels[:45000]))
+        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: self._images[:45000],
+                                                       self.FEATURE_2_NAME: np.ndarray((45000, self._hparams.noise_dim))},
+                                                      self._labels[:45000]))
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size)
         print_info("Dataset output sizes are: ")
@@ -270,10 +281,9 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
     @overrides
     def _get_val_input_fn(self):
 
-        images, labels = self._load_training_data()
-
-        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_NAME: images[:-5000]},
-                                                      labels[:-5000]))
+        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: self._images[:-5000],
+                                                       self.FEATURE_2_NAME: np.ndarray((5000, self._hparams.noise_dim))},
+                                                      self._labels[:-5000]))
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size)
         print_info("Dataset output sizes are: ")

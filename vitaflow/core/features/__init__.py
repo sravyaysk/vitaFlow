@@ -1,1 +1,1 @@
-from vitaflow.core.features.feature_types import ITextFeature, ImageFeature
+from vitaflow.core.features.feature_types import ITextFeature, ImageFeature, GANFeature
