@@ -112,7 +112,7 @@ class Experiments(object):
         return model
 
     def check_interoperability_n_import(self):
-        #Using factory classes get the handle for the actual classes from string
+        # Using factory classes get the handle for the actual classes from string
         self._dataset = self.get_dataset_reference(self._hparams['dataset_class_with_path'])
         self._data_iterator = self.get_iterator_reference(self._hparams['iterator_class_with_path'])
         self._model = self.get_model_reference(self._hparams['model_class_with_path'])
@@ -168,17 +168,14 @@ class Experiments(object):
 
     def run(self):
         self.setup()
-
         num_samples = self._data_iterator.num_train_samples
         batch_size = self._hparams[self._hparams['iterator_class_with_path']].batch_size
         num_epochs = self._hparams.num_epochs
         mode = self.mode
-
         self._init_tf_config()
-
         exec = Executor(model=self._model, data_iterator=self._data_iterator, config=self._run_config)
 
-        if (mode == "train" or mode == "retrain"):
+        if mode in ["train", "retrain"]:
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
                 print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
@@ -186,8 +183,8 @@ class Experiments(object):
                 print("\n\n Evaluating for epoch\n\n", current_epoch)
                 exec.evaluate(steps=200)
 
-        elif (mode == "predict"):
+        elif mode == "predict":
             exec.predict()
 
-        elif (mode == "predict_sentence"):
+        elif mode == "predict_sentence":
             exec.predict_sentence("SOCCER - JAPAN GET LUCKY WIN , CHINA IN SURPRISE DEFEAT .")
