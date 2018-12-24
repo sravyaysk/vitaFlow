@@ -80,9 +80,6 @@ class CoNLL2003Dataset(IPreprocessor, ICSVSeq2SeqType1):
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
         self._hparams = HParams(hparams, self.default_hparams())
-        # self._download_path =  self._hparams.experiment_root_directory + \
-        #                  "/" + self._hparams.experiment_name + \
-        #                 "/raw_data/"
         self._download_path = os.path.join(
             self._hparams.experiment_root_directory,
             self._hparams.experiment_name,
@@ -154,7 +151,6 @@ class CoNLL2003Dataset(IPreprocessor, ICSVSeq2SeqType1):
             "minimum_num_words": 5,
             "over_write": False,
         })
-
         return hparams
 
     def _create_target_directories(self):

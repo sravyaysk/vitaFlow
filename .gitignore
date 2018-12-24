@@ -109,3 +109,6 @@ venv.bak/
 
 # Pycharm or IntelliJ project settings
 .idea/
+
+# VS Code
+.vscode/
