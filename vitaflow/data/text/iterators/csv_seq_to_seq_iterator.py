@@ -551,12 +551,12 @@ class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):
         return dataset
 
     @overrides
-    def _get_predict_text_input_function(self, sentence):
+    def _get_predict_single_input_function(self, data):
 
         train_sentences, train_char_ids, train_ner_tags = None, None, None
 
         train_sentences, train_char_ids, train_ner_tags = \
-            self._make_seq_pair_text(sentence=sentence,
+            self._make_seq_pair_text(sentence=data,
                                      char_2_id_map=self.CHAR_2_ID_MAP,
                                      use_char_embd=self._hparams.use_char_embd)
 

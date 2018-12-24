@@ -17,8 +17,13 @@ Data iterator base class
 """
 
 from abc import ABC
+import os
+import pickle
+
 
 from vitaflow.core.hyperparams import HParams
+from vitaflow.core import IPreprocessor
+from vitaflow.helpers.print_helper import print_info
 
 
 class IIteratorBase(ABC):
@@ -45,9 +50,12 @@ class IIteratorBase(ABC):
 
         :return:  A dictionary of hyperparameters with default values
         """
-        return {
-            "batch_size": 32
-        }
+
+        params = IPreprocessor.default_hparams()
+        params .update(  {
+            "batch_size": 32,
+        })
+        return params
 
     @property
     def num_labels(self):
@@ -99,11 +107,11 @@ class IIteratorBase(ABC):
         """
         raise NotImplementedError
 
-    def _get_predict_text_input_function(self, sentence):
+    def _get_predict_single_input_function(self, data):
         """
 
-        :type sentence: str
-        :param sentence:
+        :type data:
+        :param data:
         :return:
         """
         raise NotImplementedError
@@ -135,7 +143,7 @@ class IIteratorBase(ABC):
         :param sentence:
         :return:
         """
-        return self._get_predict_text_input_function(sentence)
+        return self._get_predict_single_input_function(sentence)
 
     def predict_on_test_files(self, predict_fn):
         '''
@@ -154,3 +162,35 @@ class IIteratorBase(ABC):
         :return: 
         '''
         raise NotImplementedError
+
+
+    @property
+    def iterator_dir(self):
+        """
+        Returns iterator directory `experiment_root_directory`/`experiment_name`/`iterator_name`
+        :return:
+        """
+        path =  os.path.join(self._hparams.experiment_root_directory,
+                            self._hparams.experiment_name,
+                            type(self).__name__)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path
+
+
+    def store_as_pickle(self, data, file_name):
+        file_path = os.path.join(self.iterator_dir, file_name)
+        print_info("Witing the pickle file {}...".format(file_path))
+        with open(file_path, 'wb') as f:
+            pickle.dump(data, f)
+        return None
+
+    def read_pickle(self, file_name):
+        file_path = os.path.join(self.iterator_dir , file_name)
+        if os.path.exists(file_path):
+            print_info("Reading the pickle file {}...".format(file_path))
+            with open(file_path, 'rb') as f:
+                data = pickle.load(f)
+            return data
+        else:
+            return None

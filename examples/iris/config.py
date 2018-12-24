@@ -44,7 +44,7 @@ experiments = {
 
     # data model
     "LiReg": {
-        "model_directory": experiment_root_directory,
+        "model_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "use_char_embd": use_char_embd,
         "learning_rate": 0.001,

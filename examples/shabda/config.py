@@ -50,6 +50,12 @@ experiments = {
     },
 
     "examples.shabda.tedlium_iterator.TEDLiumIterator" : {
+        "experiment_root_directory": experiment_root_directory,
+        "experiment_name": experiment_name,
+        "preprocessed_data_path": "preprocessed_data",
+        "train_data_path": "train",
+        "validation_data_path": "dev",
+        "test_data_path": "test",
         "sampling_rate" : SAMPLING_RATE,
         "frame_size" : FRAME_SIZE,
         "neff" : NEFF,
@@ -64,7 +70,7 @@ experiments = {
     },
 
     "examples.shabda.deep_clustering.DeepClustering" : {
-        "model_directory": experiment_root_directory,
+        "model_root_directory": experiment_root_directory,
         "experiment_name": experiment_name
     }
 }

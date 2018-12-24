@@ -48,7 +48,7 @@ class ModelBase(object):
         """
         hparams = {
             "experiment_name": "model_name_or_dataset_name",
-            "model_directory" : os.path.join(os.path.expanduser("~"), "vitaFlow/", "default_model_dir")
+            "model_root_directory" : os.path.join(os.path.expanduser("~"), "vitaFlow/", "default_model_dir")
         }
         return hparams
 
@@ -60,7 +60,7 @@ class ModelBase(object):
         """
         return self._build(features, labels, params, mode, config=config)
 
-    def _get_loss(self, labels, logits):
+    def _get_loss(self, labels, logits, **kwargs):
         raise NotImplementedError
 
     def _build_layers(self, features, mode):
@@ -98,9 +98,9 @@ class ModelBase(object):
     @property
     def model_dir(self):
         """
-        Returns model directory `model_directory`/`experiment_name`/VanillaGAN
+        Returns model directory `model_root_directory`/`experiment_name`/VanillaGAN
         :return:
         """
-        return os.path.join(self._hparams.model_directory,
+        return os.path.join(self._hparams.model_root_directory,
                             self._hparams.experiment_name,
                             type(self).__name__)

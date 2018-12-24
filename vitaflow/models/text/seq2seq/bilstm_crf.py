@@ -106,7 +106,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         .. code-block:: python
 
             {
-                "model_directory" : os.path.expanduser("~") + "/vitaFlow/",
+                "model_root_directory" : os.path.expanduser("~") + "/vitaFlow/",
                 "experiment_name" : "experiment_name",
                 # hyper parameters
                 "use_char_embd": False,
@@ -148,7 +148,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         :return: A dictionary of hyperparameters with default values
         """
         hparams = {
-            "model_directory": os.path.expanduser("~") + "/vitaFlow/",
+            "model_root_directory": os.path.expanduser("~") + "/vitaFlow/",
             "experiment_name": "default",
             # hyper parameters
             "use_char_embd": False,

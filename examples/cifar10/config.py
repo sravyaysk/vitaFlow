@@ -45,17 +45,17 @@ experiments = {
 
     # data model
     "vitaflow.models.image.gan.vanilla_gan.VanillaGAN": {
-        "model_directory": experiment_root_directory,
+        "model_root_directory": experiment_root_directory,
         "experiment_name": experiment_name
     },
 
     "vitaflow.models.image.gan.cgan.CGAN": {
-        "model_directory": experiment_root_directory,
+        "model_root_directory": experiment_root_directory,
         "experiment_name": experiment_name
     },
 
     "vitaflow.models.image.gan.began.BEGAN": {
-        "model_directory": experiment_root_directory,
+        "model_root_directory": experiment_root_directory,
         "experiment_name": experiment_name
     }
 

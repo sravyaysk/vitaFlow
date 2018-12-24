@@ -23,13 +23,15 @@ import tensorflow as tf
 from tensorflow.contrib.learn import ModeKeys
 from tensorflow.contrib import lookup
 
+from examples.shabda.core.feature_types.shabda_wav_pair_feature import ShabdaWavPairFeature
 from vitaflow.core.hyperparams import HParams
 from vitaflow.core.models.model_base import ModelBase
 
-class DeepClustering(ModelBase):
+class DeepClustering(ModelBase, ShabdaWavPairFeature):
     def __init__(self, hparams=None, data_iterator=None):
         # ITextFeature.__init__(self)
         ModelBase.__init__(self, hparams=hparams)
+        ShabdaWavPairFeature.__init__(self)
         self._hparams = HParams(hparams,
                             self.default_hparams())
 
@@ -51,8 +53,10 @@ class DeepClustering(ModelBase):
         })
         return params
 
-
-    def _get_loss(self, embeddings, Y, VAD):
+    @overrides
+    def _get_loss(self, labels, logits, VAD):
+        embeddings = logits
+        Y = labels
         '''Defining the loss function'''
         embeddings_rs = tf.reshape(embeddings, shape=[-1, self._hparams.embd_dim])
         VAD_rs = tf.reshape(VAD, shape=[-1])
@@ -89,16 +93,21 @@ class DeepClustering(ModelBase):
                 layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_fw_cell = tf.nn.rnn_cell.DropoutWrapper(
-                lstm_fw_cell, input_keep_prob=1,
+                lstm_fw_cell,
+                input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             lstm_bw_cell = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden, layer_norm=False,
+                self.n_hidden,
+                layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_bw_cell = tf.nn.rnn_cell.DropoutWrapper(
-                lstm_bw_cell, input_keep_prob=1,
+                lstm_bw_cell,
+                input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             outputs, _ = tf.nn.bidirectional_dynamic_rnn(
-                lstm_fw_cell, lstm_bw_cell, x,
+                lstm_fw_cell,
+                lstm_bw_cell,
+                features,
                 sequence_length=[self._hparams.frames_per_sample] * self.batch_size,
                 dtype=tf.float32)
             state_concate = tf.concat(outputs, 2)
@@ -109,54 +118,69 @@ class DeepClustering(ModelBase):
             # lstm_bw_cell2 = tf.nn.rnn_cell.LSTMCell(
             #     self.n_hidden)
             lstm_fw_cell2 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden, layer_norm=False,
+                self.n_hidden,
+                layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_fw_cell2 = tf.nn.rnn_cell.DropoutWrapper(
-                lstm_fw_cell2, input_keep_prob=1,
+                lstm_fw_cell2,
+                input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             lstm_bw_cell2 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden, layer_norm=False,
+                self.n_hidden,
+                layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_bw_cell2 = tf.nn.rnn_cell.DropoutWrapper(
-                lstm_bw_cell2, input_keep_prob=1,
+                lstm_bw_cell2,
+                input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             outputs2, _ = tf.nn.bidirectional_dynamic_rnn(
-                lstm_fw_cell2, lstm_bw_cell2, state_concate,
+                lstm_fw_cell2,
+                lstm_bw_cell2,
+                state_concate,
                 sequence_length=[self._hparams.frames_per_sample] * self.batch_size,
                 dtype=tf.float32)
             state_concate2 = tf.concat(outputs2, 2)
             
         with tf.variable_scope('BLSTM3') as scope:
             lstm_fw_cell3 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden, layer_norm=False,
+                self.n_hidden,
+                layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_fw_cell3 = tf.nn.rnn_cell.DropoutWrapper(
-                lstm_fw_cell3, input_keep_prob=1,
+                lstm_fw_cell3,
+                input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             lstm_bw_cell3 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden, layer_norm=False,
+                self.n_hidden,
+                layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_bw_cell3 = tf.nn.rnn_cell.DropoutWrapper(
-                lstm_bw_cell3, input_keep_prob=1,
+                lstm_bw_cell3,
+                input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             outputs3, _ = tf.nn.bidirectional_dynamic_rnn(
-                lstm_fw_cell3, lstm_bw_cell3, state_concate2,
+                lstm_fw_cell3,
+                lstm_bw_cell3,
+                state_concate2,
                 sequence_length=[self._hparams.frames_per_sample] * self.batch_size,
                 dtype=tf.float32)
             state_concate3 = tf.concat(outputs3, 2)
             
         with tf.variable_scope('BLSTM4') as scope:
             lstm_fw_cell4 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden, layer_norm=False,
+                self.n_hidden,
+                layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_fw_cell4 = tf.nn.rnn_cell.DropoutWrapper(
-                lstm_fw_cell4, input_keep_prob=1,
+                lstm_fw_cell4,
+                input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             lstm_bw_cell4 = tf.contrib.rnn.LayerNormBasicLSTMCell(
                 self.n_hidden, layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_bw_cell4 = tf.nn.rnn_cell.DropoutWrapper(
-                lstm_bw_cell4, input_keep_prob=1,
+                lstm_bw_cell4,
+                input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             outputs4, _ = tf.nn.bidirectional_dynamic_rnn(
                 lstm_fw_cell4, lstm_bw_cell4, state_concate3,
@@ -180,7 +204,16 @@ class DeepClustering(ModelBase):
         raise NotImplementedError
 
     def _get_optimizer(self, loss):
-        raise NotImplementedError
+        optimizer = tf.train.AdamOptimizer(
+            learning_rate=0.001,
+            beta1=0.9,
+            beta2=0.999,
+            epsilon=1e-8)
+        gradients, v = zip(*optimizer.compute_gradients(loss))
+        gradients, _ = tf.clip_by_global_norm(gradients, 200)
+        train_op = optimizer.apply_gradients(
+            zip(gradients, v))
+        return train_op
 
     def _get_eval_metrics(self, predictions, labels):
         raise NotImplementedError
@@ -191,4 +224,27 @@ class DeepClustering(ModelBase):
         argument when constructing
         :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
         """
-        raise NotImplementedError
+        samples = features[self.FEATURE_1_NAME]
+        vad = features[self.FEATURE_2_NAME]
+        tf.logging.info("samples: =====> {}".format(samples))
+        tf.logging.info("vad: =====> {}".format(vad))
+
+
+        embeddings = self._build_layers(samples, mode)
+
+        loss = None
+        optimizer = None
+        if mode != tf.estimator.ModeKeys.PREDICT:
+                # labels = tf.reshape(labels, shape=(-1, self._out_dim), name="labels")
+            tf.logging.info('labels: -----> {}'.format(labels))
+
+            loss = self._get_loss(labels=labels, logits=embeddings, VAD=vad)
+            optimizer = self._get_optimizer(loss=loss)
+            # eval_metric_ops = self._get_eval_metrics(predictions=predictions, labels=ner_ids)
+
+        return tf.estimator.EstimatorSpec(
+            mode=mode,
+            predictions=None,
+            loss=loss,
+            train_op=optimizer,
+            eval_metric_ops=None)
