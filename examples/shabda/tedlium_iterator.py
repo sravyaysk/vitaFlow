@@ -214,7 +214,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 # Y: indicator of the belongings of the TF bin
                 # 1st speaker or second speaker
                 Y = np.array([sample_1 > sample_2, sample_1 < sample_2]).astype('bool')
-                Y = np.transpose(Y, [1, 2, 0])
+                Y = np.transpose(Y, [1, 2, 0]).astype('bool')
                 VAD = speech_VAD[k:k + self._hparams.frames_per_sample, :].astype('bool')
                 # sample_dict = {'Sample': sample_mix,
                 #                'VAD': VAD,
@@ -242,7 +242,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: sample,
                                                       self.FEATURE_2_NAME: vad},
                                                      target))
-        dataset = dataset.batch(batch_size=self._hparams.batch_size)
+        dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True).prefetch(2*self._hparams.batch_size)
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
@@ -252,7 +252,14 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         Inheriting class must implement this
         :return: callable
         """
-        raise NotImplementedError
+        sample, vad, target = self._generate_samples(self.VAL_WAV_PAIR)
+        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: sample,
+                                                       self.FEATURE_2_NAME: vad},
+                                                      target))
+        dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True).prefetch(2*self._hparams.batch_size)
+        print_info("Dataset output sizes are: ")
+        print_info(dataset.output_shapes)
+        return dataset
 
     def _get_test_input_function(self):
         """

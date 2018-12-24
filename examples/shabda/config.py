@@ -26,7 +26,7 @@ TRAIN_BATCH_SIZE = 128
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
 experiment_name = "TEDLiumTesDataset"
-batch_size = 32
+batch_size = 10
 experiments = {
     "num_epochs": 5,
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
@@ -36,6 +36,7 @@ experiments = {
     "keep_checkpoint_max": 5,
     "save_summary_steps": 25,
     "log_step_count_steps": 10,
+    "clear_model_data" : False,
 
     "examples.shabda.tedlium_dataset.TEDLiumDataset": {
         "experiment_name": experiment_name,
@@ -71,6 +72,13 @@ experiments = {
 
     "examples.shabda.deep_clustering.DeepClustering" : {
         "model_root_directory": experiment_root_directory,
-        "experiment_name": experiment_name
+        "experiment_name": experiment_name,
+        "neff" : NEFF,
+        "batch_size" : batch_size,
+        "n_hidden" : 4,
+        "p_keep_ff" : 0.5,
+        "p_keep_rc" : 0.5,
+        "frames_per_sample" : FRAMES_PER_SAMPLE,
+        "embd_dim" : 30,
     }
 }

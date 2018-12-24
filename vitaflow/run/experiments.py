@@ -15,6 +15,8 @@
 Experiments class that allows easy plug n play of modules
 """
 import logging
+import os
+import shutil
 from importlib import import_module
 
 import tensorflow as tf
@@ -59,7 +61,8 @@ class Experiments(object):
             "save_checkpoints_steps" : 50,
             "keep_checkpoint_max" : 5,
             "save_summary_steps" : 25,
-            "log_step_count_steps" : 10
+            "log_step_count_steps" : 10,
+            "clear_model_data" : False,
         }
 
     def _get_class(self, package, name):
@@ -134,6 +137,11 @@ class Experiments(object):
         run_config.allow_soft_placement = True
         run_config.log_device_placement = False
         model_dir = self._model.model_dir
+
+        if self._hparams.clear_model_data:
+            if os.path.exists(model_dir):
+                shutil.rmtree(model_dir)
+
         self._run_config = tf.estimator.RunConfig(session_config=run_config,
                                                   save_checkpoints_steps=self._hparams.save_checkpoints_steps,
                                                   keep_checkpoint_max=self._hparams.keep_checkpoint_max,
