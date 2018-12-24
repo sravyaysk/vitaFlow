@@ -14,7 +14,7 @@ experiments = {
     "dataset_class_with_path": "examples.cifar10.dataset.Cifar10Dataset",
     "iterator_class_with_path": "examples.cifar10.cifar10_gan_iterator.Cifar10GanIterator",
     "model_class_with_path": "vitaflow.models.image.gan.vanilla_gan.VanillaGAN",
-    "save_checkpoints_steps" : 1000,
+    "save_checkpoints_steps" : 45000/4500,
     "keep_checkpoint_max" : 5,
     "save_summary_steps" : 25,
     "log_step_count_steps" : 10,

@@ -150,18 +150,16 @@ class Experiments(object):
                                                   dataset=self._dataset)
         self._model = self._model(hparams=self._hparams[self._hparams['model_class_with_path']], data_iterator=self._data_iterator)
 
-    def test_dataset(self):
-        iterator = self._data_iterator.test_sentence_input_fn("@ º &").make_initializable_iterator()
-        next_element = iterator.get_next()
+    def test_experiment(self):
+        next_element = self._data_iterator.get_next()
         # print_debug(next_element)
-        init_op = iterator.initializer
+        init_op = self._data_iterator.initializer
         with tf.Session() as sess:
             # Initialize the iterator
             sess.run(init_op)
             # print(sess.run(next_element))
             res = sess.run(next_element)
-            print_debug(res[0])
-            print_debug(res[1])
+            print_debug(res)
             # Move the iterator back to the beginning
             # sess.run(init_op)
             # print(sess.run(next_element))
@@ -175,6 +173,9 @@ class Experiments(object):
         mode = self.mode
 
         self._init_tf_config()
+
+        if mode == "test_experiment":
+            self.test_experiment()
 
         exec = Executor(model=self._model, data_iterator=self._data_iterator, config=self._run_config)
 

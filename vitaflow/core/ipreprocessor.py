@@ -54,13 +54,24 @@ class IPreprocessor():
 
         self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,
                                                 self._hparams.experiment_name)
-        self.DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
-                                         self._hparams.preprocessed_data_path)
-        self.TRAIN_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
+
+        self.TRAIN_IN_PATH = os.path.join(self.EXPERIMENT_ROOT_DIR,
+                                          "raw_data",
+                                          self._hparams.train_data_path)
+        self.VAL_IN_PATH = os.path.join(self.EXPERIMENT_ROOT_DIR,
+                                        "raw_data",
+                                        self._hparams.validation_data_path)
+        self.TEST_IN_PATH = os.path.join(self.EXPERIMENT_ROOT_DIR,
+                                         "raw_data",
+                                         self._hparams.test_data_path)
+
+        self.PROCESSED_DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
+                                                   self._hparams.preprocessed_data_path)
+        self.TRAIN_OUT_PATH = os.path.join(self.PROCESSED_DATA_OUT_DIR,
                                            self._hparams.train_data_path)
-        self.VAL_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
+        self.VAL_OUT_PATH = os.path.join(self.PROCESSED_DATA_OUT_DIR,
                                          self._hparams.validation_data_path)
-        self.TEST_OUT_PATH = os.path.join(self.DATA_OUT_DIR,
+        self.TEST_OUT_PATH = os.path.join(self.PROCESSED_DATA_OUT_DIR,
                                           self._hparams.test_data_path)
 
     @staticmethod

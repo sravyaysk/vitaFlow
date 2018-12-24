@@ -66,9 +66,9 @@ class BiLSTMCrf(ModelBase, ITextFeature):
 
     def __init__(self, hparams=None, data_iterator: CSVSeqToSeqIterator = None):
         ITextFeature.__init__(self)
+        ModelBase.__init__(self, hparams=hparams)
         self._hparams = HParams(hparams,
-                                self.default_hparams(),
-                                allow_new_hparam=True)
+                                self.default_hparams())
 
         # if not isinstance(data_iterator, CoNLLCsvDataIterator):
         #     raise RuntimeError

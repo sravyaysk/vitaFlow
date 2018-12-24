@@ -39,8 +39,7 @@ class ModelBase(object):
     """
 
     def __init__(self, hparams=None):
-        self._hparams = HParams(hparams, self.default_hparams(),
-                                allow_new_hparam=True)
+        self._hparams = HParams(hparams, self.default_hparams())
 
     @staticmethod
     def default_hparams():
@@ -48,12 +47,14 @@ class ModelBase(object):
         Returns a dictionary of hyperparameters with default values.
         """
         hparams = {
-            "name": "modelbase"
+            "experiment_name": "model_name_or_dataset_name",
+            "model_directory" : os.path.join(os.path.expanduser("~"), "vitaFlow/", "default_model_dir")
         }
         return hparams
 
     def __call__(self, features, labels, params, mode, config=None):
-        """Used for the :tf_main:`model_fn <estimator/Estimator#__init__>`
+        """
+        Used for the :tf_main:`model_fn <estimator/Estimator#__init__>`
         argument when constructing
         :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
         """

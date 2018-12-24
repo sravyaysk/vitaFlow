@@ -106,17 +106,17 @@ class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
         To setup destination folders structure if not present.
         :return:
         """
-        if os.path.exists(self.DATA_OUT_DIR):
+        if os.path.exists(self.PROCESSED_DATA_OUT_DIR):
             if self._hparams.over_write:
-                print_info("Deleting data folder: {}".format(self.DATA_OUT_DIR))
-                shutil.rmtree(self.DATA_OUT_DIR)
-                print_info("Recreating data folder: {}".format(self.DATA_OUT_DIR))
-                os.makedirs(self.DATA_OUT_DIR)
+                print_info("Deleting data folder: {}".format(self.PROCESSED_DATA_OUT_DIR))
+                shutil.rmtree(self.PROCESSED_DATA_OUT_DIR)
+                print_info("Recreating data folder: {}".format(self.PROCESSED_DATA_OUT_DIR))
+                os.makedirs(self.PROCESSED_DATA_OUT_DIR)
             else:
                 print_info("Skipping preprocessing step, since the data might already be available")
         else:
-            print_info("Creating data folder: {}".format(self.DATA_OUT_DIR))
-            os.makedirs(self.DATA_OUT_DIR)
+            print_info("Creating data folder: {}".format(self.PROCESSED_DATA_OUT_DIR))
+            os.makedirs(self.PROCESSED_DATA_OUT_DIR)
 
     def _place_dataset(self, origin_file_path, out_dir):
         """
