@@ -111,6 +111,7 @@ class TEDLiumIterator(IIteratorBase):
 
     def generate_match_dict(self, speaker): #TODO pickle
         # generate match dict
+        pass
 
 
     def generate_samples(self):
