@@ -25,14 +25,14 @@ MAX_STEP = 2000000
 TRAIN_BATCH_SIZE = 128
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
-experiment_name = "TEDLiumTesDataset"
-batch_size = 10
+experiment_name = "TEDLiumDataset"
+batch_size = 32
 experiments = {
     "num_epochs": 5,
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
     "iterator_class_with_path": "examples.shabda.tedlium_iterator.TEDLiumIterator",
     "model_class_with_path": "examples.shabda.deep_clustering.DeepClustering",
-    "save_checkpoints_steps": 50,
+    "save_checkpoints_steps": 100,
     "keep_checkpoint_max": 5,
     "save_summary_steps": 25,
     "log_step_count_steps": 10,

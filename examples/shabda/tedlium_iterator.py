@@ -13,26 +13,34 @@ import argparse
 import glob
 
 import tensorflow as tf
+from tensorflow import TensorShape, Dimension
+from tqdm import tqdm
 
 from examples.shabda.core.feature_types.shabda_wav_pair_feature import ShabdaWavPairFeature
 from vitaflow.core import HParams, IIteratorBase, IPreprocessor
-from vitaflow.helpers.print_helper import print_error, print_info
+from vitaflow.helpers.print_helper import print_error, print_info, print_warn
 
 
 def stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
     """ short time fourier transform of audio signal """
     win = window(frameSize)
     hopSize = int(frameSize - np.floor(overlapFac * frameSize))
+    print_error("---------")
+    print_error(hopSize)
     samples = np.array(sig, dtype='float64')
+    print_error(samples.shape)
     # cols for windowing
     cols = int(np.ceil((len(samples) - frameSize) / float(hopSize)) + 1)
     # zeros at end (thus samples can be fully covered by frames)
     samples = np.append(samples, np.zeros(frameSize))
+    print_error(samples.shape)
+
     frames = stride_tricks.as_strided(
         samples,
         shape=(cols, frameSize),
         strides=(samples.strides[0] * hopSize, samples.strides[0])).copy()
     frames *= win
+    print_error("<<<<<<<<<<")
     return np.fft.rfft(frames)
 
 
@@ -102,7 +110,11 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
     @property
     def num_train_samples(self):
-        return 256
+        count = 0
+        for speaker in self.TRAIN_SPEAKER_WAV_FILES_DICT:
+            files = self.TRAIN_SPEAKER_WAV_FILES_DICT[speaker]
+            count += len(files)
+        return count
 
     @property
     def num_val_samples(self):
@@ -120,7 +132,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         """
         # get dirs for each speaker
         speakers_dirs = [os.path.join(data_dir, speaker) for speaker in os.listdir(data_dir) \
-                             if os.path.isdir(os.path.join(data_dir, speaker))]
+                         if os.path.isdir(os.path.join(data_dir, speaker))]
 
         speaker_wav_files_dict = {}
 
@@ -135,17 +147,35 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 speaker_wav_files_dict[speaker].append(wav_file)
         return speaker_wav_files_dict
 
+    def get_shape(self, wav_file):
+        # sig, _ = librosa.core.load(wav_file, sr=self._hparams.sampling_rate)
+        # return sig.shape[0]
+        st = os.stat(wav_file)
+        return st.st_size
 
     def generate_match_dict(self, speaker_wav_files_dict):
         wav_file_pair = {}
         # generate match dict
-        for speaker_1 in speaker_wav_files_dict:
-            for wav_file_1 in speaker_wav_files_dict[speaker_1]:
+        for speaker_1 in tqdm(speaker_wav_files_dict, desc="pair_dict"):
+            for wav_file_1 in tqdm(speaker_wav_files_dict[speaker_1], desc="pair_dict_inner"):
+                size_1 = self.get_shape(wav_file_1)
+                if size_1 < 1000 :
+                    continue
                 speaker_2 = random.choice(list(speaker_wav_files_dict))
+
                 while (speaker_1 == speaker_2):
                     speaker_2 = random.choice(list(speaker_wav_files_dict))
                 wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
-                wav_file_pair[wav_file_1] = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
+
+                wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
+                size_2 = self.get_shape(wav_file_2)
+
+                while size_2 < 1000:
+                    wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
+                    wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
+                    size_2 = self.get_shape(wav_file_2)
+
+                wav_file_pair[wav_file_1] = wav_file_2
 
         return wav_file_pair
 
@@ -160,8 +190,11 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         self.ind = 0
 
         # for each file pair, generate their mixture and reference samples
-        for wav_file_1 in speaker_file_match:
+        for wav_file_1 in tqdm(speaker_file_match, desc="speaker_file_match"):
             wav_file_2 = speaker_file_match[wav_file_1]
+
+            print_info(wav_file_1)
+            print_error(wav_file_2)
 
             speech_1, _ = librosa.core.load(wav_file_1, sr=self._hparams.sampling_rate)
             # amp factor between -3 dB - 3 dB
@@ -171,6 +204,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             speech_2, _ = librosa.core.load(wav_file_2, sr=self._hparams.sampling_rate)
             fac = np.random.rand(1)[0] * 6 - 3
             speech_2 = 10. ** (fac / 20) * speech_2
+
+            print_warn(speech_1.shape)
+            print_warn(speech_2.shape)
+
 
             # mix
             length = min(len(speech_1), len(speech_2))
@@ -205,6 +242,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             speech_mix_features = (speech_mix_features - self._hparams.global_mean) / self._hparams.global_std
 
             len_spec = speech_1_features.shape[0]
+            print_error("len_spec {}".format(len_spec))
             k = 0
             while(k + self._hparams.frames_per_sample < len_spec):
                 sample_1 = speech_1_features[k:k + self._hparams.frames_per_sample, :]
@@ -223,26 +261,51 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 k = k + self._hparams.frames_per_sample
 
                 # Small adjustment for the batching
-                sample_mix = np.expand_dims(sample_mix, 0)
-                VAD = np.expand_dims(VAD, 0)
-                Y = np.expand_dims(Y, 0)
+                # sample_mix = np.expand_dims(sample_mix, 0)
+                # VAD = np.expand_dims(VAD, 0)
+                # Y = np.expand_dims(Y, 0)
 
                 yield sample_mix, VAD, Y
+                # self.samples.append(({self.FEATURE_1_NAME: sample_mix,
+                #                       self.FEATURE_2_NAME: VAD}, Y))
 
     def _generate_samples(self, wav_file_pairs):
         gen = self._yield_samples(wav_file_pairs)
         return next(gen)
+
+    def _yield_train_samples(self):
+        return self._yield_samples(self.TRAIN_WAV_PAIR)
+
+    def map_func(self, x):
+        return {self.FEATURE_1_NAME: x[0],
+                self.FEATURE_2_NAME: x[1]}, x[2]
 
     def _get_train_input_fn(self):
         """
         Inheriting class must implement this
         :return: callable
         """
-        sample, vad, target = self._generate_samples(self.TRAIN_WAV_PAIR)
-        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: sample,
-                                                      self.FEATURE_2_NAME: vad},
-                                                     target))
-        dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True).prefetch(2*self._hparams.batch_size)
+
+        # sample, vad, target = self._generate_samples(self.TRAIN_WAV_PAIR)
+        #
+        # dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: sample,
+        #                                               self.FEATURE_2_NAME: vad},
+        #                                              target))
+        # print_error(len(sample))
+
+        self._generate_samples(self.TRAIN_WAV_PAIR)
+        dataset = tf.data.Dataset.from_tensor_slices(self.samples)
+
+        dataset = tf.data.Dataset.from_generator(self._yield_train_samples,
+                                                 (tf.float32, tf.bool, tf.bool),
+                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
+                                                                TensorShape([Dimension(100), Dimension(129)]),
+                                                                TensorShape([Dimension(100), Dimension(129), Dimension(2)])))
+
+        dataset = dataset.map(lambda x, y, z : ({self.FEATURE_1_NAME: x,
+                                                 self.FEATURE_2_NAME: y}, z))
+
+        dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
@@ -256,7 +319,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: sample,
                                                        self.FEATURE_2_NAME: vad},
                                                       target))
-        dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True).prefetch(2*self._hparams.batch_size)
+        dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset

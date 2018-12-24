@@ -169,6 +169,8 @@ class Experiments(object):
             # print(sess.run(next_element))
             res = sess.run(next_element)
             print_debug(res)
+            res = sess.run(next_element)
+            print_debug(res)
             # Move the iterator back to the beginning
             # sess.run(init_op)
             # print(sess.run(next_element))
@@ -177,6 +179,7 @@ class Experiments(object):
     def run(self):
         self.setup()
         num_samples = self._data_iterator.num_train_samples
+        print_info("Number of trianing samples : {}".format(num_samples))
         batch_size = self._hparams[self._hparams['iterator_class_with_path']].batch_size
         num_epochs = self._hparams.num_epochs
         mode = self.mode
