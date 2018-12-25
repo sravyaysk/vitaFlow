@@ -23,6 +23,7 @@ import pickle
 
 from vitaflow.core.hyperparams import HParams
 from vitaflow.core import IPreprocessor
+from vitaflow.helpers.os_helper import check_n_makedirs
 from vitaflow.helpers.print_helper import print_info
 
 
@@ -30,6 +31,11 @@ class IIteratorBase(ABC):
     def __init__(self, hparams=None, dataset=None):
         self._hparams = HParams(hparams, self.default_hparams())
         # self.set_dataset(dataset=dataset)
+
+        self.temp_dir = os.path.join("/tmp/vitaflow",
+                                     self._hparams.experiment_name,
+                                     type(self).__name__)
+        check_n_makedirs(self.temp_dir)
 
     @staticmethod
     def default_hparams():
@@ -171,8 +177,8 @@ class IIteratorBase(ABC):
         :return:
         """
         path =  os.path.join(self._hparams.experiment_root_directory,
-                            self._hparams.experiment_name,
-                            type(self).__name__)
+                             self._hparams.experiment_name,
+                             type(self).__name__)
         if not os.path.exists(path):
             os.makedirs(path)
         return path

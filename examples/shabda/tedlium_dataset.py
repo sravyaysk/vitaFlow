@@ -10,22 +10,40 @@ from vitaflow.helpers.print_helper import print_error, print_warn, print_info
 
 class TEDLiumDataset(IPreprocessor):
     """
+    Download the dataset from https://projets-lium.univ-lemans.fr/wp-content/uploads/corpus/TED-LIUM/TEDLIUM_release1.tar.gz
+    And unzip as shown below
 
     .. code-block:: text
 
-        ~/vitaflow/
+        ~/vitaflow/ #this can be anywhere on your system
             TEDLiumDataset/
                 raw_data/
                     train/
                         sph/
+                            speaker_1.sph
+                            speaker_2.sph ...
                     dev/
                         sph/
-                    val/
+                            speaker_1.sph ...
+                    test/
                         sph/
-                    processed_data/
+                            speaker_1.sph ...
+                    processed_data/ #created as part of this class output
                         train/
-                        val/
-
+                           speaker_1/
+                                file_1.wav
+                                file_2.wav ...
+                            speaker_2/
+                                file_1.wav
+                                file_2.wav ...
+                        dev/
+                            speaker_1/
+                                file_1.wav ...
+                            speaker_2/
+                                file_1.wav ...
+                        test/
+                            speaker_1/
+                                file_1.wav ...
     """
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
@@ -126,9 +144,9 @@ class TEDLiumDataset(IPreprocessor):
                                              y[k*sampling_rate : (k+duration)*sampling_rate],
                                              sampling_rate)
             else:
-                # print_info("While processing {}".format(file_path))
-                # print_warn("Found existing data @ {}".format(speaker_dir))
-                # print_info("Skipping!!!")
+                print_info("While processing {}".format(file_path))
+                print_warn("Found existing data @ {}".format(speaker_dir))
+                print_info("Skipping!!!")
                 pass
 
 

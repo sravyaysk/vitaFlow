@@ -25,22 +25,17 @@ def stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
     """ short time fourier transform of audio signal """
     win = window(frameSize)
     hopSize = int(frameSize - np.floor(overlapFac * frameSize))
-    print_error("---------")
-    print_error(hopSize)
     samples = np.array(sig, dtype='float64')
-    print_error(samples.shape)
     # cols for windowing
     cols = int(np.ceil((len(samples) - frameSize) / float(hopSize)) + 1)
     # zeros at end (thus samples can be fully covered by frames)
     samples = np.append(samples, np.zeros(frameSize))
-    print_error(samples.shape)
 
     frames = stride_tricks.as_strided(
         samples,
         shape=(cols, frameSize),
         strides=(samples.strides[0] * hopSize, samples.strides[0])).copy()
     frames *= win
-    print_error("<<<<<<<<<<")
     return np.fft.rfft(frames)
 
 
@@ -98,7 +93,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             "global_mean" : 44,
             "global_std" : 15.5,
             "frames_per_sample" : 100,
-            "reinit_file_pair" : False
+            "reinit_file_pair" : False,
+            "prefetch_size" : 32
         }
         )
         return params
@@ -193,8 +189,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         for wav_file_1 in tqdm(speaker_file_match, desc="speaker_file_match"):
             wav_file_2 = speaker_file_match[wav_file_1]
 
-            print_info(wav_file_1)
-            print_error(wav_file_2)
+            # print_info(wav_file_1)
+            # print_error(wav_file_2)
 
             speech_1, _ = librosa.core.load(wav_file_1, sr=self._hparams.sampling_rate)
             # amp factor between -3 dB - 3 dB
@@ -204,9 +200,9 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             speech_2, _ = librosa.core.load(wav_file_2, sr=self._hparams.sampling_rate)
             fac = np.random.rand(1)[0] * 6 - 3
             speech_2 = 10. ** (fac / 20) * speech_2
-
-            print_warn(speech_1.shape)
-            print_warn(speech_2.shape)
+            #
+            # print_warn(speech_1.shape)
+            # print_warn(speech_2.shape)
 
 
             # mix
@@ -242,7 +238,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             speech_mix_features = (speech_mix_features - self._hparams.global_mean) / self._hparams.global_std
 
             len_spec = speech_1_features.shape[0]
-            print_error("len_spec {}".format(len_spec))
+            # print_error("len_spec {}".format(len_spec))
             k = 0
             while(k + self._hparams.frames_per_sample < len_spec):
                 sample_1 = speech_1_features[k:k + self._hparams.frames_per_sample, :]
@@ -254,47 +250,25 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 Y = np.array([sample_1 > sample_2, sample_1 < sample_2]).astype('bool')
                 Y = np.transpose(Y, [1, 2, 0]).astype('bool')
                 VAD = speech_VAD[k:k + self._hparams.frames_per_sample, :].astype('bool')
-                # sample_dict = {'Sample': sample_mix,
-                #                'VAD': VAD,
-                #                'Target': Y}
-                # self.samples.append(sample_dict)
+
                 k = k + self._hparams.frames_per_sample
 
-                # Small adjustment for the batching
-                # sample_mix = np.expand_dims(sample_mix, 0)
-                # VAD = np.expand_dims(VAD, 0)
-                # Y = np.expand_dims(Y, 0)
-
                 yield sample_mix, VAD, Y
-                # self.samples.append(({self.FEATURE_1_NAME: sample_mix,
-                #                       self.FEATURE_2_NAME: VAD}, Y))
-
-    def _generate_samples(self, wav_file_pairs):
-        gen = self._yield_samples(wav_file_pairs)
-        return next(gen)
 
     def _yield_train_samples(self):
         return self._yield_samples(self.TRAIN_WAV_PAIR)
 
-    def map_func(self, x):
-        return {self.FEATURE_1_NAME: x[0],
-                self.FEATURE_2_NAME: x[1]}, x[2]
+    def _yield_val_samples(self):
+        return self._yield_samples(self.VAL_WAV_PAIR)
+
+    def _yield_test_samples(self):
+        return self._yield_samples(self.TEST_WAV_PAIR)
 
     def _get_train_input_fn(self):
         """
         Inheriting class must implement this
         :return: callable
         """
-
-        # sample, vad, target = self._generate_samples(self.TRAIN_WAV_PAIR)
-        #
-        # dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: sample,
-        #                                               self.FEATURE_2_NAME: vad},
-        #                                              target))
-        # print_error(len(sample))
-
-        self._generate_samples(self.TRAIN_WAV_PAIR)
-        dataset = tf.data.Dataset.from_tensor_slices(self.samples)
 
         dataset = tf.data.Dataset.from_generator(self._yield_train_samples,
                                                  (tf.float32, tf.bool, tf.bool),
@@ -306,6 +280,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                                                  self.FEATURE_2_NAME: y}, z))
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "train_data_cache"))
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
@@ -315,11 +291,19 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         Inheriting class must implement this
         :return: callable
         """
-        sample, vad, target = self._generate_samples(self.VAL_WAV_PAIR)
-        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: sample,
-                                                       self.FEATURE_2_NAME: vad},
-                                                      target))
+
+        dataset = tf.data.Dataset.from_generator(self._yield_val_samples,
+                                                 (tf.float32, tf.bool, tf.bool),
+                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
+                                                                TensorShape([Dimension(100), Dimension(129)]),
+                                                                TensorShape([Dimension(100), Dimension(129), Dimension(2)])))
+
+        dataset = dataset.map(lambda x, y, z : ({self.FEATURE_1_NAME: x,
+                                                 self.FEATURE_2_NAME: y}, z))
+
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "val_data_cache"))
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
@@ -329,7 +313,21 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         Inheriting class must implement this
         :return: callable
         """
-        raise NotImplementedError
+        dataset = tf.data.Dataset.from_generator(self._yield_test_samples,
+                                                 (tf.float32, tf.bool, tf.bool),
+                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
+                                                                TensorShape([Dimension(100), Dimension(129)]),
+                                                                TensorShape([Dimension(100), Dimension(129), Dimension(2)])))
+
+        dataset = dataset.map(lambda x, y, z : ({self.FEATURE_1_NAME: x,
+                                                 self.FEATURE_2_NAME: y}, z))
+
+        dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "test_data_cache"))
+        print_info("Dataset output sizes are: ")
+        print_info(dataset.output_shapes)
+        return dataset
 
 
     #
