@@ -1,9 +1,9 @@
+import os
 import glob
 import librosa
-import os
 import numpy as np
-from tqdm import tqdm
 
+from tqdm import tqdm
 from vitaflow.core import IPreprocessor, HParams
 from vitaflow.helpers.print_helper import print_error, print_warn, print_info
 
@@ -106,7 +106,6 @@ class TEDLiumDataset(IPreprocessor):
 
         return hparams
 
-
     def audio_clip(self,
                    data_dir,
                    num_clips,
@@ -131,7 +130,8 @@ class TEDLiumDataset(IPreprocessor):
 
         for i in tqdm(range(len(speakers)), desc="speakers"):
             file_path = speakers[i]
-            speaker = file_path.split("/")[-1].split(".")[0] #each speaker can have multiple talks
+            # each speaker can have multiple talks, take first one only
+            speaker = file_path.split("/")[-1].split(".")[0]
             speaker_dir = os.path.join(output_dir, speaker)
             if not os.path.exists(speaker_dir):
                 os.makedirs(speaker_dir)
@@ -149,8 +149,8 @@ class TEDLiumDataset(IPreprocessor):
                 print_info("Skipping!!!")
                 pass
 
-
     def extract_speech_clips(self):
+        # TODO - Create a dict `inputs` and pass the input as **inputs
         self.audio_clip(data_dir=os.path.join(self.TRAIN_IN_PATH, "sph"),
                         num_clips=self._hparams.num_clips,
                         start_time=self._hparams.start_time,
@@ -174,8 +174,3 @@ class TEDLiumDataset(IPreprocessor):
                         duration=self._hparams.duration,
                         output_dir=self.TEST_OUT_PATH,
                         sampling_rate=self._hparams.sampling_rate)
-
-
-
-
-

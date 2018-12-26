@@ -1,7 +1,7 @@
 
 ### [DeWave](https://github.com/chaodengusc/DeWave)
 
-We have considered DeWave as a starting poin to our exploration in Audio and/or Video sepration task.
+We have considered DeWave as a starting point to our exploration in Audio and/or Video separation task.
 
 DeWave is simplest of all which uses Deep Clustering to seperate two mixture of audio signals.
 
@@ -23,18 +23,19 @@ python vitaflow/run/run.py --mode=train -config_python_file=examples/shabda/conf
 
 ### Reference: 
 
-https://ai.googleblog.com/2018/04/looking-to-listen-audio-visual-speech.html
+* https://ai.googleblog.com/2018/04/looking-to-listen-audio-visual-speech.html
+
 Look to Listen/Cocktail Party:
-https://github.com/avivga/audio-visual-speech-enhancement
-https://github.com/andrewowens/multisensory
-https://github.com/chaodengusc/DeWave
-https://github.com/crystal-method/Looking-to-Listen
-https://github.com/Kajiyu/LLLNet
-https://github.com/vishwajeet97/Cocktail-Party-Problem
-https://github.com/marl/audiosetdl 
-DAtaset (https://research.google.com/audioset/)
+* https://github.com/avivga/audio-visual-speech-enhancement
+* https://github.com/andrewowens/multisensory
+* https://github.com/chaodengusc/DeWave
+* https://github.com/crystal-method/Looking-to-Listen
+* https://github.com/Kajiyu/LLLNet
+* https://github.com/vishwajeet97/Cocktail-Party-Problem
+* https://github.com/marl/audiosetdl 
+* Dataset (https://research.google.com/audioset/)
 
 
 
 Dataset:
-- https://projets-lium.univ-lemans.fr/ted-lium/
+* https://projets-lium.univ-lemans.fr/ted-lium/
