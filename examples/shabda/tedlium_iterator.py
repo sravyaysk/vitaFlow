@@ -107,18 +107,19 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     @property
     def num_train_samples(self):
         count = 0
-        for speaker in self.TRAIN_SPEAKER_WAV_FILES_DICT:
-            files = self.TRAIN_SPEAKER_WAV_FILES_DICT[speaker]
-            count += len(files)
+        # for speaker in self.TRAIN_SPEAKER_WAV_FILES_DICT:
+        #     files = self.TRAIN_SPEAKER_WAV_FILES_DICT[speaker]
+        #     count += len(files)
+        count = len(self.TRAIN_WAV_PAIR) #TODO chck this logic
         return count
 
     @property
     def num_val_samples(self):
-        return 128
+        return len(self.VAL_WAV_PAIR)
 
     @property
     def num_test_samples(self):
-        return 96
+        return len(self.TEST_WAV_PAIR)
 
     def get_speaker_files(self, data_dir):
         """
@@ -143,7 +144,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 speaker_wav_files_dict[speaker].append(wav_file)
         return speaker_wav_files_dict
 
-    def get_shape(self, wav_file):
+    def get_size(self, wav_file):
         # sig, _ = librosa.core.load(wav_file, sr=self._hparams.sampling_rate)
         # return sig.shape[0]
         st = os.stat(wav_file)
@@ -154,8 +155,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         # generate match dict
         for speaker_1 in tqdm(speaker_wav_files_dict, desc="pair_dict"):
             for wav_file_1 in tqdm(speaker_wav_files_dict[speaker_1], desc="pair_dict_inner"):
-                size_1 = self.get_shape(wav_file_1)
-                if size_1 < 1000 :
+                size_1 = self.get_size(wav_file_1)
+                if size_1 < 1000 : #ignore invalid wav files
                     continue
                 speaker_2 = random.choice(list(speaker_wav_files_dict))
 
@@ -164,12 +165,12 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
 
                 wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
-                size_2 = self.get_shape(wav_file_2)
+                size_2 = self.get_size(wav_file_2)
 
                 while size_2 < 1000:
                     wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
                     wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
-                    size_2 = self.get_shape(wav_file_2)
+                    size_2 = self.get_size(wav_file_2)
 
                 wav_file_pair[wav_file_1] = wav_file_2
 
@@ -186,7 +187,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         self.ind = 0
 
         # for each file pair, generate their mixture and reference samples
-        for wav_file_1 in tqdm(speaker_file_match, desc="speaker_file_match"):
+        for wav_file_1 in tqdm(speaker_file_match, desc="yield_samples"):
             wav_file_2 = speaker_file_match[wav_file_1]
 
             # print_info(wav_file_1)
@@ -264,6 +265,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     def _yield_test_samples(self):
         return self._yield_samples(self.TEST_WAV_PAIR)
 
+    def feature_map_func(self, sample_mix, VAD, Y):
+        return ({self.FEATURE_1_NAME: sample_mix,
+                 self.FEATURE_2_NAME: VAD}, Y)
+
     def _get_train_input_fn(self):
         """
         Inheriting class must implement this
@@ -272,12 +277,15 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
         dataset = tf.data.Dataset.from_generator(self._yield_train_samples,
                                                  (tf.float32, tf.bool, tf.bool),
-                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129), Dimension(2)])))
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff),
+                                                                             Dimension(2)])))
 
-        dataset = dataset.map(lambda x, y, z : ({self.FEATURE_1_NAME: x,
-                                                 self.FEATURE_2_NAME: y}, z))
+        dataset = dataset.map(self.feature_map_func, num_parallel_calls=8)
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
@@ -294,12 +302,15 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
         dataset = tf.data.Dataset.from_generator(self._yield_val_samples,
                                                  (tf.float32, tf.bool, tf.bool),
-                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129), Dimension(2)])))
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff),
+                                                                             Dimension(2)])))
 
-        dataset = dataset.map(lambda x, y, z : ({self.FEATURE_1_NAME: x,
-                                                 self.FEATURE_2_NAME: y}, z))
+        dataset = dataset.map(self.feature_map_func, num_parallel_calls=8)
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
@@ -315,12 +326,15 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         """
         dataset = tf.data.Dataset.from_generator(self._yield_test_samples,
                                                  (tf.float32, tf.bool, tf.bool),
-                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129), Dimension(2)])))
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample),
+                                                                             Dimension(self._hparams.neff),
+                                                                             Dimension(2)])))
 
-        dataset = dataset.map(lambda x, y, z : ({self.FEATURE_1_NAME: x,
-                                                 self.FEATURE_2_NAME: y}, z))
+        dataset = dataset.map(self.feature_map_func, num_parallel_calls=8)
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)

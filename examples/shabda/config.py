@@ -39,6 +39,7 @@ experiments = {
     "clear_model_data" : False,
 
     "examples.shabda.tedlium_dataset.TEDLiumDataset": {
+        "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "train_data_path": "train",
         "validation_data_path": "dev",

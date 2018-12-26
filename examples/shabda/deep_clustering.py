@@ -31,6 +31,11 @@ from vitaflow.helpers.print_helper import print_error
 
 class DeepClustering(ModelBase, ShabdaWavPairFeature):
     def __init__(self, hparams=None, data_iterator=None):
+        """
+        https://arxiv.org/abs/1508.04306
+        :param hparams:
+        :param data_iterator:
+        """
         # ITextFeature.__init__(self)
         ModelBase.__init__(self, hparams=hparams)
         ShabdaWavPairFeature.__init__(self)
@@ -329,8 +334,8 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                 tf.random_normal([self.embd_dim * self.neff]))
         }
 
-        samples = features[self.FEATURE_1_NAME]
-        vad = features[self.FEATURE_2_NAME]
+        samples = features[self.FEATURE_1_NAME] # [batch_size, FPS, NEFF]
+        vad = features[self.FEATURE_2_NAME] # [batch_size, FPS, NEFF]
         tf.logging.info("samples: =====> {}".format(samples))
         tf.logging.info("vad: =====> {}".format(vad))
 
