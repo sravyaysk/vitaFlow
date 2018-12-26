@@ -3,6 +3,12 @@ import numpy as np
 from numpy.lib import stride_tricks
 from tqdm import tqdm
 
+from multiprocessing import Pool
+from functools import reduce
+from operator import concat
+
+enable_multiprocessing = False
+
 
 def stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
     """ short time fourier transform of audio signal """
@@ -56,21 +62,22 @@ def _get_log_spectrum_features(speech, frame_size, neff, amp_fac, min_amp):
     return speech_features
 
 
-def _helper2(wav_file_1, wav_file_2,  sampling_rate, frame_size, neff, amp_fac, min_amp,
+def _get_speech_data(wav_file, sampling_rate):
+    speech, _ = librosa.core.load(wav_file, sr=sampling_rate)
+    # amp factor between -3 dB - 3 dB
+    fac = np.random.rand(1)[0] * 6 - 3
+    speech = 10. ** (fac / 20) * speech
+    return speech
+
+
+def _helper2(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
              threshold, global_mean, global_std, frames_per_sample):
     # TODO: rename this function
     # TODO: Add docs
-    speech_1, _ = librosa.core.load(wav_file_1, sr=sampling_rate)
-    # amp factor between -3 dB - 3 dB
-    fac = np.random.rand(1)[0] * 6 - 3
-    speech_1 = 10. ** (fac / 20) * speech_1
 
-    speech_2, _ = librosa.core.load(wav_file_2, sr=sampling_rate)
-    fac = np.random.rand(1)[0] * 6 - 3
-    speech_2 = 10. ** (fac / 20) * speech_2
-    #
-    # print_warn(speech_1.shape)
-    # print_warn(speech_2.shape)
+    # TODO: experimnetal though - is multi-processing required here? to reduce IO
+    speech_1 = _get_speech_data(wav_file_1, sampling_rate)
+    speech_2 = _get_speech_data(wav_file_2, sampling_rate)
 
     # mix
     length = min(len(speech_1), len(speech_2))
@@ -120,9 +127,19 @@ def boost_yield_samples(speaker_file_match, sampling_rate, frame_size, amp_fac, 
 
     # for each file pair, generate their mixture and reference samples
     bag = []
-    for wav_file_1 in tqdm(speaker_file_match, desc="speaker_file_match"):
-        wav_file_2 = speaker_file_match[wav_file_1]
-        new_data = _helper2(wav_file_1, wav_file_2,  sampling_rate, frame_size, neff, amp_fac, min_amp,
-             threshold, global_mean, global_std, frames_per_sample)
-        bag += new_data
+    speaker_file_match = dict(speaker_file_match)
+
+    def process(files):
+        (wav_file_1, wav_file_2) = files
+        return _helper2(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+                        threshold, global_mean, global_std, frames_per_sample)
+    # TODO: add tqdm
+    if enable_multiprocessing:
+        # bag = [process(files) for files in tqdm(speaker_file_match.items(), desc="speaker_file_match")]
+        p = Pool(5)
+        bag = p.map(process, speaker_file_match.items())
+        bag = reduce(concat, bag)
+    else:
+        bag = map(process, speaker_file_match.items())
+        bag = reduce(concat, bag)
     return bag
