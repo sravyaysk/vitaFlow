@@ -1,3 +1,4 @@
+import os
 import librosa
 import numpy as np
 from numpy.lib import stride_tricks
@@ -8,6 +9,7 @@ from functools import reduce
 from operator import concat
 
 enable_multiprocessing = False
+enable_file_pickling = False
 
 
 def stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
@@ -133,9 +135,27 @@ def boost_yield_samples(speaker_file_match, sampling_rate, frame_size, amp_fac, 
         (wav_file_1, wav_file_2) = files
         return _helper2(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
                         threshold, global_mean, global_std, frames_per_sample)
-    # TODO: add tqdm
+
+    def advanced_process(files):
+        # TODO - Save the result to a tmp file.
+        (wav_file_1, wav_file_2) = files
+        filename = '/tmp/_processing/' + wav_file_1 + wav_file_2 + '.pkl'
+        if os.path.isfile(filename):
+            result = open(filename).read()
+        else:
+            result = _helper2(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+                        threshold, global_mean, global_std, frames_per_sample)
+            with open(filename) as fp:
+                fp.write(result)
+        return result
+
+    # TODO:
+    if enable_file_pickling:
+        process = advanced_process
+    # TODO: Add tqdm
     if enable_multiprocessing:
         # bag = [process(files) for files in tqdm(speaker_file_match.items(), desc="speaker_file_match")]
+        # TODO: Set a global variable for Pooling processes
         p = Pool(5)
         bag = p.map(process, speaker_file_match.items())
         bag = reduce(concat, bag)
