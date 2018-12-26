@@ -31,10 +31,15 @@ config = importlib.import_module(config)
 
 pprint(config)
 
+
+# TODO: add iris_iterator
+
 if __name__ == "__main__":
     print(' -' * 35)
     print('Running Experiment: Conll')
     print(' -' * 35)
+    import pdb
+    pdb.set_trace()
     experiment = Experiments(hparams=config.experiments, mode=FLAGS.mode)
     experiment.run()
     print(' -' * 35)

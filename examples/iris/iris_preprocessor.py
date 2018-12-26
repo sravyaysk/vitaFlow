@@ -67,22 +67,16 @@ class IrisDataset(IPreprocessor):
             os.makedirs(self.DATA_OUT_DIR)
 
     def _prepare_data(self):
-        """Inheriting class must implement this class.
-        Which not limited to, but includes:
-        - Downloading or copying the data
-        - Pre processing the data
-        - Storing the preprocessed data as train/val/test
-        :return:
-        """
         print_info("Preprocessing the train data...")
-
 
     def _maybe_download(self):
         self._create_target_directories()
-        train_path = tf.keras.utils.get_file(os.path.join(self._download_path, "train.txt"), TRAIN_URL)
-        test_path = tf.keras.utils.get_file(os.path.join(self._download_path, "train.txt"), TEST_URL)
-        val_path = tf.keras.utils.get_file(os.path.join(self._download_path, "val.txt"), TEST_URL)
-        print(train_path, test_path)
+        if os.path.isfile(os.path.join(self.DATA_OUT_DIR, "train.txt")):
+            train_path = tf.keras.utils.get_file(os.path.join(self.DATA_OUT_DIR, "train.txt"), TRAIN_URL)
+            test_path = tf.keras.utils.get_file(os.path.join(self.DATA_OUT_DIR, "train.txt"), TEST_URL)
+            val_path = tf.keras.utils.get_file(os.path.join(self.DATA_OUT_DIR, "val.txt"), TEST_URL)
+        print('Train File:\t{}\nTest File:\t{}\nVal File:\t{}'.format(train_path, test_path, val_path))
 
 
-t = IrisDataset()
+if __name__ == '__main__':
+    t = IrisDataset()

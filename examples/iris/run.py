@@ -22,7 +22,10 @@ sys.path.append(os.path.abspath('.'))
 
 import argparse
 import tensorflow as tf
-from . import iris_data
+try:
+    from . import iris_data
+except:
+    import iris_data
 
 from vitaflow.models.text.dnn.simple_dnn import my_model
 
