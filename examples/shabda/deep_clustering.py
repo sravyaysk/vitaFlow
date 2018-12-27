@@ -340,6 +340,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         tf.logging.info("vad: =====> {}".format(vad))
 
 
+
         embeddings = self._build_layers(samples, mode)
 
         loss = None
