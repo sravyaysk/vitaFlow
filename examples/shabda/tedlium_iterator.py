@@ -95,7 +95,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             "frames_per_sample" : 100,
             "reinit_file_pair" : False,
             "prefetch_size" : 32,
-            "num_parallel_calls" : 8
+            "num_parallel_calls" : 8,
+            "dummy_slicing_dim" : 1000
         }
         )
         return params
@@ -107,11 +108,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
     @property
     def num_train_samples(self):
-        count = 0
-        # for speaker in self.TRAIN_SPEAKER_WAV_FILES_DICT:
-        #     files = self.TRAIN_SPEAKER_WAV_FILES_DICT[speaker]
-        #     count += len(files)
-        count = len(self.TRAIN_WAV_PAIR) #TODO chck this logic
+        count = len(self.TRAIN_WAV_PAIR)
         return count
 
     @property
@@ -146,8 +143,6 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return speaker_wav_files_dict
 
     def get_size(self, wav_file):
-        # sig, _ = librosa.core.load(wav_file, sr=self._hparams.sampling_rate)
-        # return sig.shape[0]
         st = os.stat(wav_file)
         return st.st_size
 
@@ -224,9 +219,17 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             Y = np.array([speech_1_features > speech_2_features, speech_1_features < speech_2_features]).astype('bool')
             Y = np.transpose(Y, [1, 2, 0]).astype('bool')
 
+            speech_mix_features = speech_mix_features[0:self._hparams.dummy_slicing_dim, :]
+            speech_VAD = speech_VAD[0:self._hparams.dummy_slicing_dim, :]
+            Y = Y[0:self._hparams.dummy_slicing_dim, :, :]
+
             return speech_mix_features.astype('float32'), speech_VAD.astype('bool'), Y.astype('bool')
-        except:
-            return np.random.random((1247,129)), np.empty((1247,129), dtype="bool"), np.empty((1247,129, 2), dtype="bool")
+        except Exception as e:
+            print_warn(e)
+            print_error("{} vs {}".format(wav_file_1, wav_file_2))
+            return np.random.random((self._hparams.dummy_slicing_dim,129)).astype('float32'), \
+                   np.empty((self._hparams.dummy_slicing_dim,129), dtype="bool"), \
+                   np.empty((self._hparams.dummy_slicing_dim,129, 2), dtype="bool")
 
     def _user_resize_func(self, sample, vad, label):
         """
@@ -236,11 +239,11 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         :return:
         """
 
-        sample = tf.reshape(sample, shape=TensorShape([Dimension(1247),
+        sample = tf.reshape(sample, shape=TensorShape([Dimension(self._hparams.dummy_slicing_dim),
                                                        Dimension(self._hparams.neff)]))
-        vad = tf.reshape(vad, shape=TensorShape([Dimension(1247),
+        vad = tf.reshape(vad, shape=TensorShape([Dimension(self._hparams.dummy_slicing_dim),
                                                  Dimension(self._hparams.neff)]))
-        label = tf.reshape(label, shape=TensorShape([Dimension(1247),
+        label = tf.reshape(label, shape=TensorShape([Dimension(self._hparams.dummy_slicing_dim),
                                                      Dimension(self._hparams.neff),
                                                      Dimension(2)]))
         return sample, vad, label

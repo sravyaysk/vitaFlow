@@ -22,11 +22,10 @@ P_DROPOUT_RC = 0.2
 N_HIDDEN = 300
 LEARNING_RATE = 1e-3
 MAX_STEP = 2000000
-TRAIN_BATCH_SIZE = 128
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
 experiment_name = "TEDLiumDataset"
-batch_size = 8
+batch_size = 128
 experiments = {
     "num_epochs": 25,
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
@@ -80,7 +79,7 @@ experiments = {
         "n_hidden" : 8,
         "p_keep_ff" : 0.5,
         "p_keep_rc" : 0.5,
-        "frames_per_sample" : 1247,
+        "frames_per_sample" : 1000,
         "embd_dim" : 30,
     }
 }
