@@ -68,7 +68,7 @@ experiments = {
         "frames_per_sample" : FRAMES_PER_SAMPLE,
         "batch_size" : batch_size,
         "prefetch_size" : batch_size*25,
-        "num_parallel_calls" : 4
+        "num_parallel_calls" : 8
     },
 
     "examples.shabda.deep_clustering.DeepClustering" : {
@@ -79,7 +79,7 @@ experiments = {
         "n_hidden" : 8,
         "p_keep_ff" : 0.5,
         "p_keep_rc" : 0.5,
-        "frames_per_sample" : 1000,
+        "frames_per_sample" : 1247,
         "embd_dim" : 30,
     }
 }

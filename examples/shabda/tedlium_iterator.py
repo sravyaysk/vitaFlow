@@ -96,7 +96,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             "reinit_file_pair" : False,
             "prefetch_size" : 32,
             "num_parallel_calls" : 8,
-            "dummy_slicing_dim" : 1000
+            "dummy_slicing_dim" : 1247
         }
         )
         return params
@@ -219,9 +219,12 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             Y = np.array([speech_1_features > speech_2_features, speech_1_features < speech_2_features]).astype('bool')
             Y = np.transpose(Y, [1, 2, 0]).astype('bool')
 
-            speech_mix_features = speech_mix_features[0:self._hparams.dummy_slicing_dim, :]
-            speech_VAD = speech_VAD[0:self._hparams.dummy_slicing_dim, :]
-            Y = Y[0:self._hparams.dummy_slicing_dim, :, :]
+            # speech_mix_features = speech_mix_features[0:self._hparams.dummy_slicing_dim, :]
+            # speech_VAD = speech_VAD[0:self._hparams.dummy_slicing_dim, :]
+            # Y = Y[0:self._hparams.dummy_slicing_dim, :, :]
+
+            if speech_mix_features.shape[0] != 1247 or speech_VAD.shape[0] != 1247 or Y.shape[0] != 1247:
+                raise Exception("Found files with improper duration/data")
 
             return speech_mix_features.astype('float32'), speech_VAD.astype('bool'), Y.astype('bool')
         except Exception as e:
