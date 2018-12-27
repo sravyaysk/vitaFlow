@@ -1,12 +1,10 @@
 import os
+from multiprocessing import Pool
+
 import librosa
 import numpy as np
 from numpy.lib import stride_tricks
 from tqdm import tqdm
-
-from multiprocessing import Pool
-from functools import reduce
-from operator import concat
 
 enable_multiprocessing = False
 enable_file_pickling = False
@@ -157,9 +155,18 @@ def boost_yield_samples(speaker_file_match, sampling_rate, frame_size, amp_fac, 
         # bag = [process(files) for files in tqdm(speaker_file_match.items(), desc="speaker_file_match")]
         # TODO: Set a global variable for Pooling processes
         p = Pool(5)
-        bag = p.map(process, speaker_file_match.items())
-        bag = reduce(concat, bag)
+        # bag = p.map(process, speaker_file_match.items())
+        # bag = reduce(concat, bag)
+        bag = []
+        with tqdm(total=len(speaker_file_match.items())) as pbar:
+            for i, res in tqdm(enumerate(p.imap_unordered(process, speaker_file_match.items())), desc="Parallel Works"):
+                pbar.update()
+                bag.update(res)
+
     else:
-        bag = map(process, speaker_file_match.items())
-        bag = reduce(concat, bag)
+        # bag = map(process, speaker_file_match.items())
+        # bag = reduce(concat, bag)
+        bag = []
+        for files in tqdm(speaker_file_match.items(), desc="speaker_file_match"):
+            bag.update(process(files))
     return bag
