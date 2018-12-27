@@ -25,7 +25,8 @@ MAX_STEP = 2000000
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
 experiment_name = "TEDLiumDataset"
-batch_size = 128
+batch_size = 64
+
 experiments = {
     "num_epochs": 25,
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
@@ -67,7 +68,7 @@ experiments = {
         "global_std" : GLOBAL_STD,
         "frames_per_sample" : FRAMES_PER_SAMPLE,
         "batch_size" : batch_size,
-        "prefetch_size" : batch_size*25,
+        "prefetch_size" : batch_size*2,
         "num_parallel_calls" : 8
     },
 

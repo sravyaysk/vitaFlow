@@ -223,6 +223,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             # speech_VAD = speech_VAD[0:self._hparams.dummy_slicing_dim, :]
             # Y = Y[0:self._hparams.dummy_slicing_dim, :, :]
 
+            print_info("{} vs {}".format(wav_file_1, wav_file_2))
+
             if speech_mix_features.shape[0] != 1247 or speech_VAD.shape[0] != 1247 or Y.shape[0] != 1247:
                 raise Exception("Found files with improper duration/data")
 
@@ -267,6 +269,15 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             lambda wav_file_1, wav_file_2: tuple(tf.py_func(
                 self.generate_features, [wav_file_1, wav_file_2], (tf.float32, tf.bool, tf.bool))),
             num_parallel_calls=self._hparams.num_parallel_calls)
+
+        # dataset = dataset.apply(
+        #     tf.contrib.data.parallel_interleave(
+        #     lambda wav_file_1, wav_file_2: tuple(tf.py_func(
+        #         self.generate_features, [wav_file_1, wav_file_2], (tf.float32, tf.bool, tf.bool))),
+        #         cycle_length=4
+        #     )
+        # )
+
         dataset = dataset.map(self._user_resize_func, num_parallel_calls=self._hparams.num_parallel_calls)
         dataset = dataset.map(self.feature_map_func, num_parallel_calls=self._hparams.num_parallel_calls)
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
