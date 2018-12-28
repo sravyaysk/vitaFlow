@@ -70,8 +70,9 @@ def _get_speech_data(wav_file, sampling_rate):
     return speech
 
 
-def _helper2(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
-             threshold, global_mean, global_std, frames_per_sample):
+def _helper2(args):
+    (wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+     threshold, global_mean, global_std, frames_per_sample) = args
     # TODO: rename this function
     # TODO: Add docs
 
@@ -131,8 +132,8 @@ def boost_yield_samples(speaker_file_match, sampling_rate, frame_size, amp_fac, 
 
     def process(files):
         (wav_file_1, wav_file_2) = files
-        return _helper2(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
-                        threshold, global_mean, global_std, frames_per_sample)
+        return _helper2((wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+                         threshold, global_mean, global_std, frames_per_sample))
 
     def advanced_process(files):
         # TODO - Save the result to a tmp file.
@@ -141,8 +142,8 @@ def boost_yield_samples(speaker_file_match, sampling_rate, frame_size, amp_fac, 
         if os.path.isfile(filename):
             result = open(filename).read()
         else:
-            result = _helper2(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
-                        threshold, global_mean, global_std, frames_per_sample)
+            result = _helper2((wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+                               threshold, global_mean, global_std, frames_per_sample))
             with open(filename) as fp:
                 fp.write(result)
         return result
@@ -158,15 +159,18 @@ def boost_yield_samples(speaker_file_match, sampling_rate, frame_size, amp_fac, 
         # bag = p.map(process, speaker_file_match.items())
         # bag = reduce(concat, bag)
         bag = []
+        input_params = [(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+                         threshold, global_mean, global_std, frames_per_sample) for (wav_file_1, wav_file_2) in
+                        speaker_file_match.items()]
         with tqdm(total=len(speaker_file_match.items())) as pbar:
-            for i, res in tqdm(enumerate(p.imap_unordered(process, speaker_file_match.items())), desc="Parallel Works"):
+            for i, res in tqdm(enumerate(p.imap_unordered(_helper2, input_params)), desc="Parallel Works"):
                 pbar.update()
-                bag.update(res)
+                bag += res
 
     else:
         # bag = map(process, speaker_file_match.items())
         # bag = reduce(concat, bag)
         bag = []
         for files in tqdm(speaker_file_match.items(), desc="speaker_file_match"):
-            bag.update(process(files))
+            bag += process(files)
     return bag
