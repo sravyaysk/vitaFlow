@@ -17,6 +17,7 @@ Experiments class that allows easy plug n play of modules
 import logging
 import os
 import shutil
+import time
 from importlib import import_module
 
 import tensorflow as tf
@@ -158,23 +159,18 @@ class Experiments(object):
                                                   dataset=self._dataset)
         self._model = self._model(hparams=self._hparams[self._hparams['model_class_with_path']], data_iterator=self._data_iterator)
 
-    def test_experiment(self):
-        iterator = self._data_iterator.train_input_fn().make_initializable_iterator()
+    def test_iterator(self):
+        iterator = self._data_iterator.train_input_fn().make_one_shot_iterator()
+        num_samples = self._data_iterator.num_train_samples
         next_element = iterator.get_next()
-        # print_debug(next_element)
-        init_op = iterator.initializer
         with tf.Session() as sess:
-            # Initialize the iterator
-            sess.run(init_op)
-            # print(sess.run(next_element))
-            res = sess.run(next_element)
-            print_debug(res)
-            res = sess.run(next_element)
-            print_debug(res)
-            # Move the iterator back to the beginning
-            # sess.run(init_op)
-            # print(sess.run(next_element))
-            exit(0)
+            for i in tqdm(range(num_samples), "iterator: "):
+                start_time = time.time()
+                res = sess.run(next_element)
+                end_time = time.time()
+                print_warn("Lables shape : {} and time taken is {} ".format(res[1].shape, end_time - start_time))
+
+        exit(0)
 
     def run(self):
         self.setup()
@@ -185,8 +181,8 @@ class Experiments(object):
         mode = self.mode
         self._init_tf_config()
 
-        if mode == "test_experiment":
-            self.test_experiment()
+        if mode == "run_iterator":
+            self.test_iterator()
 
         exec = Executor(model=self._model, data_iterator=self._data_iterator, config=self._run_config)
 

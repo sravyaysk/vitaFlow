@@ -223,7 +223,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             # speech_VAD = speech_VAD[0:self._hparams.dummy_slicing_dim, :]
             # Y = Y[0:self._hparams.dummy_slicing_dim, :, :]
 
-            print_info("{} vs {}".format(wav_file_1, wav_file_2))
+            # print_info("{} vs {}".format(wav_file_1, wav_file_2))
 
             if speech_mix_features.shape[0] != 1247 or speech_VAD.shape[0] != 1247 or Y.shape[0] != 1247:
                 raise Exception("Found files with improper duration/data")

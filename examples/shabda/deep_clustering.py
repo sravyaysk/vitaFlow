@@ -70,6 +70,13 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
 
     @overrides
     def _get_loss(self, labels, logits, VAD):
+        """
+
+        :param labels:
+        :param logits:
+        :param VAD:
+        :return:
+        """
         labels = tf.cast(labels, tf.float32)
         VAD = tf.cast(VAD, tf.float32) #[batch_size, FPS, NEFF]
         Y = labels  # [batch_size, FPS, NEFF, 2]
@@ -106,14 +113,18 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         Y_v_t = tf.transpose(Y_v, [0, 2, 1]) #[batch_size, 2, FPS * NEFF]
 
         # [batch_size,  embd_dim, FPS * NEFF] x [batch_size,  FPS * NEFF, embd_dim] -
+        # V^T x V
         loss_1 = tf.matmul(embeddings_v_t, embeddings_v) # [batch_size, embd_dim, embd_dim]
 
         # [batch_size,  FPS * NEFF, embd_dim] x [batch_size, FPS * NEFF, 2] +
+        # V^T x Y_v
         loss_2 = tf.matmul(embeddings_v_t, Y_v) # [batch_size, embd_dim, 2]
 
         # [batch_size, 2, FPS * NEFF] x [batch_size, FPS * NEFF, 2]
+        # Y^T x Y
         loss_3 = tf.matmul(Y_v_t, Y_v) # [batch_size, 2, 2]
 
+        # V^T x V - 2 * (V^T x Y_v) +  Y^T x Y
         loss_batch = tf.nn.l2_loss(loss_1) - 2 * tf.nn.l2_loss(loss_2) + tf.nn.l2_loss(loss_3)
 
         loss_v = (loss_batch) / self.batch_size / (self._hparams.frames_per_sample^2)
@@ -334,13 +345,15 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                 tf.random_normal([self.embd_dim * self.neff]))
         }
 
-        samples = features[self.FEATURE_1_NAME] # [batch_size, FPS, NEFF]
+        # [batch_size, FPS, NEFF]
+        # X_n = g_n(x) n : (0, ..., N}
+        samples = features[self.FEATURE_1_NAME]
         vad = features[self.FEATURE_2_NAME] # [batch_size, FPS, NEFF]
         tf.logging.info("samples: =====> {}".format(samples))
         tf.logging.info("vad: =====> {}".format(vad))
 
 
-
+        # V = f_teta(x) R^(NxK) K : self._haparams.emd_dim
         embeddings = self._build_layers(samples, mode)
 
         loss = None
