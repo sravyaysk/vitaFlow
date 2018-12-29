@@ -80,19 +80,15 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
     @property
     def num_train_samples(self):
-        count = 0
-        for speaker in self.TRAIN_SPEAKER_WAV_FILES_DICT:
-            files = self.TRAIN_SPEAKER_WAV_FILES_DICT[speaker]
-            count += len(files)
-        return count
+        return len(self.TRAIN_WAV_PAIR)
 
     @property
     def num_val_samples(self):
-        return 128
+        return len(self.VAL_WAV_PAIR)
 
     @property
     def num_test_samples(self):
-        return 96
+        return len(self.TEST_WAV_PAIR)
 
     def get_speaker_files(self, data_dir):
         """
@@ -171,6 +167,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                                                         global_mean,
                                                         global_std,
                                                         frames_per_sample):
+            # print_info((sample_mix, VAD, Y))
             yield sample_mix, VAD, Y
 
     def _yield_train_samples(self):

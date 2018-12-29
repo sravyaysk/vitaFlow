@@ -6,7 +6,7 @@ import numpy as np
 from numpy.lib import stride_tricks
 from tqdm import tqdm
 
-enable_multiprocessing = False
+enable_multiprocessing = True
 enable_file_pickling = False
 
 
@@ -35,11 +35,7 @@ def _helper1(speech_1_features, speech_2_features, frames_per_sample, len_spec,
     # TODO: Add docs
     k = 0
     bag = []
-    # TODO - Update why this exception
-    # TODO - Update this 100
-    for each in [speech_mix_features, speech_VAD]:
-        if each.shape[0] != 100:
-            return bag
+
     while k + frames_per_sample < len_spec:
         sample_mix = speech_mix_features[k:k + frames_per_sample, :].astype('float32')
         VAD = speech_VAD[k:k + frames_per_sample, :].astype('bool')
@@ -54,8 +50,7 @@ def _helper1(speech_1_features, speech_2_features, frames_per_sample, len_spec,
                      ).astype('bool')
         Y = np.transpose(Y, [1, 2, 0]).astype('bool')
         # TODO - Update why this condition & why 100
-        if Y.shape[0] == 100:
-            bag.append((sample_mix, VAD, Y))
+        bag.append((sample_mix, VAD, Y))
         k = k + frames_per_sample
     return bag
 
@@ -83,52 +78,56 @@ def _helper2(args):
     # TODO: rename this function
     # TODO: Add docs
 
-    # TODO: experimnetal though - is multi-processing required here? to reduce IO
-    speech_1 = _get_speech_data(wav_file_1, sampling_rate)
-    speech_2 = _get_speech_data(wav_file_2, sampling_rate)
-
-    # mix
-    length = min(len(speech_1), len(speech_2))
-    speech_1 = speech_1[:length]
-    speech_2 = speech_2[:length]
-    speech_mix = speech_1 + speech_2
-
-    # compute log spectrum for 1st speaker
-    # speech_1_features = np.abs(stft(speech_1, frame_size)[:, :neff])
-    # speech_1_features = np.maximum(speech_1_features, np.max(speech_1_features) / min_amp)
-    # speech_1_features = 20. * np.log10(speech_1_features * amp_fac)
-    speech_1_features = _get_log_spectrum_features(speech_1, frame_size, neff, amp_fac, min_amp)
-
-    # same for the 2nd speaker
-    # speech_2_features = np.abs(stft(speech_2, frame_size)[:, :neff])
-    # speech_2_features = np.maximum(speech_2_features, np.max(speech_2_features) / min_amp)
-    # speech_2_features = 20. * np.log10(speech_2_features * amp_fac)
-    speech_2_features = _get_log_spectrum_features(speech_2, frame_size, neff, amp_fac, min_amp)
-
-    # same for the mixture
-    speech_mix_spec0 = stft(speech_mix, frame_size)[:, :neff]
-    speech_mix_features = np.abs(speech_mix_spec0)
-
-    # speech_phase = speech_mix_spec0 / speech_mix_spec
-    speech_mix_features = np.maximum(speech_mix_features, np.max(speech_mix_features) / min_amp)
-    speech_mix_features = 20. * np.log10(speech_mix_features * amp_fac)
-    max_mag = np.max(speech_mix_features)
-
-    speech_VAD = (speech_mix_features > (max_mag - threshold)).astype(int)
-    speech_mix_features = (speech_mix_features - global_mean) / global_std
-
-    len_spec = speech_1_features.shape[0]
-    # print_error("len_spec {}".format(len_spec))
-
     # TODO: Bad exception handling
     try:
+        # TODO: experimnetal though - is multi-processing required here? to reduce IO
+        speech_1 = _get_speech_data(wav_file_1, sampling_rate)
+        speech_2 = _get_speech_data(wav_file_2, sampling_rate)
+
+        # print(wav_file_1, wav_file_2)
+
+        # mix
+        length = min(len(speech_1), len(speech_2))
+        speech_1 = speech_1[:length]
+        speech_2 = speech_2[:length]
+        speech_mix = speech_1 + speech_2
+
+        # compute log spectrum for 1st speaker
+        # speech_1_features = np.abs(stft(speech_1, frame_size)[:, :neff])
+        # speech_1_features = np.maximum(speech_1_features, np.max(speech_1_features) / min_amp)
+        # speech_1_features = 20. * np.log10(speech_1_features * amp_fac)
+        speech_1_features = _get_log_spectrum_features(speech_1, frame_size, neff, amp_fac, min_amp)
+
+        # same for the 2nd speaker
+        # speech_2_features = np.abs(stft(speech_2, frame_size)[:, :neff])
+        # speech_2_features = np.maximum(speech_2_features, np.max(speech_2_features) / min_amp)
+        # speech_2_features = 20. * np.log10(speech_2_features * amp_fac)
+        speech_2_features = _get_log_spectrum_features(speech_2, frame_size, neff, amp_fac, min_amp)
+
+        # same for the mixture
+        speech_mix_spec0 = stft(speech_mix, frame_size)[:, :neff]
+        speech_mix_features = np.abs(speech_mix_spec0)
+
+        # speech_phase = speech_mix_spec0 / speech_mix_spec
+        speech_mix_features = np.maximum(speech_mix_features, np.max(speech_mix_features) / min_amp)
+        speech_mix_features = 20. * np.log10(speech_mix_features * amp_fac)
+        max_mag = np.max(speech_mix_features)
+
+        speech_VAD = (speech_mix_features > (max_mag - threshold)).astype(int)
+        speech_mix_features = (speech_mix_features - global_mean) / global_std
+
+        len_spec = speech_1_features.shape[0]
+        # print_error("len_spec {}".format(len_spec))
+
+
         new_data = _helper1(speech_1_features, speech_2_features, frames_per_sample, len_spec,
-                        speech_mix_features, speech_VAD)
+                            speech_mix_features, speech_VAD)
     except Exception as err:
         t = '-------------------------\n'
         print('{}Failed to Run: _helper2({})\n{}'.format(t, args, t))
         print('---' * 5)
         new_data = []
+
     return new_data
 
 
@@ -169,7 +168,7 @@ def boost_yield_samples(speaker_file_match, sampling_rate, frame_size, amp_fac, 
     if enable_multiprocessing:
         # bag = [process(files) for files in tqdm(speaker_file_match.items(), desc="speaker_file_match")]
         # TODO: Set a global variable for Pooling processes
-        p = Pool(5)
+        p = Pool(8)
         # bag = p.map(process, speaker_file_match.items())
         # bag = reduce(concat, bag)
         bag = []
@@ -179,7 +178,8 @@ def boost_yield_samples(speaker_file_match, sampling_rate, frame_size, amp_fac, 
         with tqdm(total=len(speaker_file_match.items())) as pbar:
             for i, res in tqdm(enumerate(p.imap_unordered(_helper2, input_params)), desc="Parallel Works"):
                 pbar.update()
-                bag += res
+                for data in res:
+                    yield data
 
     else:
         # bag = map(process, speaker_file_match.items())
