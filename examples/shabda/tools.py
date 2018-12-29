@@ -35,6 +35,11 @@ def _helper1(speech_1_features, speech_2_features, frames_per_sample, len_spec,
     # TODO: Add docs
     k = 0
     bag = []
+    # TODO - Update why this exception
+    # TODO - Update this 100
+    for each in [speech_mix_features, speech_VAD]:
+        if each.shape[0] != 100:
+            return bag
     while k + frames_per_sample < len_spec:
         sample_mix = speech_mix_features[k:k + frames_per_sample, :].astype('float32')
         VAD = speech_VAD[k:k + frames_per_sample, :].astype('bool')
@@ -48,7 +53,9 @@ def _helper1(speech_1_features, speech_2_features, frames_per_sample, len_spec,
                       sample_1 < sample_2]
                      ).astype('bool')
         Y = np.transpose(Y, [1, 2, 0]).astype('bool')
-        bag.append((sample_mix, VAD, Y))
+        # TODO - Update why this condition & why 100
+        if Y.shape[0] == 100:
+            bag.append((sample_mix, VAD, Y))
         k = k + frames_per_sample
     return bag
 
@@ -113,8 +120,15 @@ def _helper2(args):
     len_spec = speech_1_features.shape[0]
     # print_error("len_spec {}".format(len_spec))
 
-    new_data = _helper1(speech_1_features, speech_2_features, frames_per_sample, len_spec,
+    # TODO: Bad exception handling
+    try:
+        new_data = _helper1(speech_1_features, speech_2_features, frames_per_sample, len_spec,
                         speech_mix_features, speech_VAD)
+    except Exception as err:
+        t = '-------------------------\n'
+        print('{}Failed to Run: _helper2({})\n{}'.format(t, args, t))
+        print('---' * 5)
+        new_data = []
     return new_data
 
 
