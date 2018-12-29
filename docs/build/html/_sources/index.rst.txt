@@ -25,7 +25,7 @@ Welcome to vitaFlow's documentation!
    :caption: Examples:
 
    examples/conll_2003_dataset.rst
-   exapmples/example.rst
+   examples/example.rst
 
 .. toctree::
    :maxdepth: 1
