@@ -15,6 +15,10 @@ DeWave repo is sucked into three python classes that resides as [tedlium_dataset
 
 ### Experiment
 
+**Iterator**
+```
+python vitaflow/run/run.py --mode=run_iterator -config_python_file=examples/shabda/config.py
+```
 **Train**
 ```
 python vitaflow/run/run.py --mode=train -config_python_file=examples/shabda/config.py

@@ -7,7 +7,7 @@ from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
 
 from examples.shabda.core.feature_types.shabda_wav_pair_feature import ShabdaWavPairFeature
-from examples.shabda.tools import boost_yield_samples
+from examples.shabda.tools import yield_samples_multicore
 from vitaflow.core import HParams, IIteratorBase
 from vitaflow.helpers.print_helper import print_info
 
@@ -20,59 +20,35 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         self._dataset = dataset
         print(dataset)
 
-        self.TRAIN_SPEAKER_WAV_FILES_DICT = self.get_speaker_files(data_dir=dataset.TRAIN_OUT_PATH)
-        self.VAL_SPEAKER_WAV_FILES_DICT = self.get_speaker_files(data_dir=dataset.TRAIN_OUT_PATH)
-        self.TEST_SPEAKER_WAV_FILES_DICT = self.get_speaker_files(data_dir=dataset.TRAIN_OUT_PATH)
+        self.TRAIN_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=dataset.TRAIN_OUT_PATH)
+        self.VAL_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=dataset.VAL_OUT_PATH)
+        self.TEST_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=dataset.TEST_OUT_PATH)
 
         if self._hparams.reinit_file_pair:
-            self.TRAIN_WAV_PAIR = self.generate_match_dict(self.TRAIN_SPEAKER_WAV_FILES_DICT)
+            self.TRAIN_WAV_PAIR = self._generate_match_dict(self.TRAIN_SPEAKER_WAV_FILES_DICT)
             self.store_as_pickle(self.TRAIN_WAV_PAIR, "train_wav_pair.p")
 
-            self.VAL_WAV_PAIR = self.generate_match_dict(self.VAL_SPEAKER_WAV_FILES_DICT)
+            self.VAL_WAV_PAIR = self._generate_match_dict(self.VAL_SPEAKER_WAV_FILES_DICT)
             self.store_as_pickle(self.VAL_WAV_PAIR, "val_wav_pair.p")
 
-            self.TEST_WAV_PAIR = self.generate_match_dict(self.TEST_SPEAKER_WAV_FILES_DICT)
+            self.TEST_WAV_PAIR = self._generate_match_dict(self.TEST_SPEAKER_WAV_FILES_DICT)
             self.store_as_pickle(self.TEST_WAV_PAIR, "test_wav_pair.p")
 
         else:
             self.TRAIN_WAV_PAIR = self.read_pickle("train_wav_pair.p")
             if self.TRAIN_WAV_PAIR is None:
-                self.TRAIN_WAV_PAIR = self.generate_match_dict(self.TRAIN_SPEAKER_WAV_FILES_DICT)
+                self.TRAIN_WAV_PAIR = self._generate_match_dict(self.TRAIN_SPEAKER_WAV_FILES_DICT)
                 self.store_as_pickle(self.TRAIN_WAV_PAIR, "train_wav_pair.p")
 
             self.VAL_WAV_PAIR = self.read_pickle("val_wav_pair.p")
             if self.VAL_WAV_PAIR is None:
-                self.VAL_WAV_PAIR = self.generate_match_dict(self.VAL_SPEAKER_WAV_FILES_DICT)
+                self.VAL_WAV_PAIR = self._generate_match_dict(self.VAL_SPEAKER_WAV_FILES_DICT)
                 self.store_as_pickle(self.VAL_WAV_PAIR, "val_wav_pair.p")
 
             self.TEST_WAV_PAIR = self.read_pickle("test_wav_pair.p")
             if self.TEST_WAV_PAIR is None:
-                self.TEST_WAV_PAIR = self.generate_match_dict(self.TEST_SPEAKER_WAV_FILES_DICT)
+                self.TEST_WAV_PAIR = self._generate_match_dict(self.TEST_SPEAKER_WAV_FILES_DICT)
                 self.store_as_pickle(self.TEST_WAV_PAIR, "test_wav_pair.p")
-
-    # TODO: All property methods to be here after __init__
-    # TODO: All underscore methods to be here after __init__ & property methods
-
-    @staticmethod
-    def default_hparams():
-
-        params = IIteratorBase.default_hparams()
-        params.update({
-            "sampling_rate": 16000,
-            "frame_size": 256,
-            "neff": 129,
-            "min_amp": 10000,
-            "amp_fac": 10000,
-            "threshold": 40,
-            # prams for pre-whitening
-            "global_mean": 44,
-            "global_std": 15.5,
-            "frames_per_sample": 100,
-            "reinit_file_pair": False,
-            "prefetch_size": 32
-        }
-        )
-        return params
 
     @property
     def num_labels(self):
@@ -89,8 +65,30 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     @property
     def num_test_samples(self):
         return len(self.TEST_WAV_PAIR)
+    
+    @staticmethod
+    def default_hparams():
 
-    def get_speaker_files(self, data_dir):
+        params = IIteratorBase.default_hparams()
+        params.update({
+            "sampling_rate": 16000,
+            "frame_size": 256,
+            "neff": 129,
+            "min_amp": 10000,
+            "amp_fac": 10000,
+            "threshold": 40,
+            # prams for pre-whitening
+            "global_mean": 44,
+            "global_std": 15.5,
+            "frames_per_sample": 100,
+            "reinit_file_pair": False,
+            "prefetch_size": 32,
+            "num_threads" : 8
+        }
+        )
+        return params
+
+    def _get_speaker_files(self, data_dir):
         """
 
         :param data_dir: dir containing the training data (root_dir + speaker_dir + wavfiles)
@@ -113,18 +111,18 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 speaker_wav_files_dict[speaker].append(wav_file)
         return speaker_wav_files_dict
 
-    def get_shape(self, wav_file):
+    def _get_size(self, wav_file):
         # sig, _ = librosa.core.load(wav_file, sr=self._hparams.sampling_rate)
         # return sig.shape[0]
         st = os.stat(wav_file)
         return st.st_size
 
-    def generate_match_dict(self, speaker_wav_files_dict):
+    def _generate_match_dict(self, speaker_wav_files_dict):
         wav_file_pair = {}
         # generate match dict
         for speaker_1 in tqdm(speaker_wav_files_dict, desc="pair_dict"):
-            for wav_file_1 in tqdm(speaker_wav_files_dict[speaker_1], desc="pair_dict_inner"):
-                size_1 = self.get_shape(wav_file_1)
+            for wav_file_1 in speaker_wav_files_dict[speaker_1]:
+                size_1 = self._get_size(wav_file_1)
                 if size_1 < 1000:
                     continue
                 speaker_2 = random.choice(list(speaker_wav_files_dict))
@@ -134,12 +132,12 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
 
                 wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
-                size_2 = self.get_shape(wav_file_2)
+                size_2 = self._get_size(wav_file_2)
 
                 while size_2 < 1000:
                     wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
                     wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
-                    size_2 = self.get_shape(wav_file_2)
+                    size_2 = self._get_size(wav_file_2)
 
                 wav_file_pair[wav_file_1] = wav_file_2
 
@@ -157,16 +155,17 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         global_std = self._hparams.global_std
         frames_per_sample = self._hparams.frames_per_sample
 
-        for (sample_mix, VAD, Y) in boost_yield_samples(speaker_file_match,
-                                                        sampling_rate,
-                                                        frame_size,
-                                                        amp_fac,
-                                                        neff,
-                                                        min_amp,
-                                                        threshold,
-                                                        global_mean,
-                                                        global_std,
-                                                        frames_per_sample):
+        for (sample_mix, VAD, Y) in yield_samples_multicore(speaker_file_match,
+                                                            sampling_rate,
+                                                            frame_size,
+                                                            amp_fac,
+                                                            neff,
+                                                            min_amp,
+                                                            threshold,
+                                                            global_mean,
+                                                            global_std,
+                                                            frames_per_sample,
+                                                            num_threads=self._hparams.num_threads):
             # print_info((sample_mix, VAD, Y))
             yield sample_mix, VAD, Y
 
@@ -197,7 +196,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
-        dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "train_data_cache"))
+        # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "train_data_cache"))
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
@@ -220,7 +219,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
-        dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "val_data_cache"))
+        # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "val_data_cache"))
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
@@ -241,7 +240,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
-        dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "test_data_cache"))
+        # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "test_data_cache"))
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset

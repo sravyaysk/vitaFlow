@@ -161,10 +161,12 @@ class Experiments(object):
 
 
     def test_iterator(self):
-        iterator = self._data_iterator.train_input_fn().make_one_shot_iterator()
+        iterator = self._data_iterator.train_input_fn().make_initializable_iterator()
+        training_init_op = iterator.initializer
         num_samples = self._data_iterator.num_train_samples
         next_element = iterator.get_next()
         with tf.Session() as sess:
+            sess.run(training_init_op)
             for i in tqdm(range(num_samples), "iterator: "):
                 start_time = time.time()
                 res = sess.run(next_element)
