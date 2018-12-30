@@ -156,7 +156,8 @@ def yield_samples_multicore(speaker_file_match,
                             global_mean,
                             global_std,
                             frames_per_sample,
-                            num_threads):
+                            num_threads,
+                            tqdm_desc):
 
     # for each file pair, generate their mixture and reference samples
 
@@ -165,7 +166,7 @@ def yield_samples_multicore(speaker_file_match,
                      threshold, global_mean, global_std, frames_per_sample) for (wav_file_1, wav_file_2) in
                     speaker_file_match.items()]
     with tqdm(total=len(speaker_file_match.items())) as pbar:
-        for i, res in tqdm(enumerate(p.imap_unordered(_get_speech_features, input_params)), desc="Iterator: "):
+        for i, res in tqdm(enumerate(p.imap_unordered(_get_speech_features, input_params)), desc=tqdm_desc):
             pbar.update()
             for data in res:
                 yield data

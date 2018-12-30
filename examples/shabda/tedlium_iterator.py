@@ -143,7 +143,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
         return wav_file_pair
 
-    def _yield_samples(self, speaker_file_match):
+    def _yield_samples(self, speaker_file_match, tqdm_desc):
         '''Init the training data using the wav files'''
         sampling_rate = self._hparams.sampling_rate
         frame_size = self._hparams.frame_size
@@ -165,18 +165,19 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                                                             global_mean,
                                                             global_std,
                                                             frames_per_sample,
-                                                            num_threads=self._hparams.num_threads):
+                                                            num_threads=self._hparams.num_threads,
+                                                            tqdm_desc=tqdm_desc):
             # print_info((sample_mix, VAD, Y))
             yield sample_mix, VAD, Y
 
     def _yield_train_samples(self):
-        return self._yield_samples(self.TRAIN_WAV_PAIR)
+        return self._yield_samples(self.TRAIN_WAV_PAIR, tqdm_desc="Train: ")
 
     def _yield_val_samples(self):
-        return self._yield_samples(self.VAL_WAV_PAIR)
+        return self._yield_samples(self.VAL_WAV_PAIR, tqdm_desc="Val: ")
 
     def _yield_test_samples(self):
-        return self._yield_samples(self.TEST_WAV_PAIR)
+        return self._yield_samples(self.TEST_WAV_PAIR, tqdm_desc="Test: ")
 
     def _get_train_input_fn(self):
         """
