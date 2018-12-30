@@ -165,9 +165,12 @@ class Experiments(object):
         training_init_op = iterator.initializer
         num_samples = self._data_iterator.num_train_samples
         next_element = iterator.get_next()
+        batch_size = self._hparams[self._hparams['iterator_class_with_path']].batch_size
+        current_max_steps = (num_samples // batch_size) * (1)
+
         with tf.Session() as sess:
             sess.run(training_init_op)
-            for i in tqdm(range(num_samples), "iterator: "):
+            for i in tqdm(range(50), "steps: "):
                 start_time = time.time()
                 res = sess.run(next_element)
                 end_time = time.time()
@@ -193,9 +196,9 @@ class Experiments(object):
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
                 print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
-                exec.train(max_steps=current_max_steps)  # , eval_steps=None)
+                exec.train(max_steps=None)  # , eval_steps=None)
                 print("\n\n Evaluating for epoch\n\n", current_epoch)
-                exec.evaluate(steps=200)
+                exec.evaluate(steps=500)
 
         elif mode == "predict":
             exec.predict()

@@ -32,9 +32,9 @@ experiments = {
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
     "iterator_class_with_path": "examples.shabda.tedlium_iterator.TEDLiumIterator",
     "model_class_with_path": "examples.shabda.deep_clustering.DeepClustering",
-    "save_checkpoints_steps": 10,
+    "save_checkpoints_steps": 200,
     "keep_checkpoint_max": 5,
-    "save_summary_steps": 5,
+    "save_summary_steps": 10,
     "log_step_count_steps": 5,
     "clear_model_data": False,
 
