@@ -16,9 +16,8 @@ Experiments class that allows easy plug n play of modules
 """
 import logging
 import os
-import time
-
 import shutil
+import time
 from importlib import import_module
 
 import tensorflow as tf
@@ -159,18 +158,12 @@ class Experiments(object):
         self._model = self._model(hparams=self._hparams[self._hparams['model_class_with_path']],
                                   data_iterator=self._data_iterator)
 
-
     def test_iterator(self):
-        iterator = self._data_iterator.train_input_fn().make_initializable_iterator()
-        training_init_op = iterator.initializer
+        iterator = self._data_iterator.train_input_fn().make_one_shot_iterator()
         num_samples = self._data_iterator.num_train_samples
         next_element = iterator.get_next()
-        batch_size = self._hparams[self._hparams['iterator_class_with_path']].batch_size
-        current_max_steps = (num_samples // batch_size) * (1)
-
         with tf.Session() as sess:
-            sess.run(training_init_op)
-            for i in tqdm(range(50), "steps: "):
+            for i in tqdm(range(num_samples), "iterator: "):
                 start_time = time.time()
                 res = sess.run(next_element)
                 end_time = time.time()
@@ -196,9 +189,9 @@ class Experiments(object):
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
                 print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
-                exec.train(max_steps=None)  # , eval_steps=None)
+                exec.train(max_steps=current_max_steps)  # , eval_steps=None)
                 print("\n\n Evaluating for epoch\n\n", current_epoch)
-                exec.evaluate(steps=500)
+                exec.evaluate(steps=200)
 
         elif mode == "predict":
             exec.predict()

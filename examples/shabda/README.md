@@ -1,7 +1,7 @@
 
 ### [DeWave](https://github.com/chaodengusc/DeWave)
 
-We have considered DeWave as a starting point to our exploration in Audio and/or Video separation task.
+We have considered DeWave as a starting point to our exploration in Audio and/or Video sepration task.
 
 DeWave is simplest of all which uses Deep Clustering to seperate two mixture of audio signals.
 
@@ -10,18 +10,18 @@ We have provided a [download.sh](download.sh) script that downloads data of size
 Please refer below on how to run the experiments.
 
 DeWave repo is sucked into three python classes that resides as [tedlium_dataset.py](tedlium_dataset.py), 
-[tedlium_iterator.py](tedlium_iterator.py) and [deep_clustering.py](deep_clustering.py) respectively.
+[tedlium_iterator.py](tedlium_iterator2.py) and [deep_clustering.py](deep_clustering.py) respectively.
 
 
 ### Experiment
 
-**Iterator**
+**Cache the Preprocessed Data Manually**
 ```
-python vitaflow/run/run.py --mode=run_iterator -config_python_file=examples/shabda/config.py
+CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py --mode=run_iterator -config_python_file=examples/shabda/config.py
 ```
 **Train**
 ```
-python vitaflow/run/run.py --mode=train -config_python_file=examples/shabda/config.py
+CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py --mode=train -config_python_file=examples/shabda/config.py
 ```
 
 

@@ -22,21 +22,22 @@ P_DROPOUT_RC = 0.2
 N_HIDDEN = 300
 LEARNING_RATE = 1e-3
 MAX_STEP = 2000000
+TRAIN_BATCH_SIZE = 128
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
 experiment_name = "TEDLiumDataset"
-batch_size = 128
+batch_size = 64
 
 experiments = {
-    "num_epochs": 2,
+    "num_epochs": 25,
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
     "iterator_class_with_path": "examples.shabda.tedlium_iterator.TEDLiumIterator",
     "model_class_with_path": "examples.shabda.deep_clustering.DeepClustering",
-    "save_checkpoints_steps": 200,
+    "save_checkpoints_steps": 10,
     "keep_checkpoint_max": 5,
-    "save_summary_steps": 10,
+    "save_summary_steps": 5,
     "log_step_count_steps": 5,
-    "clear_model_data": False,
+    "clear_model_data" : False,
 
     "examples.shabda.tedlium_dataset.TEDLiumDataset": {
         "experiment_root_directory": experiment_root_directory,
@@ -58,30 +59,29 @@ experiments = {
         "train_data_path": "train",
         "validation_data_path": "dev",
         "test_data_path": "test",
-        "sampling_rate": SAMPLING_RATE,
-        "frame_size": FRAME_SIZE,
-        "neff": NEFF,
-        "min_amp": MIN_AMP,
-        "amp_fac": AMP_FAC,
-        "threshold": THRESHOLD,
-        "global_mean": GLOBAL_MEAN,
-        "global_std": GLOBAL_STD,
-        "frames_per_sample": FRAMES_PER_SAMPLE,
-        "batch_size": batch_size,
-        "prefetch_size": batch_size * 4,
-        "num_threads" : 8
-
+        "sampling_rate" : SAMPLING_RATE,
+        "frame_size" : FRAME_SIZE,
+        "neff" : NEFF,
+        "min_amp" : MIN_AMP,
+        "amp_fac" : AMP_FAC,
+        "threshold" : THRESHOLD,
+        "global_mean" : GLOBAL_MEAN,
+        "global_std" : GLOBAL_STD,
+        "frames_per_sample" : FRAMES_PER_SAMPLE,
+        "batch_size" : batch_size,
+        "prefetch_size" : 1,
+        "num_parallel_calls" : 8
     },
 
-    "examples.shabda.deep_clustering.DeepClustering": {
+    "examples.shabda.deep_clustering.DeepClustering" : {
         "model_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
-        "neff": NEFF,
-        "batch_size": batch_size,
-        "n_hidden": 512,
-        "p_keep_ff": 0.5,
-        "p_keep_rc": 0.5,
-        "frames_per_sample": FRAMES_PER_SAMPLE,
-        "embd_dim": 30,
+        "neff" : NEFF,
+        "batch_size" : batch_size,
+        "n_hidden" : 8,
+        "p_keep_ff" : 0.5,
+        "p_keep_rc" : 0.5,
+        "frames_per_sample" : 1247,
+        "embd_dim" : 30,
     }
 }

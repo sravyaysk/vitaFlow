@@ -144,9 +144,9 @@ class TEDLiumDataset(IPreprocessor):
                                              y[k*sampling_rate : (k+duration)*sampling_rate],
                                              sampling_rate)
             else:
-                print_info("While processing {}".format(file_path))
-                print_warn("Found existing data @ {}".format(speaker_dir))
-                print_info("Skipping!!!")
+                # print_info("While processing {}".format(file_path))
+                # print_warn("Found existing data @ {}".format(speaker_dir))
+                # print_info("Skipping!!!")
                 pass
 
     def extract_speech_clips(self):
