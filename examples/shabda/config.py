@@ -31,7 +31,7 @@ batch_size = 64
 experiments = {
     "num_epochs": 25,
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
-    "iterator_class_with_path": "examples.shabda.tedlium_iterator.TEDLiumIterator",
+    "iterator_class_with_path": "examples.shabda.tedlium_parallel_iterator.TEDLiumIterator",
     "model_class_with_path": "examples.shabda.deep_clustering.DeepClustering",
     "save_checkpoints_steps": 10,
     "keep_checkpoint_max": 5,
@@ -52,7 +52,7 @@ experiments = {
         "sampling_rate": SAMPLING_RATE,
     },
 
-    "examples.shabda.tedlium_iterator.TEDLiumIterator": {
+    "examples.shabda.tedlium_parallel_iterator.TEDLiumIterator": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "preprocessed_data_path": "preprocessed_data",

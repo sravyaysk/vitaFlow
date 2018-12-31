@@ -300,8 +300,8 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
 
     @property
     def num_val_samples(self):
-        raise NotImplementedError
+        raise 5000
 
     @property
     def num_test_samples(self):
-        raise NotImplementedError
+        raise 10000
