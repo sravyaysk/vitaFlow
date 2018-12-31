@@ -22,6 +22,7 @@ P_DROPOUT_RC = 0.2
 N_HIDDEN = 300
 LEARNING_RATE = 1e-3
 MAX_STEP = 2000000
+TRAIN_BATCH_SIZE = 128
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
 experiment_name = "TEDLiumDataset"
@@ -44,14 +45,14 @@ experiments = {
         "train_data_path": "train",
         "validation_data_path": "dev",
         "test_data_path": "test",
-        "num_clips" : 128,
+        "num_clips": 128,
         "duration": 5,
-        "start_time" : 0,
-        "end_time" : 600,
-        "sampling_rate" : SAMPLING_RATE,
+        "start_time": 0,
+        "end_time": 600,
+        "sampling_rate": SAMPLING_RATE,
     },
 
-    "examples.shabda.tedlium_iterator.TEDLiumIterator" : {
+    "examples.shabda.tedlium_iterator.TEDLiumIterator": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "preprocessed_data_path": "preprocessed_data",

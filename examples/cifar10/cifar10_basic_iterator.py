@@ -39,6 +39,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
 
         self._hparams = HParams(hparams, self.default_hparams())
 
+        # TODO - make `EXPERIMENT_ROOT_DIR` as local variable
         self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,
                                                 self._hparams.experiment_name)
         self.PREPROCESSED_DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
@@ -53,7 +54,6 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         # This rule is assumed to be correct if the previous stage is of IPreprocessor
         self.TRAIN_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "train/")
         self.TEST_FILES_IN_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR, "test/")
-
 
         check_n_makedirs(self.OUT_DIR)
 

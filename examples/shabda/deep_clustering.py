@@ -315,14 +315,9 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         gradients, v = zip(*optimizer.compute_gradients(loss))
         gradients, _ = tf.clip_by_global_norm(gradients, 200)
         train_op = optimizer.apply_gradients(
-            zip(gradients, v))
+            zip(gradients, v),
+            global_step=tf.train.get_global_step())
 
-
-        # train_op = tf.contrib.layers.optimize_loss(
-        #     loss=loss,
-        #     global_step=tf.train.get_global_step(),
-        #     optimizer=tf.train.AdamOptimizer,
-        #     learning_rate=0.001)
         return train_op
 
     def _get_eval_metrics(self, predictions, labels):

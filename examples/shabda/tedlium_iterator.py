@@ -137,8 +137,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         # get the files in each speakers dir
         for speaker_dir in speakers_dirs:
             speaker = speaker_dir.split("/")[-1]
-            wav_files = [os.path.join(speaker_dir, file) \
-                         for file in os.listdir(speaker_dir) if file[-3:]=="wav"]
+            wav_files = [os.path.join(speaker_dir, file) for file in os.listdir(speaker_dir) if file.endswith("wav")]
             for wav_file in wav_files:
                 if speaker not in speaker_wav_files_dict:
                     speaker_wav_files_dict[speaker] = []
@@ -333,8 +332,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info(dataset.output_shapes)
         return dataset
 
-
-    #
+    # TODO: Remove dead code
     # def load_data(self, data_dir):
     #     '''
     #     Load in the audio file and transform the signal into

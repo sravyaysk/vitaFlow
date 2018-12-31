@@ -3,13 +3,6 @@ import os
 import pandas as pd
 import tensorflow as tf
 
-from vitaflow.core.dataset_types import IDatasetType
-from vitaflow.utils.data_io import maybe_download
-
-
-class Load_iris_data(IDatasetType):
-    pass
-
 
 TRAIN_URL = "http://download.tensorflow.org/data/iris_training.csv"
 TEST_URL = "http://download.tensorflow.org/data/iris_test.csv"
@@ -23,7 +16,6 @@ CSV_TYPES = [[0.0], [0.0], [0.0], [0.0], [0]]
 def maybe_download():
     train_path = tf.keras.utils.get_file(os.path.basename(TRAIN_URL), TRAIN_URL)
     test_path = tf.keras.utils.get_file(os.path.basename(TEST_URL), TEST_URL)
-
     return train_path, test_path
 
 
@@ -70,13 +62,6 @@ def eval_input_fn(features, labels, batch_size):
 
     # Return the dataset.
     return dataset
-
-
-# The remainder of this file contains a simple example of a csv parser,
-#     implemented using the `Dataset` class.
-
-# `tf.parse_csv` sets the types of the outputs to match the examples given in
-#     the `record_defaults` argument.
 
 
 def _parse_line(line):

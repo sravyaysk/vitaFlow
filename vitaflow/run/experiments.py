@@ -45,9 +45,7 @@ class Experiments(object):
 
     def __init__(self, hparams, mode='train'):
         self._hparams = HParams(hparams, self.default_hparams(), allow_new_hparam=True)
-
         self.mode = mode
-
         self._dataset = None
         self.data_iterator = None
         self._model = None
@@ -157,7 +155,8 @@ class Experiments(object):
         self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_class_with_path']])
         self._data_iterator = self._data_iterator(hparams=self._hparams[self._hparams['iterator_class_with_path']],
                                                   dataset=self._dataset)
-        self._model = self._model(hparams=self._hparams[self._hparams['model_class_with_path']], data_iterator=self._data_iterator)
+        self._model = self._model(hparams=self._hparams[self._hparams['model_class_with_path']],
+                                  data_iterator=self._data_iterator)
 
     def test_iterator(self):
         iterator = self._data_iterator.train_input_fn().make_one_shot_iterator()
