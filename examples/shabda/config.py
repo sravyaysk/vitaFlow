@@ -68,7 +68,7 @@ experiments = {
         "global_std" : GLOBAL_STD,
         "frames_per_sample" : FRAMES_PER_SAMPLE,
         "batch_size" : batch_size,
-        "prefetch_size" : batch_size*2,
+        "prefetch_size" : 1,
         "num_parallel_calls" : 8
     },
 

@@ -1,4 +1,7 @@
 import random
+import time
+
+import threading
 
 import numpy as np
 import librosa
@@ -176,6 +179,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     def generate_features(self, wav_file_1, wav_file_2):
 
         try:
+            start = time.time()
             speech_1, _ = librosa.core.load(wav_file_1, sr=self._hparams.sampling_rate)
             # amp factor between -3 dB - 3 dB
             fac = np.random.rand(1)[0] * 6 - 3
@@ -216,6 +220,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
             speech_mix_features = (speech_mix_features - self._hparams.global_mean) / self._hparams.global_std
 
+            #The ideal binary mask gives ownership of a time-frequency bin to the source whose magnitude is
+            # maximum among all sources in that bin.
+            # The mask values were assigned with 1 for active and 0 otherwise (binary),
+            # making Y x Y^T as the ideal affinity matrix for the mixture.
             Y = np.array([speech_1_features > speech_2_features, speech_1_features < speech_2_features]).astype('bool')
             Y = np.transpose(Y, [1, 2, 0]).astype('bool')
 
@@ -224,6 +232,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             # Y = Y[0:self._hparams.dummy_slicing_dim, :, :]
 
             # print_info("{} vs {}".format(wav_file_1, wav_file_2))
+            end = time.time()
+
+
+            print_info("Thread name: {} : took {}".format(threading.currentThread().getName(), end -start))
 
             if speech_mix_features.shape[0] != 1247 or speech_VAD.shape[0] != 1247 or Y.shape[0] != 1247:
                 raise Exception("Found files with improper duration/data")
@@ -251,11 +263,9 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         label = tf.reshape(label, shape=TensorShape([Dimension(self._hparams.dummy_slicing_dim),
                                                      Dimension(self._hparams.neff),
                                                      Dimension(2)]))
-        return sample, vad, label
+        return ({self.FEATURE_1_NAME: sample,
+                 self.FEATURE_2_NAME: vad}, label)
 
-    def feature_map_func(self, sample_mix, VAD, Y):
-        return ({self.FEATURE_1_NAME: sample_mix,
-                 self.FEATURE_2_NAME: VAD}, Y)
 
     def _get_train_input_fn(self):
         """
@@ -270,19 +280,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 self.generate_features, [wav_file_1, wav_file_2], (tf.float32, tf.bool, tf.bool))),
             num_parallel_calls=self._hparams.num_parallel_calls)
 
-        # dataset = dataset.apply(
-        #     tf.contrib.data.parallel_interleave(
-        #     lambda wav_file_1, wav_file_2: tuple(tf.py_func(
-        #         self.generate_features, [wav_file_1, wav_file_2], (tf.float32, tf.bool, tf.bool))),
-        #         cycle_length=4
-        #     )
-        # )
-
         dataset = dataset.map(self._user_resize_func, num_parallel_calls=self._hparams.num_parallel_calls)
-        dataset = dataset.map(self.feature_map_func, num_parallel_calls=self._hparams.num_parallel_calls)
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
-        dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "train_data_cache"))
+        # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "train_data_cache"))
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
@@ -300,8 +301,6 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 self.generate_features, [wav_file_1, wav_file_2], (tf.float32, tf.bool, tf.bool))),
             num_parallel_calls=self._hparams.num_parallel_calls)
         dataset = dataset.map(self._user_resize_func, num_parallel_calls=self._hparams.num_parallel_calls)
-        dataset = dataset.map(self.feature_map_func, num_parallel_calls=self._hparams.num_parallel_calls)
-
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
