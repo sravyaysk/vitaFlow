@@ -41,16 +41,6 @@ class ModelBase(object):
     def __init__(self, hparams=None):
         self._hparams = HParams(hparams, self.default_hparams())
 
-    @staticmethod
-    def default_hparams():
-        """
-        Returns a dictionary of hyperparameters with default values.
-        """
-        hparams = {
-            "experiment_name": "model_name_or_dataset_name",
-            "model_root_directory" : os.path.join(os.path.expanduser("~"), "vitaFlow/", "default_model_dir")
-        }
-        return hparams
 
     def __call__(self, features, labels, params, mode, config=None):
         """
@@ -60,32 +50,33 @@ class ModelBase(object):
         """
         return self._build(features, labels, params, mode, config=config)
 
-    def _get_loss(self, labels, logits, **kwargs):
-        raise NotImplementedError
-
-    def _build_layers(self, features, mode):
-        raise NotImplementedError
-
-    def _get_predicted_classes(self, logits):
-        raise NotImplementedError
-
-    def _get_class_probabilities(self, logits):
-        raise NotImplementedError
-
-    def _get_optimizer(self, loss):
-        raise NotImplementedError
-
-    def _get_eval_metrics(self, predictions, labels):
-        raise NotImplementedError
-
-    def _build(self, features, labels, params, mode, config=None):
+    @staticmethod
+    def default_hparams():
         """
-        Used for the :tf_main:`model_fn <estimator/Estimator#__init__>`
-        argument when constructing
-        :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
-        """
-        raise NotImplementedError
+        .. role:: python(code)
+           :language: python
 
+        .. code-block:: python
+
+            {
+                "experiment_name": "model_name_or_dataset_name",
+                "model_root_directory" : os.path.join(os.path.expanduser("~"), "vitaFlow/", "default_model_dir")
+            }
+
+        Here:
+
+        "experiment_name" : str
+            Name of the experiment
+        "model_root_directory" : str
+            Model root directory to store the model data under it with model class name as folder name
+
+        :return:  A dictionary of hyperparameters with default values
+        """
+        hparams = {
+            "experiment_name": "model_name_or_dataset_name",
+            "model_root_directory" : os.path.join(os.path.expanduser("~"), "vitaFlow/", "default_model_dir")
+        }
+        return hparams
 
     @property
     def hparams(self):
@@ -104,3 +95,27 @@ class ModelBase(object):
         return os.path.join(self._hparams.model_root_directory,
                             self._hparams.experiment_name,
                             type(self).__name__)
+
+
+    def _build_layers(self, features, mode):
+        raise NotImplementedError
+
+    def _get_loss(self, labels, logits):
+        raise NotImplementedError
+
+    def _get_optimizer(self, loss):
+        raise NotImplementedError
+
+    def _get_eval_metrics(self, predictions, labels):
+        raise NotImplementedError
+
+    def _build(self, features, labels, params, mode, config=None):
+        """
+        Used for the :tf_main:`model_fn <estimator/Estimator#__init__>`
+        argument when constructing
+        :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
+        """
+        raise NotImplementedError
+
+
+

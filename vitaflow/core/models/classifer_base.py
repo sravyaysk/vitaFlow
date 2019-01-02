@@ -17,7 +17,10 @@ A class that sets up default Tensorflow operations for classifying audio
 
 import tensorflow as tf
 from overrides import overrides
+
+from vitaflow.core import HParams
 from vitaflow.core.models.model_base import ModelBase
+from vitaflow.helpers.print_helper import print_error, print_warn
 
 
 class ClassifierBase(ModelBase):
@@ -27,21 +30,57 @@ class ClassifierBase(ModelBase):
 
     def __init__(self, hparams):
         ModelBase.__init__(self, hparams=hparams)
+        self._hparams = HParams(hparams, self.default_hparams())
 
         self._out_dim = self._hparams.out_dim
         self._learning_rate = self.hparams.learning_rate
-        # self._layers = {}
+
+    def __call__(self, features, labels, params, mode, config=None):
+        """
+        Used for the :tf_main:`model_fn <estimator/Estimator#__init__>`
+        argument when constructing
+        :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
+        """
+        return self._build(features, labels, params, mode, config=config)
 
     @staticmethod
     def default_hparams():
-        """Returns a dictionary of hyperparameters with default values.
         """
-        hparams = {
+        .. role:: python(code)
+           :language: python
+
+        .. code-block:: python
+
+            {
+                "experiment_name": "model_name_or_dataset_name",
+                "model_root_directory" : os.path.join(os.path.expanduser("~"), "vitaFlow/", "default_model_dir"),
+                "name": "classifier_base",
+                "out_dim": -1,
+                "learning_rate": 0.001,
+            }
+
+        Here:
+
+        "experiment_name" : str
+            Name of the experiment
+        "model_root_directory" : str
+            Model root directory to store the model data under it with model class name as folder name
+        "name": str
+            Name of the classifier
+        "out_dim":
+            Number of output labels/classes
+        "learning_rate" : float
+            Learning rate
+
+        :return:  A dictionary of hyperparameters with default values
+        """
+        params = ModelBase.default_hparams()
+        params.update({
             "name": "classifier_base",
             "out_dim": -1,
-            "learning_rate": 0.001
-        }
-        return hparams
+            "learning_rate": 0.001,
+        })
+        return params
 
     def _get_loss(self, labels, logits):
         """
@@ -86,6 +125,9 @@ class ClassifierBase(ModelBase):
         tf.logging.info('predicted_probabilities: -----> {}'.format(predicted_probabilities))
         return predicted_probabilities
 
+    # def _get_top_k_predictions(self, logits):
+    #     return tf.nn.top_k(tf.nn.softmax(logits), self._k)
+
     def _get_optimizer(self, loss):
         optimizer = tf.contrib.layers.optimize_loss(
             loss=loss,
@@ -124,9 +166,10 @@ class ClassifierBase(ModelBase):
         logits = self._build_layers(features=features, mode=mode)
         predicted_class = self._get_predicted_classes(logits=logits)
         predicted_probabilities = self._get_class_probabilities(logits=logits)
+        # top_k = self._get_top_k_predictions(logits=logits)
         predictions = {
             "classes": predicted_class,
-            "probabilities": predicted_probabilities
+            "probabilities": predicted_probabilities,
         }
 
         if mode != tf.estimator.ModeKeys.PREDICT:

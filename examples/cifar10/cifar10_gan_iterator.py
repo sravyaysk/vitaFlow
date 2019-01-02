@@ -17,8 +17,11 @@ CIFAR10 Basic Iterator
 
 import os
 import numpy as np
-import tensorflow as tf
 from overrides import overrides
+from tqdm import tqdm
+
+import tensorflow as tf
+from tensorflow import TensorShape, Dimension
 
 from vitaflow.core import HParams
 from vitaflow.core import IPreprocessor
@@ -67,7 +70,7 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
         self._img_size_flat = self._img_size * self._img_size * self._num_channels
 
         # Number of classes.
-        self._num_classes = 10
+        self._num_classes = 10 # TODO
 
         # Number of files for the training-set.
         self._num_files_train = 5
@@ -80,6 +83,7 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
         self._num_images_train = self._num_files_train * self._images_per_file
 
         self._images, self._labels = self._load_training_data()
+        self._images = self._images.astype("float32")
 
     @staticmethod
     def default_hparams():
@@ -143,12 +147,38 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
         })
         return hparams
 
+    @property
+    def num_labels(self):
+        return self._num_classes
+
+    @property
+    def num_train_samples(self):
+        return 45000
+
+    @property
+    def num_val_samples(self):
+        raise 5000
+
+    @property
+    def num_test_samples(self):
+        raise 10000
 
     def _unpickle(self, file):
         import pickle
         with open(file, 'rb') as fo:
             data_dict = pickle.load(fo, encoding='bytes')
         return data_dict
+
+    def _normalize(self, x):
+        """
+        Normalize a list of sample image data in the range of 0 to 1
+        : x: List of image data.  The image shape is (32, 32, 3)
+        : return: Numpy array of normalize data
+        """
+        minV = np.min(x)
+        maxV = np.max(x)
+        ret = (x - minV)/maxV
+        return ret
 
     def _convert_images(self, raw):
         """
@@ -166,7 +196,7 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
         # Reorder the indices of the array.
         images = images.transpose([0, 2, 3, 1])
 
-        return images
+        return self._normalize(images)
 
     def _load_data(self, filepath):
         """
@@ -210,7 +240,7 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
 
         return np.eye(num_classes, dtype=float)[class_numbers]
 
-    def _yield_training_data(self):
+    def _load_training_data(self):
         """
         Load all the training-data for the CIFAR-10 data-set.
         The data-set is split into 5 data-files which are merged here.
@@ -225,7 +255,7 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
         begin = 0
 
         # For each data-file.
-        for i in range(self._num_files_train):
+        for i in tqdm(range(self._num_files_train), desc="loading: "):
             filepath = os.path.join(self.TRAIN_OUT_PATH, "data_batch_" + str(i + 1))
             # Load the images and class-numbers from the data-file.
             images_batch, cls_batch = self._load_data(filepath=filepath)
@@ -245,14 +275,10 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
             # The begin-index for the next batch is the current end-index.
             begin = end
 
-        yield images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
-
-    def _load_training_data(self):
-        generator = self._yield_training_data()
-        return next(generator)
+        return images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
 
 
-    def _yield_test_data(self):
+    def _load_test_data(self):
         """
         Load all the test-data for the CIFAR-10 data-set.
         Returns the images, class-numbers and one-hot encoded class-labels.
@@ -260,48 +286,73 @@ class Cifar10GanIterator(IIteratorBase, GANFeature):
         filepath = os.path.join(self.TEST_OUT_PATH, "test_batch")
         images, cls = self._load_data(filepath=filepath)
 
-        yield images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
+        return images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
 
-    def _load_test_data(self):
-        generator = self._yield_test_data()
-        return next(generator)
+    def _yield_samples(self, features, labels):
+        for feature, label in zip(features, labels):
+            noise = np.random.random(self._hparams.noise_dim)
+            yield feature, noise, label
+
+    def _yield_train_samples(self):
+        return self._yield_samples(self._images[:45000], self._labels[:45000])
+
+    def _yield_val_samples(self):
+        return self._yield_samples(self._images[:-5000], self._labels[:-5000])
+
+    def _yield_test_samples(self):
+        images, labels = self._load_test_data()
+        return self._yield_samples(images, labels)
 
     @overrides
     def _get_train_input_fn(self):
 
-        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: self._images[:45000],
-                                                       self.FEATURE_2_NAME: np.ndarray((45000, self._hparams.noise_dim))},
-                                                      self._labels[:45000]))
+        dataset = tf.data.Dataset.from_generator(self._yield_train_samples,
+                                                 (tf.float32, tf.float32, tf.int32),
+                                                 output_shapes=(TensorShape([Dimension(32), Dimension(32), Dimension(3)]),
+                                                                TensorShape([Dimension(self._hparams.noise_dim)]),
+                                                                TensorShape(Dimension(10))))
+
+        dataset = dataset.map(lambda image, noise, label: ({self.FEATURE_1_NAME: image, self.FEATURE_2_NAME: noise},
+                                                           label))
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size)
-        print_info("Dataset output sizes are: ")
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        print_info("Trianing Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
 
     @overrides
     def _get_val_input_fn(self):
 
-        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_1_NAME: self._images[:-5000],
-                                                       self.FEATURE_2_NAME: np.ndarray((5000, self._hparams.noise_dim))},
-                                                      self._labels[:-5000]))
+        dataset = tf.data.Dataset.from_generator(self._yield_val_samples,
+                                                 (tf.float32, tf.float32, tf.int32),
+                                                 output_shapes=(TensorShape([Dimension(32), Dimension(32), Dimension(3)]),
+                                                                TensorShape([Dimension(self._hparams.noise_dim)]),
+                                                                TensorShape(Dimension(10))))
+
+        dataset = dataset.map(lambda image, noise, label: ({self.FEATURE_1_NAME: image, self.FEATURE_2_NAME: noise},
+                                                           label))
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size)
-        print_info("Dataset output sizes are: ")
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        print_info("Validation Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
 
-    @property
-    def num_labels(self):
-        return self._num_classes
+    @overrides
+    def _get_test_input_fn(self):
 
-    @property
-    def num_train_samples(self):
-        return 45000
+        dataset = tf.data.Dataset.from_generator(self._yield_test_samples,
+                                                 (tf.float32, tf.float32, tf.int32),
+                                                 output_shapes=(TensorShape([Dimension(32), Dimension(32), Dimension(3)]),
+                                                                TensorShape([Dimension(self._hparams.noise_dim)]),
+                                                                TensorShape(Dimension(10))))
 
-    @property
-    def num_val_samples(self):
-        raise 5000
+        dataset = dataset.map(lambda image, noise, label: ({self.FEATURE_1_NAME: image, self.FEATURE_2_NAME: noise},
+                                                           label))
 
-    @property
-    def num_test_samples(self):
-        raise 10000
+        dataset = dataset.batch(batch_size=self._hparams.batch_size)
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        print_info("Dataset output sizes are: ")
+        print_info(dataset.output_shapes)
+        return dataset

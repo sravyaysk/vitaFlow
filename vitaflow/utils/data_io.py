@@ -65,16 +65,16 @@ def maybe_download(urls, path, filenames=None, extract=False):
             else:
                 filepath = _download(url, filename, path)
 
-            if extract:
-                tf.logging.info('Extract %s', filepath)
-                if tarfile.is_tarfile(filepath):
-                    tarfile.open(filepath, 'r').extractall(path)
-                elif zipfile.is_zipfile(filepath):
-                    with zipfile.ZipFile(filepath) as zfile:
-                        zfile.extractall(path)
-                else:
-                    tf.logging.info("Unknown compression type. Only .tar.gz, "
-                                    ".tar.bz2, .tar, and .zip are supported")
+        if extract:
+            tf.logging.info('Extract %s', filepath)
+            if tarfile.is_tarfile(filepath):
+                tarfile.open(filepath, 'r').extractall(path)
+            elif zipfile.is_zipfile(filepath):
+                with zipfile.ZipFile(filepath) as zfile:
+                    zfile.extractall(path)
+            else:
+                tf.logging.info("Unknown compression type. Only .tar.gz, "
+                                ".tar.bz2, .tar, and .zip are supported")
 
     return result
 

@@ -116,7 +116,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
                 "word_emd_size": 24,
                 "char_emd_size": 24,
                 "num_lstm_layers": 1,
-                "keep_propability": 0.5,
+                "keep_probability": 0.5,
             }
 
         Here:
@@ -158,7 +158,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
             "word_emd_size": 24,
             "char_emd_size": 24,
             "num_lstm_layers": 1,
-            "keep_propability": 0.5,
+            "keep_probability": 0.5,
         }
         return hparams
 

@@ -153,21 +153,35 @@ class Experiments(object):
         self.check_interoperability_n_import()
         # Initialize the handles and call any user specific init() methods
         self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_class_with_path']])
+        #TODO avoid loading train data while prediction
         self._data_iterator = self._data_iterator(hparams=self._hparams[self._hparams['iterator_class_with_path']],
                                                   dataset=self._dataset)
+        print_error(self._model)
         self._model = self._model(hparams=self._hparams[self._hparams['model_class_with_path']],
                                   data_iterator=self._data_iterator)
 
     def test_iterator(self):
-        iterator = self._data_iterator.train_input_fn().make_one_shot_iterator()
+        iterator = self._data_iterator.train_input_fn().make_initializable_iterator()
+        training_init_op = iterator.initializer
         num_samples = self._data_iterator.num_train_samples
         next_element = iterator.get_next()
+        batch_size = self._hparams[self._hparams['iterator_class_with_path']].batch_size
+        current_max_steps = (num_samples // batch_size) * (1)
+
         with tf.Session() as sess:
-            for i in tqdm(range(num_samples), "iterator: "):
-                start_time = time.time()
+            sess.run(training_init_op)
+            start_time = time.time()
+
+            for i in tqdm(range(current_max_steps), "steps: "):
                 res = sess.run(next_element)
-                end_time = time.time()
-                print_warn("Lables shape : {} and time taken is {} ".format(res[1].shape, end_time - start_time))
+                print("Data shapes : ", end=" ")
+                for key in res[0].keys():
+                    print(res[0][key].shape, end=", ")
+                print(" label shape : {}".format(res[1].shape))
+
+            end_time = time.time()
+
+            print_debug("time taken is {} ".format(end_time - start_time))
 
         exit(0)
 
@@ -183,18 +197,21 @@ class Experiments(object):
         if mode == "run_iterator":
             self.test_iterator()
 
-        exec = Executor(model=self._model, data_iterator=self._data_iterator, config=self._run_config)
+        executor = Executor(model=self._model, data_iterator=self._data_iterator, config=self._run_config)
+
 
         if mode in ["train", "retrain"]:
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
                 print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
-                exec.train(max_steps=current_max_steps)  # , eval_steps=None)
+                executor.train(max_steps=current_max_steps)  # , eval_steps=None)
                 print("\n\n Evaluating for epoch\n\n", current_epoch)
-                exec.evaluate(steps=200)
+                executor.evaluate(steps=200)
 
         elif mode == "predict":
-            exec.predict()
+            #exec.predict()
+            #TODO: Prediction logic is pushed to iterator, since each iterator has the details on how to handle the data
+            self._data_iterator.predict(executor=executor)
 
-        elif mode == "predict_sentence":
-            exec.predict_sentence("SOCCER - JAPAN GET LUCKY WIN , CHINA IN SURPRISE DEFEAT .")
+        # elif mode == "predict_sentence":
+        #     exec.predict_sentence("SOCCER - JAPAN GET LUCKY WIN , CHINA IN SURPRISE DEFEAT .")

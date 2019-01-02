@@ -23,77 +23,13 @@ from tensorflow.python.training import session_run_hook
 from tensorflow.python.training import training_util
 from tensorflow.contrib.learn import ModeKeys
 
+from vitaflow.core import HParams
 from vitaflow.core.features import GANFeature
+from vitaflow.core.hooks.image_grid_hook import ImageGridHook
 from vitaflow.helpers.print_helper import print_info, print_error
 from vitaflow.core.models import ModelBase
 from vitaflow.utils.image_utils import images_square_grid
-
-
-class RunTrainOpsHook(session_run_hook.SessionRunHook):
-    """A hook to run train ops a fixed number of times."""
-
-    def __init__(self, train_op, train_steps):
-
-        self._train_op = train_op
-        self._train_steps = train_steps
-
-    def before_run(self, run_context):
-        for _ in range(self._train_steps):
-            run_context.session.run(self._train_op)
-
-class LogShapeHook(session_run_hook.SessionRunHook):
-    """A hook to run train ops a fixed number of times."""
-
-    def __init__(self, tensors):
-        self._tensors = tensors
-
-    def before_run(self, run_context):
-        for tensor in self._tensors:
-            # print_error(tensor)
-            # print_error(tensor.get_shape())
-            pass
-
-class UserLogHook(session_run_hook.SessionRunHook):
-    def __init__(self, z_image, d_loss, g_loss, global_Step):
-        self._z_image = z_image
-        self._d_loss = d_loss
-        self._g_loss = g_loss
-        self._global_Step = global_Step
-
-
-    def before_run(self, run_context):
-        global_step = run_context.session.run(self._global_Step)
-
-        print_info("global_step {}".format(global_step))
-
-        if global_step % 2 == 0 or global_step % 3 == 0 :
-            samples = run_context.session.run(self._z_image)
-            channel = self._z_image.get_shape()[-1]
-            if channel == 1:
-                images_grid= images_square_grid(samples, "L")
-            else:
-                images_grid= images_square_grid(samples, "RGB")
-
-            if not os.path.exists(os.path.join(os.path.expanduser("~"), "vitaFlow/runtime/BEGAN")): os.makedirs(EXPERIMENT_DATA_ROOT_DIR+'/vanilla_gan/' )
-
-            images_grid.save(os.path.join(os.path.expanduser("~"), "vitaFlow/runtime/BEGAN", '/step_{}.png'.format(global_step)))
-
-        if global_step % 2 == 0:
-            dloss, gloss = run_context.session.run([self._d_loss, self._g_loss])
-            print_info("\nDiscriminator Loss: {:.4f}... Generator Loss: {:.4f}".format(dloss, gloss))
-
-class GANTrainSteps(
-    collections.namedtuple('GANTrainSteps', (
-            'generator_train_steps',
-            'discriminator_train_steps'
-    ))):
-    """Contains configuration for the GAN Training.
-
-    Args:
-      generator_train_steps: Number of generator steps to take in each GAN step.
-      discriminator_train_steps: Number of discriminator steps to take in each GAN
-        step.
-    """
+from vitaflow.core.hooks.run_train_ops_hook import GANTrainSteps, RunTrainOpsHook
 
 
 class BEGAN(ModelBase, GANFeature):
@@ -107,24 +43,80 @@ class BEGAN(ModelBase, GANFeature):
 
     def __init__(self, hparams=None, data_iterator=None):
         ModelBase.__init__(self, hparams=hparams)
-        ImageFeature.__init__(self)
+        GANFeature.__init__(self)
+        self._hparams = HParams(hparams=hparams, default_hparams=self.default_hparams())
 
         self._data_iterator = data_iterator
 
         self.num_image_channels = 3
         self.image_size = 32
 
-        self.gen_filter_size = 1024
-        self.learning_rate = 0.001
-        self.z_dim = 30
+        self.gen_filter_size = self._hparams.gen_filter_size
+        self.learning_rate = self._hparams.learning_rate
+        self.z_dim = self._hparams.z_dim
 
 
         # BEGAN Parameter
-        self.gamma = 0.75
-        self.lamda = 0.001
+        self.gamma = self._hparams.gamma
+        self.lamda = self._hparams.lamda
 
-        self.beta1 = 0.5
-        self.alpha = 0.15
+        self.beta1 = self._hparams.beta1
+        self.alpha = self._hparams.alpha
+
+    @staticmethod
+    def default_hparams():
+        """
+        .. role:: python(code)
+           :language: python
+
+        .. code-block:: python
+
+            {
+                "experiment_name": "model_name_or_dataset_name",
+                "model_root_directory" : os.path.join(os.path.expanduser("~"), "vitaFlow/", "default_model_dir")
+                "gen_filter_size" : 1024,
+                "learning_rate" : 0.001,
+                "gamma" : 0.75,
+                "lamda" : 0.001,
+                "alpha" : 0.15,
+                "beta1" : 0.4,
+                "z_dim" : 30
+            }
+
+        Here:
+
+        "experiment_name" : str
+            Name of the experiment
+        "model_root_directory" : str
+            Model root directory to store the model data under it with model class name as folder name
+        "gen_filter_size" : int
+            Geenrator filter size
+        "learning_rate" : float
+            Learning Rate
+        "gamma" : float
+            Gamma
+        "lamda" : float
+            lamda
+        "alpha" : float
+            Alpha
+        "beta1" : float
+            The exponential decay rate for the 1st moment in the optimizer
+        "z_dim" : int
+            Noise vector dimension
+
+        :return:  A dictionary of hyperparameters with default values
+        """
+        params = ModelBase.default_hparams()
+        params.update({
+            "gen_filter_size" : 1024,
+            "learning_rate" : 0.001,
+            "gamma" : 0.75,
+             "lamda" : 0.001,
+            "alpha" : 0.15,
+            "beta1" : 0.4,
+            "z_dim" : 30
+        })
+        return params
 
     def get_sequential_train_hooks(self,
                                    generator_train_op,
@@ -133,8 +125,8 @@ class BEGAN(ModelBase, GANFeature):
         """Returns a hooks function for sequential GAN training.
 
         Args:
-          train_steps: A `GANTrainSteps` tuple that determines how many generator
-            and discriminator training steps to take.
+          train_steps: A `GANTrainSteps` tuple that determines how many namespace_generator
+            and namespace_discriminator training steps to take.
 
         Returns:
           A function that takes a GANTrainOps tuple and returns a list of hooks.
@@ -152,7 +144,7 @@ class BEGAN(ModelBase, GANFeature):
     def discriminator(self, x, out_channel_dim, is_training=True, reuse=False):
         # It must be Auto-Encoder style architecture
         # Architecture : (64)4c2s-FC32_BR-FC64*14*14_BR-(1)4dc2s_S
-        with tf.variable_scope("discriminator", reuse=reuse):
+        with tf.variable_scope("namespace_discriminator", reuse=reuse):
             # net = tf.nn.relu(conv2d(x, 64, 4, 4, 2, 2, name='d_conv1'))
             net = tf.layers.conv2d(x, 64, 4, strides=2, padding='same',
                                    kernel_initializer=tf.random_normal_initializer(stddev=0.02),
@@ -211,65 +203,17 @@ class BEGAN(ModelBase, GANFeature):
 
             return out, recon_error, code
 
-    # def generator(self, z, is_training=True, reuse=False):
-    #     # Network Architecture is exactly same as in infoGAN (https://arxiv.org/abs/1606.03657)
-    #     # Architecture : FC1024_BR-FC7x7x128_BR-(64)4dc2s_BR-(1)4dc2s_S
-    #     with tf.variable_scope("generator", reuse=reuse):
-    #         net = tf.nn.relu(bn(linear(z, 1024, scope='g_fc1'), is_training=is_training, scope='g_bn1'))
-    #         net = tf.nn.relu(bn(linear(net, 128 * 7 * 7, scope='g_fc2'), is_training=is_training, scope='g_bn2'))
-    #         net = tf.reshape(net, [self.gan_config.batch_size, 7, 7, 128])
-    #         net = tf.nn.relu(
-    #             bn(deconv2d(net, [self.gan_config.batch_size, 14, 14, 64], 4, 4, 2, 2, name='g_dc3'), is_training=is_training,
-    #                scope='g_bn3'))
-    #
-    #         out = tf.nn.sigmoid(deconv2d(net, [self.gan_config.batch_size, 28, 28, 1], 4, 4, 2, 2, name='g_dc4'))
-    #
-    #     return out
 
     def generator(self, z, out_channel_dim, is_training=True, reuse=False):
         """
-        Create the generator network
+        Create the namespace_generator network
         :param z: Input z
         :param out_channel_dim: The number of channels in the output image
-        :param is_training: Boolean if generator is being used for training
-        :return: The tensor output of the generator
+        :param is_training: Boolean if namespace_generator is being used for training
+        :return: The tensor output of the namespace_generator
         """
 
-        # with tf.variable_scope('generator', reuse=not is_training):
-        #     # First fully connected layer
-        #     x1 = tf.layers.dense(z, 7 * 7 * 512 * 2)
-        #     # Reshape it to start the convolutional stack
-        #     x1 = tf.reshape(x1, (-1, 7, 7, 512 * 2))
-        #     #         x1 = tf.layers.batch_normalization(x1, training=training)
-        #     x1 = tf.maximum(self.gan_config.alpha * x1, x1)
-        #     # 7x7x512 now
-        #     #         print(x1)
-        #     x2 = tf.layers.conv2d_transpose(x1, 256 * 2, 5, strides=1, padding='same')
-        #     x2 = tf.layers.batch_normalization(x2, training=is_training)
-        #     x2 = tf.maximum(self.gan_config.alpha * x2, x2)
-        #     # 7x7x256 now
-        #     #         print(x2)
-        #     x3 = tf.layers.conv2d_transpose(x2, 128 * 2, 5, strides=2, padding='same')
-        #     x3 = tf.layers.batch_normalization(x3, training=is_training)
-        #     x3 = tf.maximum(self.gan_config.alpha * x3, x3)
-        #     # 14x14x128 now
-        #     #         print(x3)
-        #
-        #     x4 = tf.layers.conv2d_transpose(x3, 64 * 2, 5, strides=2, padding='same')
-        #     x4 = tf.layers.batch_normalization(x4, training=is_training)
-        #     x4 = tf.maximum(self.gan_config.alpha * x4, x4)
-        #
-        #     # Output layer
-        #     logits = tf.layers.conv2d_transpose(x4, out_channel_dim, 5, strides=1, padding='same')
-        #     # 28x28x3 now
-        #     #         print(logits)3
-        #     out = tf.tanh(logits)
-        #
-        #     print_info("======>out: {}".format(out))
-        #
-        #     return out
-
-        with tf.variable_scope('generator', reuse=not is_training):
+        with tf.variable_scope('namespace_generator', reuse=not is_training): #reuse if it not training phase
             filter_size = 512
 
             # First fully connected layer
@@ -305,29 +249,43 @@ class BEGAN(ModelBase, GANFeature):
 
             return out
 
-    def model_loss(self, input_real, input_z, out_channel_dim, global_step, is_training):
-        """
-        Get the loss for the discriminator and generator
-        :param input_real: Images from the real dataset
-        :param input_z: Z input
-        :param out_channel_dim: The number of channels in the output image
-        :return: A tuple of (discriminator loss, generator loss)
-        """
 
-        print_error(input_real)
-        print_error(input_z)
+    def _build_layers(self, features, mode):
 
-        # output of D for real images
-        D_real_img, D_real_err, D_real_code = self.discriminator(input_real, out_channel_dim=out_channel_dim,is_training=True, reuse=False)
+        is_training = mode != ModeKeys.INFER
 
-        # output of D for fake images
-        G = self.generator(input_z,  out_channel_dim=out_channel_dim, is_training=True, reuse=False)
-        D_fake_img, D_fake_err, D_fake_code = self.discriminator(G, out_channel_dim=out_channel_dim, is_training=True, reuse=True)
 
-        # get loss for discriminator
+        input_z = features[self.FEATURE_2_NAME]  # Audio/Noise Placeholder to the namespace_discriminator
+        input_z = tf.cast(input_z, tf.float32)
+        tf.logging.info("=========> {}".format(input_z))
+
+        if mode != ModeKeys.INFER: #Training and Evaluation
+
+            input_real = features[self.FEATURE_1_NAME]  # Placeholder for input image vectors to the namespace_generator
+            input_real = tf.cast(input_real, tf.float32)
+            tf.logging.info("=========> {}".format(input_real))
+
+            out_channel_dim = input_real.get_shape()[-1]
+
+            # output of D for real images
+            D_real_img, D_real_err, D_real_code = self.discriminator(input_real, out_channel_dim=out_channel_dim,
+                                                                     is_training=is_training, reuse=False)
+
+            # output of D for fake images
+            G = self.generator(input_z,  out_channel_dim=out_channel_dim, is_training=is_training, reuse=False)
+            D_fake_img, D_fake_err, D_fake_code = self.discriminator(G, out_channel_dim=out_channel_dim, is_training=is_training, reuse=True)
+
+            return G, D_real_img, D_real_err, D_real_code, D_fake_img, D_fake_err, D_fake_code
+        else:
+            sample_image = self.generator(input_z, self.num_image_channels)
+            return sample_image
+
+
+    def _get_loss(self, D_real_img, D_real_err, D_real_code, D_fake_img, D_fake_err, D_fake_code):
+        # get loss for namespace_discriminator
         d_loss = D_real_err - self.k * D_fake_err
 
-        # get loss for generator
+        # get loss for namespace_generator
         g_loss = D_fake_err
 
         # convergence metric
@@ -337,28 +295,22 @@ class BEGAN(ModelBase, GANFeature):
         update_k = self.k.assign(
             tf.clip_by_value(self.k + self.lamda * (self.gamma * D_real_err - D_fake_err), 0, 1))
 
-        print_hooks = UserLogHook(G, d_loss, g_loss, global_step)
+        return d_loss, g_loss, update_k
 
-        return d_loss, g_loss, print_hooks, update_k
-
-    def model_opt(self, d_loss, g_loss, global_step):
+    def _get_optimizer(self, d_loss, g_loss, global_step):
         """
         Get optimization operations
         :param d_loss: Discriminator loss Tensor
         :param g_loss: Generator loss Tensor
         :param learning_rate: Learning Rate Placeholder
         :param beta1: The exponential decay rate for the 1st moment in the optimizer
-        :return: A tuple of (discriminator training operation, generator training operation)
+        :return: A tuple of (namespace_discriminator training operation, namespace_generator training operation)
         """
 
         # divide trainable variables into a group for D and a group for G
         t_vars = tf.trainable_variables()
-        # d_vars = [var for var in t_vars if 'd_' in var.name]
-        #
-        # g_vars = [var for var in t_vars if 'g_' in var.name]
-
-        d_vars = [var for var in t_vars if var.name.startswith('discriminator')]
-        g_vars = [var for var in t_vars if var.name.startswith('generator')]
+        d_vars = [var for var in t_vars if var.name.startswith('namespace_discriminator')]
+        g_vars = [var for var in t_vars if var.name.startswith('namespace_generator')]
 
         # optimizers
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
@@ -373,30 +325,10 @@ class BEGAN(ModelBase, GANFeature):
 
         return d_optim, g_optim
 
-
-    def _get_loss(self, labels, logits):
-        raise NotImplementedError
-
-    def _build_layers(self, features, mode):
-        raise NotImplementedError
-
-    def _get_predicted_classes(self, logits):
-        raise NotImplementedError
-
-    def _get_class_probabilities(self, logits):
-        raise NotImplementedError
-
-    def _get_optimizer(self, loss):
-        raise NotImplementedError
-
     def _get_eval_metrics(self, predictions, labels):
-        raise NotImplementedError
+        raise {}
 
     def _build(self, features, labels, params, mode, config=None):
-        """Used for the :tf_main:`model_fn <estimator/Estimator#__init__>`
-        argument when constructing
-        :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
-        """
         """
 
         :param features: 
@@ -418,49 +350,19 @@ class BEGAN(ModelBase, GANFeature):
         """ BEGAN variable """
         self.k = tf.Variable(0., trainable=False)
 
-        # z_placeholder = features[self._feature_type.AUDIO_OR_NOISE]  # Audio/Noise Placeholder to the discriminator
-        # z_placeholder = tf.random_normal(shape=[self._data_iterator.batch_size, 30])#features[self.FEATURE_NAME]  # Audio/Noise Placeholder to the discriminator
-
-        # z_placeholder = tf.random_normal(shape=[self._data_iterator.batch_size, 30])
-        z_placeholder = features[self.FEATURE_2_NAME]  # Audio/Noise Placeholder to the discriminator
-
-        tf.logging.info("=========> {}".format(z_placeholder))
-
-        z_placeholder = tf.cast(z_placeholder, tf.float32, name="z_placeholder")
-
-        tf.logging.info("=========> {}".format(z_placeholder))
-
-        if is_training:
-
-            x_placeholder = features[self.FEATURE_1_NAME]  # Placeholder for input image vectors to the generator
-            tf.logging.info("=========> {}".format(x_placeholder))
-
-            x_placeholder = tf.cast(x_placeholder, tf.float32, name="x_placeholder")
-            tf.logging.info("=========> {}".format(x_placeholder))
-
-            num_img_channel = x_placeholder.get_shape()[-1]
-
-            print_error(num_img_channel)
-            d_loss, g_loss, print_hooks, update_k = self.model_loss(x_placeholder,
-                                                                    z_placeholder,
-                                                                    num_img_channel,
-                                                                    self.global_step,
-                                                                    is_training)
-
-            d_train_opt, g_train_opt = self.model_opt(d_loss,
-                                                      g_loss,
-                                                      self.global_step)
-        else:
-            sample_image = self.generator(z_placeholder, self.num_image_channels)
-            #changes are made to take image channels from data iterator just for prediction
-
-
         # Loss, training and eval operations are not needed during inference.
         loss = None
         train_op = None
         eval_metric_ops = {}
 
         if mode != ModeKeys.INFER:
+            G, D_real_img, D_real_err, D_real_code, D_fake_img, D_fake_err, D_fake_code = \
+                self._build_layers(features=features, mode=mode)
+            d_loss, g_loss, update_k = self._get_loss(D_real_img, D_real_err, D_real_code, D_fake_img, D_fake_err, D_fake_code)
+            print_hooks = ImageGridHook(G, d_loss, g_loss, self.global_step,
+                                        path=os.path.join(os.path.expanduser("~"), "vitaFlow/runtime/BEGAN"))
+
+            d_train_opt, g_train_opt = self._get_optimizer(d_loss, g_loss, self.global_step)
             loss = g_loss + d_loss
             tf.summary.scalar(name="g_loss", tensor=g_loss)
             tf.summary.scalar(name="d_loss", tensor=d_loss)
@@ -470,6 +372,9 @@ class BEGAN(ModelBase, GANFeature):
             training_hooks.append(print_hooks)
             training_hooks.append(update_k_hook)
 
+        else:
+            sample_image = self._build_layers(features=features, mode=mode)
+
         return tf.estimator.EstimatorSpec(
             mode=mode,
             predictions=sample_image,
@@ -478,66 +383,3 @@ class BEGAN(ModelBase, GANFeature):
             eval_metric_ops=eval_metric_ops,
             training_hooks=training_hooks
         )
-
-        # sample_image = None
-        # training_hooks = None
-        #
-        # is_training = mode != ModeKeys.INFER
-        #
-        #
-        # # Create global step increment op.
-        # self.global_step = training_util.get_or_create_global_step()
-        # self.global_step_inc = self.global_step.assign_add(0)
-        #
-        # """ BEGAN variable """
-        # self.k = tf.Variable(0., trainable=False)
-        #
-        # z_placeholder = tf.random_normal(shape=[self._data_iterator.batch_size, 30])#features[self.FEATURE_NAME]  # Audio/Noise Placeholder to the discriminator
-        # tf.logging.info("=========> {}".format(z_placeholder))
-        #
-        # z_placeholder = tf.cast(z_placeholder, tf.float32)
-        #
-        # tf.logging.info("=========> {}".format(z_placeholder))
-        #
-        # if is_training:
-        #
-        #     x_placeholder = features[self.FEATURE_NAME]  # Placeholder for input image vectors to the generator
-        #     tf.logging.info("=========> {}".format(x_placeholder))
-        #
-        #     x_placeholder = tf.cast(x_placeholder, tf.float32)
-        #     tf.logging.info("=========> {}".format(x_placeholder))
-        #
-        #     channel = x_placeholder.get_shape()[-1]
-        #     d_loss, g_loss, print_hooks = self.model_loss(x_placeholder, z_placeholder, channel, self.global_step,
-        #                                                   is_training=is_training)
-        #
-        #     d_train_opt, g_train_opt = self.model_opt(d_loss, g_loss,
-        #                                               self.learning_rate,
-        #                                               self.beta1,
-        #                                               self.global_step)
-        # else:
-        #     sample_image = self.generator(z_placeholder, self.num_image_channels,is_train=False)
-        #     #changes are made to take image channels from data iterator just for prediction
-        #
-        #
-        # # Loss, training and eval operations are not needed during inference.
-        # loss = None
-        # train_op = None
-        # eval_metric_ops = {}
-        #
-        # if mode != ModeKeys.INFER:
-        #     loss = g_loss + d_loss
-        #     tf.summary.scalar(name="g_loss", tensor=g_loss)
-        #     tf.summary.scalar(name="d_loss", tensor=d_loss)
-        #
-        #     training_hooks = self.get_sequential_train_hooks(d_train_opt, g_train_opt)
-        #     training_hooks.extend(print_hooks)
-        #
-        # return tf.estimator.EstimatorSpec(
-        #     mode=mode,
-        #     predictions=sample_image,
-        #     loss=loss,
-        #     train_op=self.global_step_inc,
-        #     eval_metric_ops=eval_metric_ops,
-        #     training_hooks=training_hooks
-        # )

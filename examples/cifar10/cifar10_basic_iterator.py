@@ -17,14 +17,21 @@ CIFAR10 Basic Iterator
 
 import os
 import numpy as np
-import tensorflow as tf
+import collections
 from overrides import overrides
+from tqdm import tqdm
+
+import tensorflow as tf
+from tensorflow import TensorShape, Dimension
+
 
 from vitaflow.core import HParams
 from vitaflow.core.features import ImageFeature
 from vitaflow.core import IPreprocessor
 from vitaflow.core import IIteratorBase
-from vitaflow.helpers.os_helper import check_n_makedirs, print_info, print_error
+from vitaflow.core.models import ClassifierBase
+from vitaflow.helpers.os_helper import check_n_makedirs, print_info, print_error, print_warn
+from vitaflow.run import Executor
 
 
 class Cifar10BasicIterator(IIteratorBase, ImageFeature):
@@ -38,6 +45,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         IIteratorBase.__init__(self, dataset=dataset)
 
         self._hparams = HParams(hparams, self.default_hparams())
+        self._dataset = dataset
 
         # TODO - make `EXPERIMENT_ROOT_DIR` as local variable
         self.EXPERIMENT_ROOT_DIR = os.path.join(self._hparams.experiment_root_directory,
@@ -79,7 +87,26 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         # This is used to pre-allocate arrays for efficiency.
         self._num_images_train = self._num_files_train * self._images_per_file
 
+        self.images, self.labels = self._load_training_data()
+        self.images = self.images.astype("float32")
 
+        self._number_test_of_samples = self._hparams.number_test_of_samples
+
+    @property
+    def num_labels(self):
+        return self._num_classes
+
+    @property
+    def num_train_samples(self):
+        return 45000
+
+    @property
+    def num_val_samples(self):
+        raise 5000
+
+    @property
+    def num_test_samples(self):
+        raise 10000
 
     @staticmethod
     def default_hparams():
@@ -98,6 +125,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
                 "validation_data_path" : "val",
                 "test_data_path" : "test",
                 "batch_size" : 32,
+                number_test_of_samples
             }
 
         Here:
@@ -128,6 +156,9 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         "batch_size" : int
             Batch size for the current iterator
 
+        "number_test_of_samples" : int
+            Number of test samples to consider for predictions
+
 
         :return: A dictionary of hyperparameters with default values
         """
@@ -135,7 +166,8 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         hparams = IPreprocessor.default_hparams()
         hparams.update(IIteratorBase.default_hparams())
         hparams.update({
-            "iterator_name": "Cifar10BasicIterator"
+            "iterator_name": "Cifar10BasicIterator",
+            "number_test_of_samples" : 4
         })
         return hparams
 
@@ -145,6 +177,17 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         with open(file, 'rb') as fo:
             data_dict = pickle.load(fo, encoding='bytes')
         return data_dict
+
+    def _normalize(self, x):
+        """
+        Normalize a list of sample image data in the range of 0 to 1
+        : x: List of image data.  The image shape is (32, 32, 3)
+        : return: Numpy array of normalize data
+        """
+        minV = np.min(x)
+        maxV = np.max(x)
+        ret = (x - minV)/maxV
+        return ret
 
     def _convert_images(self, raw):
         """
@@ -162,7 +205,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         # Reorder the indices of the array.
         images = images.transpose([0, 2, 3, 1])
 
-        return images
+        return self._normalize(images)
 
     def _load_data(self, filepath):
         """
@@ -221,7 +264,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         begin = 0
 
         # For each data-file.
-        for i in range(self._num_files_train):
+        for i in tqdm(range(self._num_files_train), desc="loading: "):
             filepath = os.path.join(self.TRAIN_OUT_PATH, "data_batch_" + str(i + 1))
             # Load the images and class-numbers from the data-file.
             images_batch, cls_batch = self._load_data(filepath=filepath)
@@ -241,7 +284,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
             # The begin-index for the next batch is the current end-index.
             begin = end
 
-        yield images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
+        return images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
 
 
     def _load_test_data(self):
@@ -252,46 +295,100 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         filepath = os.path.join(self.TEST_OUT_PATH, "test_batch")
         images, cls = self._load_data(filepath=filepath)
 
-        yield images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes)
+        return images, self._one_hot_encoded(class_numbers=cls, num_classes=self._num_classes), cls
+
+    def _yield_samples(self, features, labels):
+        for feature, label in zip(features, labels):
+            yield feature, label
+
+    def _yield_train_samples(self):
+        return self._yield_samples(self.images[:45000], self.labels[:45000])
+
+    def _yield_val_samples(self):
+        return self._yield_samples(self.images[:-5000], self.labels[:-5000])
+
+    def _yield_test_samples(self):
+        # TODO :
+        # random_test_features, random_test_labels = tuple(zip(*random.sample(list(zip(test_features, test_labels)), n_samples)))
+        self._test_images, self._test_one_enc_labels, self._test_labels = self._load_test_data()
+        return self._yield_samples(self._test_images[:self._number_test_of_samples],
+                                   self._test_one_enc_labels[:self._number_test_of_samples])
 
     @overrides
     def _get_train_input_fn(self):
 
-        images, labels = self._load_training_data()
-
-        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_NAME: images[:45000]},
-                                                      labels[:45000]))
-
+        dataset = tf.data.Dataset.from_generator(self._yield_train_samples,
+                                                 (tf.float32, tf.int32),
+                                                 output_shapes=(TensorShape([Dimension(32), Dimension(32), Dimension(3)]),
+                                                                TensorShape(Dimension(10))))
+        dataset = dataset.map(lambda image, label: ({self.FEATURE_NAME: image}, label))
         dataset = dataset.batch(batch_size=self._hparams.batch_size)
-        print_info("Dataset output sizes are: ")
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        print_info("Trianing Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
 
     @overrides
     def _get_val_input_fn(self):
 
-        images, labels = self._load_training_data()
-
-        dataset = tf.data.Dataset.from_tensor_slices(({self.FEATURE_NAME: images[:-5000]},
-                                                      labels[:-5000]))
-
+        dataset = tf.data.Dataset.from_generator(self._yield_val_samples,
+                                                 (tf.float32, tf.int32),
+                                                 output_shapes=(TensorShape([Dimension(32), Dimension(32), Dimension(3)]),
+                                                                TensorShape(Dimension(10))))
+        dataset = dataset.map(lambda image, label: ({self.FEATURE_NAME: image}, label))
         dataset = dataset.batch(batch_size=self._hparams.batch_size)
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        print_info("Validation Dataset output sizes are: ")
+        print_info(dataset.output_shapes)
+        return dataset
+
+    @overrides
+    def _get_test_input_fn(self):
+
+        dataset = tf.data.Dataset.from_generator(self._yield_test_samples,
+                                                 (tf.float32, tf.int32),
+                                                 output_shapes=(TensorShape([Dimension(32), Dimension(32), Dimension(3)]),
+                                                                TensorShape(Dimension(10))))
+        dataset = dataset.map(lambda image, label: ({self.FEATURE_NAME: image}, label))
+        dataset = dataset.batch(batch_size=self._hparams.batch_size)
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
 
-    @property
-    def num_labels(self):
-        return self._num_classes
+    def predict(self, executor: Executor):
+        model = executor.model
+        estimator = executor.estimator
+        data_iterator = executor.data_iterator
+        model_predictions = []
+        predictions = []
 
-    @property
-    def num_train_samples(self):
-        return 45000
+        # TODO :
+        # random_test_features, random_test_labels = tuple(zip(*random.sample(list(zip(test_features, test_labels)), n_samples)))
 
-    @property
-    def num_val_samples(self):
-        raise NotImplementedError
+        if isinstance(model, ClassifierBase) and isinstance(data_iterator, Cifar10BasicIterator):
+            predict_fn = estimator.predict(input_fn=lambda: data_iterator.test_input_fn())
+            for predict in predict_fn:
+                model_predictions.append(predict)
 
-    @property
-    def num_test_samples(self):
-        raise NotImplementedError
+            sess = tf.Session()
+
+            TopKV2 = collections.namedtuple("TopKV2", ["values", "indices"])
+            predictions = TopKV2([], [])
+
+            test_features = self._test_images[:self._number_test_of_samples]
+            test_labels = self._test_one_enc_labels[:self._number_test_of_samples]
+
+
+            for predict_dict in model_predictions:
+                predicted_class = predict_dict["classes"]
+                predicted_prob = predict_dict["probabilities"][predicted_class]
+                logits = predict_dict["logits"]
+                res = sess.run(tf.nn.top_k(tf.nn.softmax(logits), 3))
+                predictions.values.append(res[0])
+                predictions.indices.append(res[1])
+
+            self._dataset.display_image_predictions(features=test_features, labels=test_labels, predictions=predictions)
+
+        else:
+            print_error("Either selected model or iterator is not supported for predictions")

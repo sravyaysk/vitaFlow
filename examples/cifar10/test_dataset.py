@@ -1,7 +1,7 @@
 import unittest
 import os
 import tensorflow as tf
-from examples.cifar10.dataset import Cifar10Dataset
+from examples.cifar10.cifar10_dataset import Cifar10Dataset
 
 
 class TestCifiar10Dataset(tf.test.TestCase):

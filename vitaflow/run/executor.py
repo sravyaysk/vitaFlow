@@ -88,6 +88,18 @@ class Executor(object):
         self._estimator = tf.estimator.Estimator(
             model_fn=self._model, config=config, params=self._model_hparams)
 
+    @property
+    def model(self):
+        return self._model
+
+    @property
+    def estimator(self):
+        return self._estimator
+
+    @property
+    def data_iterator(self):
+        return self._data_iterator
+
     def _get_train_spec(self, max_steps=None):
         input_fn = self._data_iterator.train_input_fn()
         # Estimators expect an input_fn to take no arguments.

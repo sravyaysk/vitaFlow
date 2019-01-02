@@ -31,10 +31,11 @@ class IIteratorBase(ABC):
         self._hparams = HParams(hparams, self.default_hparams())
         # self.set_dataset(dataset=dataset)
 
-        self.temp_dir = os.path.join("/tmp/vitaflow",
-                                     self._hparams.experiment_name,
-                                     type(self).__name__)
-        check_n_makedirs(self.temp_dir)
+        #TODO experiment name is not getin gupdated with actual value by this time
+        # self.temp_dir = os.path.join("/tmp/vitaflow",
+        #                              self._hparams.experiment_name,
+        #                              type(self).__name__)
+        # check_n_makedirs(self.temp_dir)
 
     @staticmethod
     def default_hparams():
@@ -59,8 +60,22 @@ class IIteratorBase(ABC):
         params = IPreprocessor.default_hparams()
         params.update({
             "batch_size": 32,
+            "prefetch_size": 32,
         })
         return params
+
+    @property
+    def iterator_dir(self):
+        """
+        Returns iterator directory `experiment_root_directory`/`experiment_name`/`iterator_name`
+        :return:
+        """
+        path = os.path.join(self._hparams.experiment_root_directory,
+                            self._hparams.experiment_name,
+                            type(self).__name__)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path
 
     @property
     def num_labels(self):
@@ -105,7 +120,7 @@ class IIteratorBase(ABC):
         """
         raise NotImplementedError
 
-    def _get_test_input_function(self):
+    def _get_test_input_fn(self):
         """
         Inheriting class must implement this
         :return: callable
@@ -140,7 +155,7 @@ class IIteratorBase(ABC):
         Returns an data set iterator function that can be used in estimator
         :return:
         """
-        return self._get_test_input_function()
+        return self._get_test_input_fn()
 
     def test_sentence_input_fn(self, sentence):
         """
@@ -167,19 +182,6 @@ class IIteratorBase(ABC):
         :return: 
         '''
         raise NotImplementedError
-
-    @property
-    def iterator_dir(self):
-        """
-        Returns iterator directory `experiment_root_directory`/`experiment_name`/`iterator_name`
-        :return:
-        """
-        path = os.path.join(self._hparams.experiment_root_directory,
-                            self._hparams.experiment_name,
-                            type(self).__name__)
-        if not os.path.exists(path):
-            os.makedirs(path)
-        return path
 
     def store_as_pickle(self, data, file_name):
         file_path = os.path.join(self.iterator_dir, file_name)
