@@ -209,9 +209,6 @@ class Experiments(object):
                 executor.evaluate(steps=200)
 
         elif mode == "predict":
-            #exec.predict()
             #TODO: Prediction logic is pushed to iterator, since each iterator has the details on how to handle the data
             self._data_iterator.predict(executor=executor)
 
-        # elif mode == "predict_sentence":
-        #     exec.predict_sentence("SOCCER - JAPAN GET LUCKY WIN , CHINA IN SURPRISE DEFEAT .")

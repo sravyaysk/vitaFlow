@@ -32,6 +32,7 @@ from vitaflow.core.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, 
 from vitaflow.data.text.vocabulary import SpecialTokens
 from vitaflow.helpers.os_helper import check_n_makedirs
 from vitaflow.helpers.print_helper import print_info
+from vitaflow.run import Executor
 
 
 class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):
@@ -673,3 +674,30 @@ class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):
             pred_3_confidence = top_3_predicted_confidence[:, 2:]
 
         return predicted_id
+
+
+    def predict(self,  executor: Executor):
+        """
+        Runs the prediction on list of file to be tagged
+        :return:
+        """
+        model = executor.model
+        estimator = executor.estimator
+        data_iterator = executor.data_iterator
+
+        predict_fn = estimator.predict(input_fn=lambda: data_iterator.test_input_fn())
+        data_iterator.predict_on_test_files(predict_fn)
+
+    def predict_sentence(self,  executor: Executor, sentence):
+        """
+        Runs prediction on a single sentence
+        :param sentence: A single sentence whose tokens are separated by space
+        :return: tuple of (words_n,tags_n)
+        """
+        model = executor.model
+        estimator = executor.estimator
+        data_iterator = executor.data_iterator
+
+        predict_fn = estimator.predict(input_fn=lambda: data_iterator.test_sentence_input_fn(sentence))
+        results = data_iterator.predict_on_text(predict_fn)
+        print(list(zip(sentence.split(), results)))
