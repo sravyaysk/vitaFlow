@@ -1,6 +1,7 @@
 vitaFlow.iml
 doctrees/
 .buildinfo
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
