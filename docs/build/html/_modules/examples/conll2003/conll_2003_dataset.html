@@ -97,6 +97,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
+<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dlfe/dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dlfe/debugging_tf_models.html">Debugging the TF Models</a></li>
+</ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../audio/AudioBasics.html">Audio Basics</a></li>
@@ -245,9 +250,6 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">IPreprocessor</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="n">hparams</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span> <span class="o">=</span> <span class="n">HParams</span><span class="p">(</span><span class="n">hparams</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">())</span>
-        <span class="c1"># self._download_path =  self._hparams.experiment_root_directory + \</span>
-        <span class="c1">#                  &quot;/&quot; + self._hparams.experiment_name + \</span>
-        <span class="c1">#                 &quot;/raw_data/&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_download_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">experiment_root_directory</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">,</span>
@@ -319,7 +321,6 @@
             <span class="s2">&quot;minimum_num_words&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
             <span class="s2">&quot;over_write&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="p">})</span>
-
         <span class="k">return</span> <span class="n">hparams</span></div>
 
     <span class="k">def</span> <span class="nf">_create_target_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -327,17 +328,17 @@
 <span class="sd">        To setup destination folders structure if not present.</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">over_write</span><span class="p">:</span>
-                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Deleting data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">))</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">)</span>
-                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Recreating data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">))</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">)</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Deleting data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">))</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">)</span>
+                <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Recreating data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">))</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Skipping preprocessing step, since the data might already be available&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">))</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">)</span>
+            <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Creating data folder: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_conll_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txt_file_path</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

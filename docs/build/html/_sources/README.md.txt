@@ -60,12 +60,3 @@ python vitaflow/run/run.py --config_python_file=examples/conll2003/config.py
 The big difference comes from the way the whole experiment can be configured. Say, if the model needs to replaced based on a latest paper published, it is simple as writing a model (that adheres some rules) and plugin into the vitaFlow, you are good to go with new model with old tested dataset and data iterator modules.
 
 This level of configuration and project design will allows as to iterate the Deep Learning ideas as fast as possible to meet the business demands.
-
-## Future Road Map
-
-Add support for set of open datasets across domains and corresponding models based on published papers, tweak the model to derive the best insights of given dataset, while exposing right sets of  configurations for any new incoming datasets.
-
-With that in place, we hope it would reduce lot of efforts when we have to address any future requirements.
-
-**As an example**: 
-We currently have Sequence to Sequence model(s) (text and character level embeddings) based on CoNLL dataset. With that model and iterator in place, we can address any Seq2Seq model requirements, once we write a Dataset module for the new data that gives some predefined intermediate data for the data iterator. For a working example refer [conll2003](examples/conll2003/README.md) folder

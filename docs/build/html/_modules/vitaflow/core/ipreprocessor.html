@@ -97,6 +97,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
+<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dlfe/dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dlfe/debugging_tf_models.html">Debugging the TF Models</a></li>
+</ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../audio/AudioBasics.html">Audio Basics</a></li>
@@ -190,7 +195,7 @@
 <span class="kn">from</span> <span class="nn">vitaflow.core.hyperparams</span> <span class="k">import</span> <span class="n">HParams</span>
 
 
-<div class="viewcode-block" id="IPreprocessor"><a class="viewcode-back" href="../../../api/core/ipreprocessor.html#vitaflow.core.IPreprocessor">[docs]</a><span class="k">class</span> <span class="nc">IPreprocessor</span><span class="p">():</span>
+<div class="viewcode-block" id="IPreprocessor"><a class="viewcode-back" href="../../../api/core/ipreprocessor.html#vitaflow.core.IPreprocessor">[docs]</a><span class="k">class</span> <span class="nc">IPreprocessor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A pre-processing interface that every dataset class should inherit.</span>
 <span class="sd">    This make sure that data of concern are downloaded and preprocessed alike across</span>
@@ -212,20 +217,29 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span> <span class="o">=</span> <span class="n">HParams</span><span class="p">(</span><span class="n">hparams</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">())</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">experiment_root_directory</span><span class="p">,</span>
                                                 <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span><span class="p">,</span>
-                                         <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">preprocessed_data_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">,</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_IN_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span><span class="p">,</span>
+                                          <span class="s2">&quot;raw_data&quot;</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">train_data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VAL_IN_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span><span class="p">,</span>
+                                        <span class="s2">&quot;raw_data&quot;</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">validation_data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TEST_IN_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span><span class="p">,</span>
+                                         <span class="s2">&quot;raw_data&quot;</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">test_data_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_ROOT_DIR</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">preprocessed_data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">,</span>
                                            <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">train_data_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">VAL_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VAL_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">,</span>
                                          <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">validation_data_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">TEST_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_OUT_DIR</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TEST_OUT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROCESSED_DATA_OUT_DIR</span><span class="p">,</span>
                                           <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">test_data_path</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IPreprocessor.default_hparams"><a class="viewcode-back" href="../../../api/core/ipreprocessor.html#vitaflow.core.IPreprocessor.default_hparams">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -271,7 +285,7 @@
 <span class="sd">        :return: A dictionary of hyperparameters with default values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;experiment_root_directory&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/vitaFlow/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;experiment_root_directory&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;vitaFlow/&quot;</span><span class="p">),</span>
             <span class="s2">&quot;experiment_name&quot;</span><span class="p">:</span> <span class="s2">&quot;experiment_name&quot;</span><span class="p">,</span>
             <span class="s2">&quot;preprocessed_data_path&quot;</span><span class="p">:</span> <span class="s2">&quot;preprocessed_data&quot;</span><span class="p">,</span>
             <span class="s2">&quot;train_data_path&quot;</span><span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>

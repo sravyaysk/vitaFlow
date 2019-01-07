@@ -97,6 +97,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
+<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../dlfe/dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../dlfe/debugging_tf_models.html">Debugging the TF Models</a></li>
+</ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../audio/AudioBasics.html">Audio Basics</a></li>
@@ -197,6 +202,7 @@
 <span class="kn">from</span> <span class="nn">vitaflow.data.text.vocabulary</span> <span class="k">import</span> <span class="n">SpecialTokens</span>
 <span class="kn">from</span> <span class="nn">vitaflow.helpers.os_helper</span> <span class="k">import</span> <span class="n">check_n_makedirs</span>
 <span class="kn">from</span> <span class="nn">vitaflow.helpers.print_helper</span> <span class="k">import</span> <span class="n">print_info</span>
+<span class="kn">from</span> <span class="nn">vitaflow.run</span> <span class="k">import</span> <span class="n">Executor</span>
 
 
 <div class="viewcode-block" id="CSVSeqToSeqIterator"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator">[docs]</a><span class="k">class</span> <span class="nc">CSVSeqToSeqIterator</span><span class="p">(</span><span class="n">IIteratorBase</span><span class="p">,</span> <span class="n">ITextFeature</span><span class="p">):</span>
@@ -687,7 +693,7 @@
         <span class="k">return</span> <span class="n">dataset</span>
 
     <span class="nd">@overrides</span>
-    <span class="k">def</span> <span class="nf">_get_test_input_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_test_input_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;test_padded_data_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.p&quot;</span>
         <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_padded_data</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
@@ -716,12 +722,12 @@
         <span class="k">return</span> <span class="n">dataset</span>
 
     <span class="nd">@overrides</span>
-    <span class="k">def</span> <span class="nf">_get_predict_single_input_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_predict_single_input_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 
         <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
         <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_char_ids</span><span class="p">,</span> <span class="n">train_ner_tags</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">_make_seq_pair_text</span><span class="p">(</span><span class="n">sentence</span><span class="o">=</span><span class="n">sentence</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_make_seq_pair_text</span><span class="p">(</span><span class="n">sentence</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
                                      <span class="n">char_2_id_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHAR_2_ID_MAP</span><span class="p">,</span>
                                      <span class="n">use_char_embd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span><span class="o">.</span><span class="n">use_char_embd</span><span class="p">)</span>
 
@@ -837,7 +843,34 @@
             <span class="n">pred_2_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">pred_3_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span>
 
-        <span class="k">return</span> <span class="n">predicted_id</span></div></div>
+        <span class="k">return</span> <span class="n">predicted_id</span></div>
+
+
+<div class="viewcode-block" id="CSVSeqToSeqIterator.predict"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the prediction on list of file to be tagged</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">model</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">estimator</span>
+        <span class="n">data_iterator</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">data_iterator</span>
+
+        <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">test_input_fn</span><span class="p">())</span>
+        <span class="n">data_iterator</span><span class="o">.</span><span class="n">predict_on_test_files</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CSVSeqToSeqIterator.predict_sentence"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_sentence">[docs]</a>    <span class="k">def</span> <span class="nf">predict_sentence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs prediction on a single sentence</span>
+<span class="sd">        :param sentence: A single sentence whose tokens are separated by space</span>
+<span class="sd">        :return: tuple of (words_n,tags_n)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">model</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">estimator</span>
+        <span class="n">data_iterator</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">data_iterator</span>
+
+        <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">test_sentence_input_fn</span><span class="p">(</span><span class="n">sentence</span><span class="p">))</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">predict_on_text</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">results</span><span class="p">)))</span></div></div>
 </pre></div>
 
            </div>

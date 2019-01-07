@@ -29,6 +29,14 @@ Welcome to vitaFlow's documentation!
 
 .. toctree::
    :maxdepth: 1
+   :caption: DL For Engineers:
+
+   dlfe/dl_for_engineers.md
+   dlfe/debugging_tf_models.md
+
+
+.. toctree::
+   :maxdepth: 1
    :caption: References:
 
    audio/AudioBasics.md

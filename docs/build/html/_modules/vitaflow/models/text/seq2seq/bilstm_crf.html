@@ -97,6 +97,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
+<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../dlfe/dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../dlfe/debugging_tf_models.html">Debugging the TF Models</a></li>
+</ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../audio/AudioBasics.html">Audio Basics</a></li>
@@ -231,9 +236,9 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_iterator</span><span class="p">:</span> <span class="n">CSVSeqToSeqIterator</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">ITextFeature</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hparams</span><span class="o">=</span><span class="n">hparams</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hparams</span> <span class="o">=</span> <span class="n">HParams</span><span class="p">(</span><span class="n">hparams</span><span class="p">,</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">(),</span>
-                                <span class="n">allow_new_hparam</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">default_hparams</span><span class="p">())</span>
 
         <span class="c1"># if not isinstance(data_iterator, CoNLLCsvDataIterator):</span>
         <span class="c1">#     raise RuntimeError</span>
@@ -271,7 +276,7 @@
 <span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            {</span>
-<span class="sd">                &quot;model_directory&quot; : os.path.expanduser(&quot;~&quot;) + &quot;/vitaFlow/&quot;,</span>
+<span class="sd">                &quot;model_root_directory&quot; : os.path.expanduser(&quot;~&quot;) + &quot;/vitaFlow/&quot;,</span>
 <span class="sd">                &quot;experiment_name&quot; : &quot;experiment_name&quot;,</span>
 <span class="sd">                # hyper parameters</span>
 <span class="sd">                &quot;use_char_embd&quot;: False,</span>
@@ -281,7 +286,7 @@
 <span class="sd">                &quot;word_emd_size&quot;: 24,</span>
 <span class="sd">                &quot;char_emd_size&quot;: 24,</span>
 <span class="sd">                &quot;num_lstm_layers&quot;: 1,</span>
-<span class="sd">                &quot;keep_propability&quot;: 0.5,</span>
+<span class="sd">                &quot;keep_probability&quot;: 0.5,</span>
 <span class="sd">            }</span>
 
 <span class="sd">        Here:</span>
@@ -313,7 +318,7 @@
 <span class="sd">        :return: A dictionary of hyperparameters with default values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">hparams</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;model_directory&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/vitaFlow/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;model_root_directory&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/vitaFlow/&quot;</span><span class="p">,</span>
             <span class="s2">&quot;experiment_name&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
             <span class="c1"># hyper parameters</span>
             <span class="s2">&quot;use_char_embd&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
@@ -323,7 +328,7 @@
             <span class="s2">&quot;word_emd_size&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
             <span class="s2">&quot;char_emd_size&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
             <span class="s2">&quot;num_lstm_layers&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;keep_propability&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;keep_probability&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">hparams</span></div>
 

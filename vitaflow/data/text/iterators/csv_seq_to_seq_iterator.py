@@ -523,7 +523,7 @@ class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):
         return dataset
 
     @overrides
-    def _get_test_input_function(self):
+    def _get_test_input_fn(self):
         file_name = "test_padded_data_" + str(self._hparams.use_char_embd) + ".p"
         train_sentences, train_char_ids, train_ner_tags = None, None, None
         data = self.get_padded_data(file_name=file_name)

@@ -92,7 +92,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-tool">Build Tool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#intellij-integration">IntelliJ Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#intellij-integration">IntelliJ Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-notebook-server">Python Notebook Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#git-commands">GIT Commands</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#note">Note:</a></li>
 </ul>
 </li>
@@ -108,6 +110,11 @@
 <p class="caption"><span class="caption-text">Examples:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dlfe/dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dlfe/debugging_tf_models.html">Debugging the TF Models</a></li>
 </ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
@@ -213,6 +220,47 @@
 </div>
 <div class="section" id="intellij-integration">
 <span id="intellij-integration"></span><h2>IntelliJ Integration<a class="headerlink" href="#intellij-integration" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="python-notebook-server">
+<span id="python-notebook-server"></span><h2>Python Notebook Server<a class="headerlink" href="#python-notebook-server" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipython</span> <span class="n">notebook</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">browser</span> <span class="o">--</span><span class="n">port</span><span class="o">=</span><span class="mi">8889</span>
+<span class="n">ssh</span> <span class="o">-</span><span class="n">N</span> <span class="o">-</span><span class="n">f</span> <span class="o">-</span><span class="n">L</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">8888</span><span class="p">:</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8889</span> <span class="n">remote_user</span><span class="nd">@remote_host</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="git-commands">
+<span id="git-commands"></span><h2>GIT Commands<a class="headerlink" href="#git-commands" title="Permalink to this headline">¶</a></h2>
+<p><strong>Sub modules notes:</strong></p>
+<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>#add submodule and define the master branch as the one you want to track  
+git submodule add -b master [URL to Git repo]     
+git submodule init
+
+#update your submodule --remote fetches new commits in the submodules 
+# and updates the working tree to the commit described by the branch  
+# pull all changes for the submodules
+git submodule update --remote
+ ---or---
+# pull all changes in the repo including changes in the submodules
+git pull --recurse-submodules
+
+
+# update submodule in the master branch
+# skip this if you use --recurse-submodules
+# and have the master branch checked out
+cd [submodule directory]
+git checkout master
+git pull
+
+# commit the change in main repo
+# to use the latest commit in master of the submodule
+cd ..
+git add [submodule directory]
+git commit -m &quot;move submodule to latest commit in master&quot;
+
+# share your changes
+git push
+</pre></div>
+</div>
 <div class="section" id="note">
 <span id="note"></span><h3>Note:<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">

@@ -21,6 +21,7 @@ import sys
 import os
 from recommonmark.parser import CommonMarkParser
 from unittest.mock import MagicMock
+from recommonmark.transform import AutoStructify
 sys.path.insert(0, os.path.abspath('.'))
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -212,3 +213,11 @@ extlinks = {
     'tf_hmpg': ('https://www.tensorflow.org/%s', None),
     'gym': ('https://gym.openai.com/docs/%s', None),
 }
+
+# At the bottom of conf.py
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+        'enable_inline_math': True,
+        'auto_toc_tree_section': 'Contents',
+    }, True)
+    app.add_transform(AutoStructify)

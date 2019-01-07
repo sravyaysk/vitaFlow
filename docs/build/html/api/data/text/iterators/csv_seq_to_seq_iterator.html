@@ -103,6 +103,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
+<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dlfe/dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dlfe/debugging_tf_models.html">Debugging the TF Models</a></li>
+</ul>
 <p class="caption"><span class="caption-text">References:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../audio/AudioBasics.html">Audio Basics</a></li>
@@ -267,6 +272,13 @@ should be stored</dd>
 </dd></dl>
 
 <dl class="method">
+<dt id="vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>executor: vitaflow.run.executor.Executor</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/vitaflow/data/text/iterators/csv_seq_to_seq_iterator.html#CSVSeqToSeqIterator.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the prediction on list of file to be tagged
+:return:</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_on_test_files">
 <code class="descname">predict_on_test_files</code><span class="sig-paren">(</span><em>predict_fn</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/vitaflow/data/text/iterators/csv_seq_to_seq_iterator.html#CSVSeqToSeqIterator.predict_on_test_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_on_test_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the files and use <cite>predict_on_test_file</cite>, for prediction
@@ -287,6 +299,14 @@ should be stored</dd>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_sentence">
+<code class="descname">predict_sentence</code><span class="sig-paren">(</span><em>executor: vitaflow.run.executor.Executor</em>, <em>sentence</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/vitaflow/data/text/iterators/csv_seq_to_seq_iterator.html#CSVSeqToSeqIterator.predict_sentence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_sentence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs prediction on a single sentence
+:param sentence: A single sentence whose tokens are separated by space
+:return: tuple of (words_n,tags_n)</p>
 </dd></dl>
 
 <dl class="attribute">
