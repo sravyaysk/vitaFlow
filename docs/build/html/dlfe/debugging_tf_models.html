@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Debugging the TF Models &mdash; vitaFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom_theme.css" type="text/css" />
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Audio Basics" href="../audio/AudioBasics.html" />
+    <link rel="prev" title="Deep Learning For Engineers" href="dl_for_engineers.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> vitaFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">vitaFlow - VideoImageTextAudioFlow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/developers.html">Developers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/core/core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/data/data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/models/models.html">Models</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Debugging the TF Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#eager-execution">Eager Execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#non-eager-execution">Non Eager Execution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#common-pradigms">Common Pradigms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simple-models">Simple Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estimator-based-models">Estimator Based Models</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">References:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../audio/AudioBasics.html">Audio Basics</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">vitaFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Debugging the TF Models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dlfe/debugging_tf_models.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="debugging-the-tf-models">
+<span id="debugging-the-tf-models"></span><h1>Debugging the TF Models<a class="headerlink" href="#debugging-the-tf-models" title="Permalink to this headline">¶</a></h1>
+<p>Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible,
+you are, by definition, not smart enough to debug it. — BRIAN W. KERNIGHAN</p>
+<div class="section" id="eager-execution">
+<span id="eager-execution"></span><h2>Eager Execution<a class="headerlink" href="#eager-execution" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>TODO</li>
+</ul>
+</div>
+<div class="section" id="non-eager-execution">
+<span id="non-eager-execution"></span><h2>Non Eager Execution<a class="headerlink" href="#non-eager-execution" title="Permalink to this headline">¶</a></h2>
+<p>Debugging in general can be a tedious and challenging task. Nevertheless, you must be comfortable going through the
+written code and identifying problems. Normally there are many guides, and the process of debugging is often well documented for many languages and frameworks.</p>
+<p>When it comes to TensorFlow, however, some new challenges arise because of the way it works.</p>
+<p>As the official documentation states:</p>
+<p>A TensorFlow Core program consists of two discrete sections:</p>
+<ul class="simple">
+<li>Building the computational graph (a tf.Graph).</li>
+<li>Running the computational graph (using a tf.Session).</li>
+</ul>
+<p>~<a class="reference external" href="../images/tf_graph.gif"></a></p>
+<div class="section" id="common-pradigms">
+<span id="common-pradigms"></span><h3>Common Pradigms<a class="headerlink" href="#common-pradigms" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>Enable TF Logger</strong></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="c1"># Only log errors (to prevent unnecessary cluttering of the console)</span>
+<span class="n">tf</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/Print"><strong>TF Print</strong></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+<span class="n">add</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">print_node</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">add</span><span class="p">],</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Add: &quot;</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">print_node</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Print output will show up in stderr in the console. Keep this in mind when searching for your print outputs!</p>
+<p>Another word of caution: if you use tf.Print in your input function, be sure to limit the amount of data you pass in,
+otherwise you might end up scrolling through a very long console window :)</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/debugging/Assert"><strong>TF Assert</strong></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">Assert</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first"><strong>Tensorboard</strong></p>
+<ul class="simple">
+<li>Proper tensor names and name scopes (<code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">tf.name_scope():</span> <span class="pre">....</span></code>)</li>
+<li>Add tf.summaries</li>
+<li>Add a tf.summary.FileWriter to create log files</li>
+<li>Start the tensorboard server from your terminal</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">For</span> <span class="n">example</span><span class="p">:</span> <span class="n">tensorboard</span> <span class="o">--</span><span class="n">logdir</span><span class="o">=./</span><span class="n">logs</span><span class="o">/</span> <span class="o">--</span><span class="n">port</span><span class="o">=</span><span class="mi">6006</span> <span class="o">--</span><span class="n">host</span><span class="o">=</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Navigating to the tensorboard server (in this case http://127.0.0.1:6006)</li>
+</ul>
+</li>
+<li><p class="first"><strong>Use the Tensorboard debugger</strong></p>
+</li>
+</ul>
+<p>To accomplish this, there are 3 things to add to our previous example:</p>
+<ul class="simple">
+<li>Import <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">tensorflow.python</span> <span class="pre">import</span> <span class="pre">debug</span> <span class="pre">as</span> <span class="pre">tf_debug</span></code></li>
+<li>Add your session with <code class="docutils literal notranslate"><span class="pre">tf_debug.TensorBoardDebugWrapsperSession</span></code></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python</span> <span class="kn">import</span> <span class="n">debug</span> <span class="k">as</span> <span class="n">tf_debug</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf_debug</span><span class="o">.</span><span class="n">TensorBoardDebugWrapperSession</span><span class="p">(</span>
+    <span class="n">sess</span><span class="p">,</span> <span class="s2">&quot;localhost:8080&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Add to your tensorboard server the debugger_port</li>
+</ul>
+<p>Now you have the option to debug the whole visualized model like with any other debugger, but with a beautiful map.
+You are able to select certain nodes and inspect them, control execution with the “step” and “continue” buttons,
+and visualize tensors and their values.</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.tensorflow.org/guide/debugger"><strong>Use the TensorFlow debugger</strong></a></li>
+</ul>
+</div>
+<div class="section" id="simple-models">
+<span id="simple-models"></span><h3>Simple Models<a class="headerlink" href="#simple-models" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fetch and print values within Session.run</li>
+</ul>
+</div>
+<div class="section" id="estimator-based-models">
+<span id="estimator-based-models"></span><h3>Estimator Based Models<a class="headerlink" href="#estimator-based-models" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Runtime Hooks</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../audio/AudioBasics.html" class="btn btn-neutral float-right" title="Audio Basics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dl_for_engineers.html" class="btn btn-neutral" title="Deep Learning For Engineers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, vitaFlow Team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
