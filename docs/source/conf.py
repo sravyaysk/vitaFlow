@@ -30,6 +30,18 @@ sys.path.insert(0, os.path.abspath('../'))
 sys.path.insert(0, os.path.abspath('../../'))
 # sys.setrecursionlimit(100)
 
+# TODO: https://github.com/rtfd/recommonmark/issues/93
+# TODO https://github.com/rtfd/recommonmark/issues/120
+# This patch helps in linking markdown files within mardown files
+from recommonmark.states import DummyStateMachine
+# Monkey patch to fix recommonmark 0.4 doc reference issues.
+orig_run_role = DummyStateMachine.run_role
+def run_role(self, name, options=None, content=None):
+    if name == 'doc':
+        name = 'any'
+    return orig_run_role(self, name, options, content)
+DummyStateMachine.run_role = run_role
+
 
 # -- General configuration ------------------------------------------------
 
@@ -215,9 +227,11 @@ extlinks = {
 }
 
 # At the bottom of conf.py
+# https://recommonmark.readthedocs.io/en/latest/auto_structify.html
 def setup(app):
     app.add_config_value('recommonmark_config', {
+        'enable_auto_toc_tree' : True,
+        'enable_math': True,
         'enable_inline_math': True,
-        'auto_toc_tree_section': 'Contents',
     }, True)
     app.add_transform(AutoStructify)

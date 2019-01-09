@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Optimization Algorithms &mdash; vitaFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom_theme.css" type="text/css" />
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Debugging the TF Models" href="debugging_tf_models.html" />
+    <link rel="prev" title="Loss/Cost Functions" href="loss.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> vitaFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">vitaFlow - VideoImageTextAudioFlow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/developers.html">Developers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/core/core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/data/data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/models/models.html">Models</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">vitaFlow Study Materials:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dl_for_eng.html">Deep Learning for Engineers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="activation_function.html">Activation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loss.html">Loss/Cost Functions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Optimization Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#batch-gradient-descent">Batch gradient descent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stochastic-gradient-descent">Stochastic gradient descent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mini-batch-gradient-descent">Mini-batch gradient descent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#momentum">Momentum</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adagrad">Adagrad</a><ul>
+<li class="toctree-l4"><a class="reference external" href="http://jmlr.org/papers/v12/duchi11a.html">Paper</a></li>
+<li class="toctree-l4"><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdagradOptimizer">TF API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#adadelta">Adadelta</a><ul>
+<li class="toctree-l4"><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdadeltaOptimizer">TF API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#adam">Adam</a><ul>
+<li class="toctree-l4"><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdamOptimizer">TF API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_tf_models.html">Debugging the TF Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tf_models_performance.html">TF Model Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../audio/AudioBasics.html">Audio Basics</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">vitaFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="dl_for_eng.html">Deep Learning for Engineers</a> &raquo;</li>
+        
+      <li>Optimization Algorithms</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dlfe/optimizers.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="optimization-algorithms">
+<span id="optimization-algorithms"></span><h1>Optimization Algorithms<a class="headerlink" href="#optimization-algorithms" title="Permalink to this headline">¶</a></h1>
+<p>One of the best material on the topic can be found here &#64; http://ruder.io/optimizing-gradient-descent/</p>
+<div class="section" id="batch-gradient-descent">
+<span id="batch-gradient-descent"></span><h2>Batch gradient descent<a class="headerlink" href="#batch-gradient-descent" title="Permalink to this headline">¶</a></h2>
+<p>Vanilla gradient descent, aka batch gradient descent, computes the gradient of the cost function w.r.t. to the parameters θ
+for the entire training dataset:</p>
+<p>$$\theta = \theta - \eta \cdot \nabla_\theta J( \theta)$$</p>
+</div>
+<div class="section" id="stochastic-gradient-descent">
+<span id="stochastic-gradient-descent"></span><h2>Stochastic gradient descent<a class="headerlink" href="#stochastic-gradient-descent" title="Permalink to this headline">¶</a></h2>
+<p>Stochastic gradient descent (SGD) in contrast performs a parameter update for each training example
+<span class="math notranslate">\(x^(i)\)</span> and label <span class="math notranslate">\(y^(i)\)</span>:</p>
+<p>$$\theta = \theta - \eta \cdot \nabla_\theta J( \theta; x^{(i)}; y^{(i)})$$</p>
+</div>
+<div class="section" id="mini-batch-gradient-descent">
+<span id="mini-batch-gradient-descent"></span><h2>Mini-batch gradient descent<a class="headerlink" href="#mini-batch-gradient-descent" title="Permalink to this headline">¶</a></h2>
+<p>Mini-batch gradient descent finally takes the best of both worlds and performs an update for every mini-batch of
+n training examples:</p>
+<p>$$\theta = \theta - \eta \cdot \nabla_\theta J( \theta; x^{(i:i+n)}; y^{(i:i+n)})$$</p>
+</div>
+<div class="section" id="momentum">
+<span id="momentum"></span><h2>Momentum<a class="headerlink" href="#momentum" title="Permalink to this headline">¶</a></h2>
+<p>Momentum is a method that helps accelerate SGD in the relevant direction and dampens oscillations.
+It does this by adding a fraction γ of the update vector of the past time step to the current update vector:</p>
+<p>$$
+\begin{align}
+\begin{split}
+v_t &amp;= \gamma v_{t-1} + \eta \nabla_\theta J( \theta) \
+\theta &amp;= \theta - v_t
+\end{split}
+\end{align}
+$$</p>
+</div>
+<div class="section" id="adagrad">
+<span id="adagrad"></span><h2>Adagrad<a class="headerlink" href="#adagrad" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="http://jmlr.org/papers/v12/duchi11a.html">Paper</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdagradOptimizer">TF API</a></li>
+</ul>
+</div>
+<p>Adagrad is an algorithm for gradient-based optimization that does just this: It adapts the learning rate to the parameters,
+performing smaller updates (i.e. low learning rates) for parameters associated with frequently
+occurring features, and larger updates (i.e. high learning rates) for parameters associated with
+infrequent features. For this reason, it is well-suited for dealing with sparse data.</p>
+</div>
+<div class="section" id="adadelta">
+<span id="adadelta"></span><h2>Adadelta<a class="headerlink" href="#adadelta" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdadeltaOptimizer">TF API</a></li>
+</ul>
+</div>
+<p>Adadelta is an extension of Adagrad that seeks to reduce its aggressive, monotonically decreasing
+learning rate. Instead of accumulating all past squared gradients, Adadelta restricts the window of
+accumulated past gradients to some fixed size w.</p>
+</div>
+<div class="section" id="adam">
+<span id="adam"></span><h2>Adam<a class="headerlink" href="#adam" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdamOptimizer">TF API</a></li>
+</ul>
+</div>
+<p>Adaptive Moment Estimation (Adam) is another method that computes adaptive learning rates for each parameter.
+In addition to storing an exponentially decaying average of past squared gradients <span class="math notranslate">\(v_t\)</span>
+like Adadelta, Adam also keeps an exponentially decaying average of past gradients <span class="math notranslate">\(m_t\)</span>, similar to momentum.
+Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction,
+which thus prefers flat minima in the error surface. We compute the decaying averages of past and past squared gradients <span class="math notranslate">\(m_t\)</span> and <span class="math notranslate">\(v_t\)</span> respectively as follows:</p>
+<p>$$
+\begin{align}
+\begin{split}
+m_t &amp;= \beta_1 m_{t-1} + (1 - \beta_1) g_t \
+v_t &amp;= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 \
+\end{split}
+\end{align}
+$$</p>
+<p>$$
+\begin{align}
+\begin{split}
+\hat{m}_t &amp;= \dfrac{m_t}{1 - \beta^t_1} \
+\hat{v}_t &amp;= \dfrac{v_t}{1 - \beta^t_2} \
+\end{split}
+\end{align}
+$$</p>
+<p>$$
+\theta_{t+1} = \theta_{t} - \dfrac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t
+$$</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="debugging_tf_models.html" class="btn btn-neutral float-right" title="Debugging the TF Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="loss.html" class="btn btn-neutral" title="Loss/Cost Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, vitaFlow Team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

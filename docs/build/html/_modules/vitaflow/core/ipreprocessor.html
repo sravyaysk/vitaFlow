@@ -97,13 +97,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
-<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<p class="caption"><span class="caption-text">vitaFlow Study Materials:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../dlfe/dl_for_engineers.html">Deep Learning For Engineers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../dlfe/debugging_tf_models.html">Debugging the TF Models</a></li>
-</ul>
-<p class="caption"><span class="caption-text">References:</span></p>
-<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dlfe/dl_for_eng.html">Deep Learning for Engineers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../audio/AudioBasics.html">Audio Basics</a></li>
 </ul>
 
@@ -290,16 +286,16 @@
             <span class="s2">&quot;preprocessed_data_path&quot;</span><span class="p">:</span> <span class="s2">&quot;preprocessed_data&quot;</span><span class="p">,</span>
             <span class="s2">&quot;train_data_path&quot;</span><span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>
             <span class="s2">&quot;validation_data_path&quot;</span><span class="p">:</span> <span class="s2">&quot;val&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;test_data_path&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span>
-        <span class="p">}</span></div>
+            <span class="s2">&quot;test_data_path&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span></div>
+        <span class="p">}</span>
 
 <div class="viewcode-block" id="IPreprocessor._create_target_directories"><a class="viewcode-back" href="../../../api/core/ipreprocessor.html#vitaflow.core.IPreprocessor._create_target_directories">[docs]</a>    <span class="k">def</span> <span class="nf">_create_target_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inheriting class must take care of creating experiment folder and all needed</span>
 <span class="sd">        sub directories to store the preprocessed training and test data</span>
 <span class="sd">        :return: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="IPreprocessor._prepare_data"><a class="viewcode-back" href="../../../api/core/ipreprocessor.html#vitaflow.core.IPreprocessor._prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">_prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -307,16 +303,16 @@
 <span class="sd">        Which not limited to, but includes: Downloading or copying the data, Preprocessing the data,</span>
 <span class="sd">        Storing the preprocessed data as train/val/test</span>
 <span class="sd">        :return: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="IPreprocessor.preprocess_prepare"><a class="viewcode-back" href="../../../api/core/ipreprocessor.html#vitaflow.core.IPreprocessor.preprocess_prepare">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pre-process and prepares the data for training</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_target_directories</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_data</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_target_directories</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_data</span><span class="p">()</span>
 </pre></div>
 
            </div>
@@ -350,11 +346,21 @@
 
     
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
         <script type="text/javascript" src="../../../_static/jquery.js"></script>
         <script type="text/javascript" src="../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

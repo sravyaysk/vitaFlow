@@ -31,8 +31,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Debugging the TF Models" href="debugging_tf_models.html" />
-    <link rel="prev" title="CoNLL2003Dataset" href="../examples/conll_2003_dataset.html" /> 
+    <link rel="next" title="Activation Functions" href="activation_function.html" />
+    <link rel="prev" title="Deep Learning for Engineers" href="dl_for_eng.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -99,49 +99,24 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
-<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<p class="caption"><span class="caption-text">vitaFlow Study Materials:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Deep Learning For Engineers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#activation-functions">Activation Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#sigmoid-or-logistic-activation-function">Sigmoid or Logistic Activation Function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#tanh-or-hyperbolic-tangent-activation-function">Tanh or hyperbolic tangent Activation Function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#relu-rectified-linear-unit-activation-function">ReLU (Rectified Linear Unit) Activation Function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#leaky-relu">Leaky ReLU</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#layers">Layers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#loss-cost-functions">Loss/Cost Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#classification">Classification</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#cross-entropy">Cross Entropy</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#regression">Regression</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#squarred-error">Squarred Error</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#sequence">Sequence</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#crf">CRF</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="dl_for_eng.html">Deep Learning for Engineers</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Deep Learning For Engineers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#must-read-blogs">Must Read Blogs</a><ul>
+<li class="toctree-l4"><a class="reference external" href="https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b">https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#optimization-algorithms">Optimization Algorithms</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#batch-gradient-descent">Batch gradient descent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#stochastic-gradient-descent">Stochastic gradient descent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#mini-batch-gradient-descent">Mini-batch gradient descent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#momentum">Momentum</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#adagrad">Adagrad</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#adadelta">Adadelta</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#adam">Adam</a></li>
+<li class="toctree-l2"><a class="reference internal" href="activation_function.html">Activation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loss.html">Loss/Cost Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizers.html">Optimization Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_tf_models.html">Debugging the TF Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tf_models_performance.html">TF Model Performance</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#must-read-blogs">Must Read Blogs</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="debugging_tf_models.html">Debugging the TF Models</a></li>
-</ul>
-<p class="caption"><span class="caption-text">References:</span></p>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="../audio/AudioBasics.html">Audio Basics</a></li>
 </ul>
 
@@ -188,6 +163,8 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
+          <li><a href="dl_for_eng.html">Deep Learning for Engineers</a> &raquo;</li>
+        
       <li>Deep Learning For Engineers</li>
     
     
@@ -224,245 +201,13 @@ uses some special algorithms along with back propagation to bring down the loss 
 <span class="n">Iterations</span> <span class="ow">is</span> <span class="mi">4</span>
 </pre></div>
 </div>
-<div class="section" id="activation-functions">
-<span id="activation-functions"></span><h2>Activation Functions<a class="headerlink" href="#activation-functions" title="Permalink to this headline">¶</a></h2>
-<p>It’s just a thing (node) that you add to the output end of any neural network. It is also known as Transfer Function.
-It can also be attached in between two Neural Networks.</p>
-<p><strong>Why we use Activation functions with Neural Networks?</strong></p>
-<p>It is used to determine the output of neural network like yes or no. It maps the resulting values in between 0 to 1 or -1 to 1 etc. (depending upon the function).
-The Activation Functions can be basically divided into 2 types-</p>
-<ul class="simple">
-<li>Linear Activation Function<ul>
-<li>Eg: $$f(x) = x$$</li>
-<li>As you can see the function is a line or linear.Therefore, the output of the functions will not be confined between any range.</li>
-<li>It doesn’t help with the complexity or various parameters of usual data that is fed to the neural networks.<img alt="" src="../_images/liniear_graph.png" /></li>
-</ul>
-</li>
-<li>Non-linear Activation Functions<ul>
-<li>The Nonlinear Activation Functions are the most used activation functions. Nonlinearity helps to makes the graph look something like this</li>
-<li>It makes it easy for the model to generalize or adapt with variety of data and to differentiate between the output.</li>
-<li>The main terminologies needed to understand for nonlinear functions are:<ul>
-<li><strong>Derivative or Differential</strong>: Change in y-axis w.r.t. change in x-axis.It is also known as slope.
-That means, we can find the slope of the sigmoid curve at any two points.</li>
-<li><strong>Monotonic function</strong>: A function which is either entirely non-increasing or non-decreasing.<img alt="" src="../_images/non_linear_graph.png" /></li>
-</ul>
-</li>
-<li>Why derivative/differentiation is used ?When updating the curve, to know in which direction and how much to change or update the curve depending upon the slope.That is why we use differentiation in almost every part of Machine Learning and Deep Learning.</li>
-</ul>
-</li>
-</ul>
-<div class="section" id="sigmoid-or-logistic-activation-function">
-<span id="sigmoid-or-logistic-activation-function"></span><h3>Sigmoid or Logistic Activation Function<a class="headerlink" href="#sigmoid-or-logistic-activation-function" title="Permalink to this headline">¶</a></h3>
-<p><strong>When to use?</strong></p>
-<ul class="simple">
-<li>To predict probability</li>
-</ul>
-<p><strong>Pros:</strong></p>
-<ul class="simple">
-<li>Inputs: Real value</li>
-<li>Outputs: 0 to 1 (used to predict the probability as an output)</li>
-<li>Nature : non-linear, continuously differentiable, monotonic, non-monotic derivative, and has a fixed output range.</li>
-</ul>
-<p><strong>Cons:</strong></p>
-<ul class="simple">
-<li>Towards either end of the sigmoid function, the Y values tend to respond very less to changes in X.</li>
-<li>ts output isn’t zero centered. It makes the gradient updates go too far in different directions. 0 &lt; output &lt; 1, and it makes optimization harder.</li>
-<li>It gives rise to a problem of “vanishing gradients”.</li>
-<li>Sigmoids saturate and kill gradients.</li>
-<li>The network refuses to learn further or is drastically slow</li>
-</ul>
-<p>The softmax function is a more generalized logistic activation function which is used for multiclass classification.</p>
-</div>
-<div class="section" id="tanh-or-hyperbolic-tangent-activation-function">
-<span id="tanh-or-hyperbolic-tangent-activation-function"></span><h3>Tanh or hyperbolic tangent Activation Function<a class="headerlink" href="#tanh-or-hyperbolic-tangent-activation-function" title="Permalink to this headline">¶</a></h3>
-<p><strong>When to use?</strong></p>
-<ul class="simple">
-<li>The tanh function is mainly used classification between two classes.</li>
-</ul>
-<p><strong>Pros:</strong></p>
-<ul class="simple">
-<li>Inputs: Real value</li>
-<li>Outputs: [-1, 1]</li>
-<li>The advantage is that the negative inputs will be mapped strongly negative and the zero inputs will be mapped near zero in the tanh graph.</li>
-<li>Nature : non-linear, continuously differentiable, monotonic, and has a fixed output range.</li>
-</ul>
-<p><strong>Cons:</strong></p>
-<ul class="simple">
-<li>Tanh also has the vanishing gradient problem.</li>
-</ul>
-</div>
-<div class="section" id="relu-rectified-linear-unit-activation-function">
-<span id="relu-rectified-linear-unit-activation-function"></span><h3>ReLU (Rectified Linear Unit) Activation Function<a class="headerlink" href="#relu-rectified-linear-unit-activation-function" title="Permalink to this headline">¶</a></h3>
-<p>The ReLU is the most used activation function in the world right now.
-Since, it is used in almost all the convolutional neural networks or deep learning.</p>
-<p><strong>When to use?</strong></p>
-<ul class="simple">
-<li>For hidden layers</li>
-</ul>
-<p><strong>Pros:</strong></p>
-<ul class="simple">
-<li>Inputs: Real numbers</li>
-<li>Outputs $max(0, inputs)$ [ 0 to infinity)</li>
-<li>As you can see, the ReLU is half rectified (from bottom). f(z) is zero when z is less than zero and f(z) is equal to z when z is above or equal to zero.</li>
-<li>Nature : non-linear, continuously differentiable, monotonic, and has a fixed output range.</li>
-</ul>
-<p><strong>Cons:</strong></p>
-<ul class="simple">
-<li>But the issue is that all the negative values become zero immediately which decreases the ability of the model to fit or train from the data properly.</li>
-<li>That means any negative input given to the ReLU activation function turns the value into zero immediately, which in turns affects the mapping of the negative values appropriately.</li>
-<li>One of its limitation is that it should only be used within Hidden layers of a Neural Network Model.</li>
-<li>Some gradients can be fragile during training and can die. It can cause a weight update which will makes it never activate on any data point again. Simply saying that ReLu could result in Dead Neurons.</li>
-<li>In another words, For activations in the region (x&lt;0) of ReLu, gradient will be 0 because of which the weights will not get adjusted during descent. That means, those neurons which go into that state will stop responding to variations in error/ input ( simply because gradient is 0, nothing changes ). This is called dying ReLu problem.</li>
-<li>The range of ReLu is [0, inf). This means it can blow up the activation.</li>
-</ul>
-</div>
-<div class="section" id="leaky-relu">
-<span id="leaky-relu"></span><h3>Leaky ReLU<a class="headerlink" href="#leaky-relu" title="Permalink to this headline">¶</a></h3>
-<p>It is an attempt to solve the dying ReLU problem.
-The leak helps to increase the range of the ReLU function. Usually, the value of a is 0.01 or so.
-When a is not 0.01 then it is called Randomized ReLU.</p>
-<p><strong>When to use?</strong></p>
-<ul class="simple">
-<li>For hidden layers</li>
-</ul>
-<p><strong>Pros:</strong></p>
-<ul class="simple">
-<li>Inputs: Real numbers</li>
-<li>Outputs $max(random_number, inputs)$ [ -infinity to infinity)</li>
-<li>As you can see, the ReLU is half rectified (from bottom). f(z) is zero when z is less than zero and f(z) is equal to z when z is above or equal to zero.</li>
-<li>Nature : non-linear, continuously differentiable, monotonic, and has a fixed output range.</li>
-</ul>
-<p><strong>Cons:</strong></p>
-<ul class="simple">
-<li>As it possess linearity, it can’t be used for the complex Classification. It lags behind the Sigmoid and Tanh for some of the use cases.</li>
-</ul>
-<p><strong>Cheat sheets:</strong></p>
-<p><img alt="" src="../_images/activation_function_cheatsheet.png" />
-<img alt="" src="../_images/activation_function_derivatives.png" /></p>
-<p><strong>APIs</strong>
-Check the <a class="reference external" href="https://www.tensorflow.org/api_guides/python/nn#Activation_Functions">Tensorflow APIs</a>!</p>
-</div>
-</div>
-<div class="section" id="layers">
-<span id="layers"></span><h2>Layers<a class="headerlink" href="#layers" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Fully Connected/Dense Layers</li>
-<li>Dropout Layers</li>
-</ul>
-</div>
-<div class="section" id="loss-cost-functions">
-<span id="loss-cost-functions"></span><h2>Loss/Cost Functions<a class="headerlink" href="#loss-cost-functions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="classification">
-<span id="classification"></span><h3>Classification<a class="headerlink" href="#classification" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="cross-entropy">
-<span id="cross-entropy"></span><h4>Cross Entropy<a class="headerlink" href="#cross-entropy" title="Permalink to this headline">¶</a></h4>
-<p>Activation Function: Softmax</p>
-</div>
-</div>
-<div class="section" id="regression">
-<span id="regression"></span><h3>Regression<a class="headerlink" href="#regression" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="squarred-error">
-<span id="squarred-error"></span><h4>Squarred Error<a class="headerlink" href="#squarred-error" title="Permalink to this headline">¶</a></h4>
-<p>Activation Function : Tanh, Sigmoid</p>
-</div>
-</div>
-<div class="section" id="sequence">
-<span id="sequence"></span><h3>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="crf">
-<span id="crf"></span><h4>CRF<a class="headerlink" href="#crf" title="Permalink to this headline">¶</a></h4>
-</div>
-</div>
-</div>
-<div class="section" id="optimization-algorithms">
-<span id="optimization-algorithms"></span><h2>Optimization Algorithms<a class="headerlink" href="#optimization-algorithms" title="Permalink to this headline">¶</a></h2>
-<p>On eof the best material on the topic can be found here &#64; http://ruder.io/optimizing-gradient-descent/</p>
-<div class="section" id="batch-gradient-descent">
-<span id="batch-gradient-descent"></span><h3>Batch gradient descent<a class="headerlink" href="#batch-gradient-descent" title="Permalink to this headline">¶</a></h3>
-<p>Vanilla gradient descent, aka batch gradient descent, computes the gradient of the cost function w.r.t. to the parameters θ
-for the entire training dataset:</p>
-<p>$$\theta = \theta - \eta \cdot \nabla_\theta J( \theta)$$</p>
-</div>
-<div class="section" id="stochastic-gradient-descent">
-<span id="stochastic-gradient-descent"></span><h3>Stochastic gradient descent<a class="headerlink" href="#stochastic-gradient-descent" title="Permalink to this headline">¶</a></h3>
-<p>Stochastic gradient descent (SGD) in contrast performs a parameter update for each training example
-$x^(i)$ and label $y^(i)$:</p>
-<p>$$\theta = \theta - \eta \cdot \nabla_\theta J( \theta; x^{(i)}; y^{(i)})$$</p>
-</div>
-<div class="section" id="mini-batch-gradient-descent">
-<span id="mini-batch-gradient-descent"></span><h3>Mini-batch gradient descent<a class="headerlink" href="#mini-batch-gradient-descent" title="Permalink to this headline">¶</a></h3>
-<p>Mini-batch gradient descent finally takes the best of both worlds and performs an update for every mini-batch of
-n training examples:</p>
-<p>$$\theta = \theta - \eta \cdot \nabla_\theta J( \theta; x^{(i:i+n)}; y^{(i:i+n)})$$</p>
-</div>
-<div class="section" id="momentum">
-<span id="momentum"></span><h3>Momentum<a class="headerlink" href="#momentum" title="Permalink to this headline">¶</a></h3>
-<p>Momentum is a method that helps accelerate SGD in the relevant direction and dampens oscillations.
-It does this by adding a fraction γ of the update vector of the past time step to the current update vector:</p>
-<p>$$
-\begin{align}
-\begin{split}
-v_t &amp;= \gamma v_{t-1} + \eta \nabla_\theta J( \theta) \
-\theta &amp;= \theta - v_t
-\end{split}
-\end{align}
-$$</p>
-</div>
-<div class="section" id="adagrad">
-<span id="adagrad"></span><h3>Adagrad<a class="headerlink" href="#adagrad" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><a class="reference external" href="http://jmlr.org/papers/v12/duchi11a.html">Paper</a></li>
-<li><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdagradOptimizer">TF API</a></li>
-</ul>
-<p>Adagrad is an algorithm for gradient-based optimization that does just this: It adapts the learning rate to the parameters,
-performing smaller updates (i.e. low learning rates) for parameters associated with frequently
-occurring features, and larger updates (i.e. high learning rates) for parameters associated with
-infrequent features. For this reason, it is well-suited for dealing with sparse data.</p>
-</div>
-<div class="section" id="adadelta">
-<span id="adadelta"></span><h3>Adadelta<a class="headerlink" href="#adadelta" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdadeltaOptimizer">TF API</a></li>
-</ul>
-<p>Adadelta is an extension of Adagrad that seeks to reduce its aggressive, monotonically decreasing
-learning rate. Instead of accumulating all past squared gradients, Adadelta restricts the window of
-accumulated past gradients to some fixed size w.</p>
-</div>
-<div class="section" id="adam">
-<span id="adam"></span><h3>Adam<a class="headerlink" href="#adam" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/train/AdamOptimizer">TF API</a></li>
-</ul>
-<p>Adaptive Moment Estimation (Adam) is another method that computes adaptive learning rates for each parameter.
-In addition to storing an exponentially decaying average of past squared gradients $v_t$
-like Adadelta, Adam also keeps an exponentially decaying average of past gradients $m_t$, similar to momentum.
-Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction,
-which thus prefers flat minima in the error surface. We compute the decaying averages of past and past squared gradients $m_t$ and $v_t$ respectively as follows:</p>
-<p>$$
-\begin{align}
-\begin{split}
-m_t &amp;= \beta_1 m_{t-1} + (1 - \beta_1) g_t \
-v_t &amp;= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 \
-\end{split}
-\end{align}
-$$</p>
-<p>$$
-\begin{align}
-\begin{split}
-\hat{m}_t &amp;= \dfrac{m_t}{1 - \beta^t_1} \
-\hat{v}_t &amp;= \dfrac{v_t}{1 - \beta^t_2} \
-\end{split}
-\end{align}
-$$</p>
-<p>$$
-\theta_{t+1} = \theta_{t} - \dfrac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t
-$$</p>
-</div>
-</div>
 <div class="section" id="must-read-blogs">
 <span id="must-read-blogs"></span><h2>Must Read Blogs<a class="headerlink" href="#must-read-blogs" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><a class="reference external" href="https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b">https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b</a></li>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b">https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b</a></li>
 </ul>
+</div>
 </div>
 </div>
 
@@ -474,10 +219,10 @@ $$</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="debugging_tf_models.html" class="btn btn-neutral float-right" title="Debugging the TF Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="activation_function.html" class="btn btn-neutral float-right" title="Activation Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../examples/conll_2003_dataset.html" class="btn btn-neutral" title="CoNLL2003Dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="dl_for_eng.html" class="btn btn-neutral" title="Deep Learning for Engineers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -507,11 +252,21 @@ $$</p>
 
     
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
         <script type="text/javascript" src="../_static/jquery.js"></script>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

@@ -97,13 +97,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
-<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<p class="caption"><span class="caption-text">vitaFlow Study Materials:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../dlfe/dl_for_engineers.html">Deep Learning For Engineers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../dlfe/debugging_tf_models.html">Debugging the TF Models</a></li>
-</ul>
-<p class="caption"><span class="caption-text">References:</span></p>
-<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../dlfe/dl_for_eng.html">Deep Learning for Engineers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../audio/AudioBasics.html">Audio Basics</a></li>
 </ul>
 
@@ -330,8 +326,8 @@
             <span class="s2">&quot;max_word_length&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
             <span class="s2">&quot;use_char_embd&quot;</span><span class="p">:</span> <span class="kc">False</span>
         <span class="p">})</span>
-
-        <span class="k">return</span> <span class="n">hparams</span></div>
+</div>
+        <span class="k">return</span> <span class="n">hparams</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">word_vocab_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -807,8 +803,8 @@
             <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OUT_DIR</span> <span class="p">,</span><span class="s2">&quot;predictions&quot;</span><span class="p">)</span>
             <span class="n">check_n_makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
             <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span> <span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">results</span></div>
+</div>
+        <span class="k">return</span> <span class="n">results</span>
 
 <div class="viewcode-block" id="CSVSeqToSeqIterator.predict_on_text"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_on_text">[docs]</a>    <span class="nd">@overrides</span>
     <span class="k">def</span> <span class="nf">predict_on_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predict_fn</span><span class="p">):</span>
@@ -842,8 +838,8 @@
             <span class="n">pred_1_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">pred_2_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">pred_3_confidence</span> <span class="o">=</span> <span class="n">top_3_predicted_confidence</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span>
-
-        <span class="k">return</span> <span class="n">predicted_id</span></div>
+</div>
+        <span class="k">return</span> <span class="n">predicted_id</span>
 
 
 <div class="viewcode-block" id="CSVSeqToSeqIterator.predict"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span><span class="p">):</span>
@@ -855,8 +851,8 @@
         <span class="n">estimator</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">estimator</span>
         <span class="n">data_iterator</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">data_iterator</span>
 
-        <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">test_input_fn</span><span class="p">())</span>
-        <span class="n">data_iterator</span><span class="o">.</span><span class="n">predict_on_test_files</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">)</span></div>
+        <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">test_input_fn</span><span class="p">())</span></div>
+        <span class="n">data_iterator</span><span class="o">.</span><span class="n">predict_on_test_files</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CSVSeqToSeqIterator.predict_sentence"><a class="viewcode-back" href="../../../../../api/data/text/iterators/csv_seq_to_seq_iterator.html#vitaflow.data.text.iterators.CSVSeqToSeqIterator.predict_sentence">[docs]</a>    <span class="k">def</span> <span class="nf">predict_sentence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -869,8 +865,8 @@
         <span class="n">data_iterator</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">data_iterator</span>
 
         <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">test_sentence_input_fn</span><span class="p">(</span><span class="n">sentence</span><span class="p">))</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">predict_on_text</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">results</span><span class="p">)))</span></div></div>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">data_iterator</span><span class="o">.</span><span class="n">predict_on_text</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">)</span></div></div>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">results</span><span class="p">)))</span>
 </pre></div>
 
            </div>
@@ -904,11 +900,21 @@
 
     
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../../../../',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
         <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
         <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

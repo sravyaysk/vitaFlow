@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Activation Functions &mdash; vitaFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom_theme.css" type="text/css" />
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Layers" href="layers.html" />
+    <link rel="prev" title="Deep Learning For Engineers" href="dl_for_engineers.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> vitaFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">vitaFlow - VideoImageTextAudioFlow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/developers.html">Developers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/core/core.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/data/data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/models/models.html">Models</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
+</ul>
+<p class="caption"><span class="caption-text">vitaFlow Study Materials:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dl_for_eng.html">Deep Learning for Engineers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Activation Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sigmoid-or-logistic-activation-function">Sigmoid or Logistic Activation Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tanh-or-hyperbolic-tangent-activation-function">Tanh or hyperbolic tangent Activation Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#relu-rectified-linear-unit-activation-function">ReLU (Rectified Linear Unit) Activation Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#leaky-relu">Leaky ReLU</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loss.html">Loss/Cost Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizers.html">Optimization Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_tf_models.html">Debugging the TF Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tf_models_performance.html">TF Model Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../audio/AudioBasics.html">Audio Basics</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">vitaFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="dl_for_eng.html">Deep Learning for Engineers</a> &raquo;</li>
+        
+      <li>Activation Functions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dlfe/activation_function.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="activation-functions">
+<span id="activation-functions"></span><h1>Activation Functions<a class="headerlink" href="#activation-functions" title="Permalink to this headline">¶</a></h1>
+<p>It’s just a thing (node) that you add to the output end of any neural network. It is also known as Transfer Function.
+It can also be attached in between two Neural Networks.</p>
+<p><strong>Why we use Activation functions with Neural Networks?</strong></p>
+<p>It is used to determine the output of neural network like yes or no. It maps the resulting values in between 0 to 1 or -1 to 1 etc. (depending upon the function).
+The Activation Functions can be basically divided into 2 types-</p>
+<ul class="simple">
+<li>Linear Activation Function<ul>
+<li>Eg: <span class="math notranslate">\(f(x) = x\)</span></li>
+<li>As you can see the function is a line or linear.Therefore, the output of the functions will not be confined between any range.</li>
+<li>It doesn’t help with the complexity or various parameters of usual data that is fed to the neural networks.<img alt="" src="../_images/liniear_graph.png" /></li>
+</ul>
+</li>
+<li>Non-linear Activation Functions<ul>
+<li>The Nonlinear Activation Functions are the most used activation functions. Nonlinearity helps to makes the graph look something like this</li>
+<li>It makes it easy for the model to generalize or adapt with variety of data and to differentiate between the output.</li>
+<li>The main terminologies needed to understand for nonlinear functions are:<ul>
+<li><strong>Derivative or Differential</strong>: Change in y-axis w.r.t. change in x-axis.It is also known as slope.
+That means, we can find the slope of the sigmoid curve at any two points.</li>
+<li><strong>Monotonic function</strong>: A function which is either entirely non-increasing or non-decreasing.<img alt="" src="../_images/non_linear_graph.png" /></li>
+</ul>
+</li>
+<li>Why derivative/differentiation is used ?When updating the curve, to know in which direction and how much to change or update the curve depending upon the slope.That is why we use differentiation in almost every part of Machine Learning and Deep Learning.</li>
+</ul>
+</li>
+</ul>
+<div class="section" id="sigmoid-or-logistic-activation-function">
+<span id="sigmoid-or-logistic-activation-function"></span><h2>Sigmoid or Logistic Activation Function<a class="headerlink" href="#sigmoid-or-logistic-activation-function" title="Permalink to this headline">¶</a></h2>
+<p><strong>When to use?</strong></p>
+<ul class="simple">
+<li>To predict probability</li>
+</ul>
+<p><strong>Pros:</strong></p>
+<ul class="simple">
+<li>Inputs: Real value</li>
+<li>Outputs: 0 to 1 (used to predict the probability as an output)</li>
+<li>Nature : non-linear, continuously differentiable, monotonic, non-monotic derivative, and has a fixed output range.</li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul class="simple">
+<li>Towards either end of the sigmoid function, the Y values tend to respond very less to changes in X.</li>
+<li>ts output isn’t zero centered. It makes the gradient updates go too far in different directions. 0 &lt; output &lt; 1, and it makes optimization harder.</li>
+<li>It gives rise to a problem of “vanishing gradients”.</li>
+<li>Sigmoids saturate and kill gradients.</li>
+<li>The network refuses to learn further or is drastically slow</li>
+</ul>
+<p>The softmax function is a more generalized logistic activation function which is used for multiclass classification.</p>
+</div>
+<div class="section" id="tanh-or-hyperbolic-tangent-activation-function">
+<span id="tanh-or-hyperbolic-tangent-activation-function"></span><h2>Tanh or hyperbolic tangent Activation Function<a class="headerlink" href="#tanh-or-hyperbolic-tangent-activation-function" title="Permalink to this headline">¶</a></h2>
+<p><strong>When to use?</strong></p>
+<ul class="simple">
+<li>The tanh function is mainly used classification between two classes.</li>
+</ul>
+<p><strong>Pros:</strong></p>
+<ul class="simple">
+<li>Inputs: Real value</li>
+<li>Outputs: [-1, 1]</li>
+<li>The advantage is that the negative inputs will be mapped strongly negative and the zero inputs will be mapped near zero in the tanh graph.</li>
+<li>Nature : non-linear, continuously differentiable, monotonic, and has a fixed output range.</li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul class="simple">
+<li>Tanh also has the vanishing gradient problem.</li>
+</ul>
+</div>
+<div class="section" id="relu-rectified-linear-unit-activation-function">
+<span id="relu-rectified-linear-unit-activation-function"></span><h2>ReLU (Rectified Linear Unit) Activation Function<a class="headerlink" href="#relu-rectified-linear-unit-activation-function" title="Permalink to this headline">¶</a></h2>
+<p>The ReLU is the most used activation function in the world right now.
+Since, it is used in almost all the convolutional neural networks or deep learning.</p>
+<p><strong>When to use?</strong></p>
+<ul class="simple">
+<li>For hidden layers</li>
+</ul>
+<p><strong>Pros:</strong></p>
+<ul class="simple">
+<li>Inputs: Real numbers</li>
+<li>Outputs <span class="math notranslate">\(max(0, inputs)\)</span> [ 0 to infinity)</li>
+<li>As you can see, the ReLU is half rectified (from bottom). f(z) is zero when z is less than zero and f(z) is equal to z when z is above or equal to zero.</li>
+<li>Nature : non-linear, continuously differentiable, monotonic, and has a fixed output range.</li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul class="simple">
+<li>But the issue is that all the negative values become zero immediately which decreases the ability of the model to fit or train from the data properly.</li>
+<li>That means any negative input given to the ReLU activation function turns the value into zero immediately, which in turns affects the mapping of the negative values appropriately.</li>
+<li>One of its limitation is that it should only be used within Hidden layers of a Neural Network Model.</li>
+<li>Some gradients can be fragile during training and can die. It can cause a weight update which will makes it never activate on any data point again. Simply saying that ReLu could result in Dead Neurons.</li>
+<li>In another words, For activations in the region (x&lt;0) of ReLu, gradient will be 0 because of which the weights will not get adjusted during descent. That means, those neurons which go into that state will stop responding to variations in error/ input ( simply because gradient is 0, nothing changes ). This is called dying ReLu problem.</li>
+<li>The range of ReLu is [0, inf). This means it can blow up the activation.</li>
+</ul>
+</div>
+<div class="section" id="leaky-relu">
+<span id="leaky-relu"></span><h2>Leaky ReLU<a class="headerlink" href="#leaky-relu" title="Permalink to this headline">¶</a></h2>
+<p>It is an attempt to solve the dying ReLU problem.
+The leak helps to increase the range of the ReLU function. Usually, the value of a is 0.01 or so.
+When a is not 0.01 then it is called Randomized ReLU.</p>
+<p><strong>When to use?</strong></p>
+<ul class="simple">
+<li>For hidden layers</li>
+</ul>
+<p><strong>Pros:</strong></p>
+<ul class="simple">
+<li>Inputs: Real numbers</li>
+<li>Outputs <span class="math notranslate">\(max(random_number, inputs)\)</span> [ -infinity to infinity)</li>
+<li>As you can see, the ReLU is half rectified (from bottom). f(z) is zero when z is less than zero and f(z) is equal to z when z is above or equal to zero.</li>
+<li>Nature : non-linear, continuously differentiable, monotonic, and has a fixed output range.</li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul class="simple">
+<li>As it possess linearity, it can’t be used for the complex Classification. It lags behind the Sigmoid and Tanh for some of the use cases.</li>
+</ul>
+<p><strong>Cheat sheets:</strong></p>
+<p><img alt="" src="../_images/activation_function_cheatsheet.png" />
+<img alt="" src="../_images/activation_function_derivatives.png" /></p>
+<p><strong>APIs</strong>
+Check the <a class="reference external" href="https://www.tensorflow.org/api_guides/python/nn#Activation_Functions">Tensorflow APIs</a>!</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="layers.html" class="btn btn-neutral float-right" title="Layers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dl_for_engineers.html" class="btn btn-neutral" title="Deep Learning For Engineers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, vitaFlow Team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

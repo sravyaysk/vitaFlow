@@ -31,8 +31,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Audio Basics" href="../audio/AudioBasics.html" />
-    <link rel="prev" title="Deep Learning For Engineers" href="dl_for_engineers.html" /> 
+    <link rel="next" title="TF Model Performance" href="tf_models_performance.html" />
+    <link rel="prev" title="Optimization Algorithms" href="optimizers.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -99,22 +99,27 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
-<p class="caption"><span class="caption-text">DL For Engineers:</span></p>
+<p class="caption"><span class="caption-text">vitaFlow Study Materials:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="dl_for_engineers.html">Deep Learning For Engineers</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Debugging the TF Models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#eager-execution">Eager Execution</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#non-eager-execution">Non Eager Execution</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#common-pradigms">Common Pradigms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#simple-models">Simple Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#estimator-based-models">Estimator Based Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="dl_for_eng.html">Deep Learning for Engineers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="dl_for_engineers.html">Deep Learning For Engineers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="activation_function.html">Activation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loss.html">Loss/Cost Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizers.html">Optimization Algorithms</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Debugging the TF Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#eager-execution">Eager Execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#non-eager-execution">Non Eager Execution</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#common-pradigms">Common Pradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#simple-models">Simple Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estimator-based-models">Estimator Based Models</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="tf_models_performance.html">TF Model Performance</a></li>
 </ul>
-<p class="caption"><span class="caption-text">References:</span></p>
-<ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../audio/AudioBasics.html">Audio Basics</a></li>
 </ul>
 
@@ -160,6 +165,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="dl_for_eng.html">Deep Learning for Engineers</a> &raquo;</li>
         
       <li>Debugging the TF Models</li>
     
@@ -297,10 +304,10 @@ and visualize tensors and their values.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../audio/AudioBasics.html" class="btn btn-neutral float-right" title="Audio Basics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tf_models_performance.html" class="btn btn-neutral float-right" title="TF Model Performance" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="dl_for_engineers.html" class="btn btn-neutral" title="Deep Learning For Engineers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="optimizers.html" class="btn btn-neutral" title="Optimization Algorithms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -330,11 +337,21 @@ and visualize tensors and their values.</p>
 
     
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
         <script type="text/javascript" src="../_static/jquery.js"></script>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   
