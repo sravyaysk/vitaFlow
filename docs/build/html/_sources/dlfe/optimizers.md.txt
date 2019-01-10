@@ -27,7 +27,7 @@ It does this by adding a fraction γ of the update vector of the past time step 
 $$
 \begin{align} 
 \begin{split} 
-v_t &= \gamma v_{t-1} + \eta \nabla_\theta J( \theta) \\ 
+v_t &= \gamma v_{t-1} + \eta \nabla_\theta J( \theta) \newline
 \theta &= \theta - v_t 
 \end{split} 
 \end{align}
@@ -64,8 +64,8 @@ which thus prefers flat minima in the error surface. We compute the decaying ave
 $$
 \begin{align} 
 \begin{split} 
-m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t \\ 
-v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 \\
+m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t \newline
+v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 \newline
 \end{split} 
 \end{align}
 $$
@@ -73,8 +73,8 @@ $$
 $$
 \begin{align} 
 \begin{split} 
-\hat{m}_t &= \dfrac{m_t}{1 - \beta^t_1} \\ 
-\hat{v}_t &= \dfrac{v_t}{1 - \beta^t_2} \\ 
+\hat{m}_t &= \dfrac{m_t}{1 - \beta^t_1} \newline
+\hat{v}_t &= \dfrac{v_t}{1 - \beta^t_2} \newline
 \end{split} 
 \end{align}
 $$

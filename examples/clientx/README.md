@@ -136,7 +136,7 @@ You can read more on this at [architecture]()
   2xxx8,Pxxxxxr,278.76,428.381,1.0,O
   ```
 
-- Before we start feeding the data into training pipeline, we would like to convert it into [IOB](https://en.wikipedia.org/wiki/Inside%E2%80%93outside%E2%80%93beginning_(tagging)) notation, so that we can mark the start and the end of the tagging sequence.  Here, the first word of the entity grouping is prefixed with **B-** and remain words in sequence are prefixed with **I-**. 
+- Before we start feeding the data into training pipeline, we would like to convert it into [IOB](https://en.wikipedia.org/wiki/Inside%E2%80%93outside%E2%80%93beginning_(tagging)) notation, so that we can mark the start and the end of the tagging sequence.  Here, the first word of the entity grouping is prefixed with **B-** and remain words in sequence are prefixed with **I-**.
 
 - Words to ignore are tagged with O 
 

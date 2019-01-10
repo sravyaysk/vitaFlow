@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview: module code &mdash; vitaFlow 0.0.1 documentation</title>
+  <title>Introduction &mdash; vitaFlow 0.0.1 documentation</title>
   
 
   
@@ -30,7 +30,9 @@
   <link rel="stylesheet" href="../_static/css/custom_theme.css" type="text/css" />
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Activation Functions" href="activation_function.html" />
+    <link rel="prev" title="Deep Learning for Engineers" href="dl_for_eng.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -100,8 +102,23 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples/conll_2003_dataset.html">CoNLL2003Dataset</a></li>
 </ul>
 <p class="caption"><span class="caption-text">vitaFlow Study Materials:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../dlfe/dl_for_eng.html">Deep Learning for Engineers</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dl_for_eng.html">Deep Learning for Engineers</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#must-read-blogs">Must Read Blogs</a><ul>
+<li class="toctree-l4"><a class="reference external" href="https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b">https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="activation_function.html">Activation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loss.html">Loss/Cost Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizers.html">Optimization Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_tf_models.html">Debugging the TF Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tf_models_performance.html">TF Model Performance</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../audio/AudioBasics.html">Audio Basics</a></li>
 </ul>
 
@@ -148,10 +165,16 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Overview: module code</li>
+          <li><a href="dl_for_eng.html">Deep Learning for Engineers</a> &raquo;</li>
+        
+      <li>Introduction</li>
     
     
       <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dlfe/intro.md.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -163,19 +186,49 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="examples/conll2003/conll_2003_dataset.html">examples.conll2003.conll_2003_dataset</a></li>
-<li><a href="vitaflow/core/hyperparams.html">vitaflow.core.hyperparams</a></li>
-<li><a href="vitaflow/core/ipreprocessor.html">vitaflow.core.ipreprocessor</a></li>
-<li><a href="vitaflow/data/text/iterators/csv_seq_to_seq_iterator.html">vitaflow.data.text.iterators.csv_seq_to_seq_iterator</a></li>
-<li><a href="vitaflow/data/text/vocabulary.html">vitaflow.data.text.vocabulary</a></li>
-<li><a href="vitaflow/models/text/seq2seq/bilstm_crf.html">vitaflow.models.text.seq2seq.bilstm_crf</a></li>
+  <div class="section" id="introduction">
+<span id="introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>A typical deep learning project starts with preparing the dataset (<strong>Data</strong>), preprocessing the data such that the domain data is
+is getting transformed to model specific numeric data (<strong>Data Iterators</strong>). Then comes the model building part by stacking
+the neural network layers (with Activation Functions). Followed by defining a <strong>Cost/Loss Function</strong> which compares the
+ground truth value with predicted value and gives out a numerical value/tensor. Once the loss function is established,
+then the natural following step would be considering the the loss value/tesnor and use a <strong>Optimization Function</strong> which
+uses some special algorithms along with back propagation to bring down the loss value/tensor  by adjusting the network weights.</p>
+<p><strong>Epoch</strong> : One Epoch is when an ENTIRE dataset is passed forward and backward through the neural network only ONCE.</p>
+<p><strong>Batch Size</strong> : Total number of training examples present in a single batch.</p>
+<p><strong>Iterations/Steps</strong> : Iterations is the number of batches needed to complete one epoch.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Eg</span><span class="p">:</span> <span class="n">We</span> <span class="n">can</span> <span class="n">divide</span> <span class="n">the</span> <span class="n">dataset</span> <span class="n">of</span> <span class="mi">2000</span> <span class="n">examples</span> <span class="n">into</span> <span class="n">batches</span> <span class="n">of</span> <span class="mi">500</span> <span class="n">then</span> <span class="n">it</span> <span class="n">will</span> <span class="n">take</span> <span class="mi">4</span> <span class="n">iterations</span> <span class="n">to</span> <span class="n">complete</span> <span class="mi">1</span> <span class="n">epoch</span><span class="o">.</span>
+
+<span class="n">Where</span><span class="p">:</span> 
+<span class="n">Epoch</span> <span class="ow">is</span> <span class="mi">1</span>
+<span class="n">Batch</span> <span class="n">Size</span> <span class="ow">is</span> <span class="mi">500</span>
+<span class="n">Iterations</span> <span class="ow">is</span> <span class="mi">4</span>
+</pre></div>
+</div>
+<div class="section" id="must-read-blogs">
+<span id="must-read-blogs"></span><h2>Must Read Blogs<a class="headerlink" href="#must-read-blogs" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b">https://medium.com/&#64;karpathy/yes-you-should-understand-backprop-e2f06eab496b</a></li>
 </ul>
+</div>
+</div>
+</div>
+
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="activation_function.html" class="btn btn-neutral float-right" title="Activation Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dl_for_eng.html" class="btn btn-neutral" title="Deep Learning for Engineers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

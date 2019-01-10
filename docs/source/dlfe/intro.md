@@ -1,4 +1,4 @@
-# Deep Learning For Engineers
+# Introduction
 
 A typical deep learning project starts with preparing the dataset (**Data**), preprocessing the data such that the domain data is 
 is getting transformed to model specific numeric data (**Data Iterators**). Then comes the model building part by stacking 
@@ -7,8 +7,10 @@ ground truth value with predicted value and gives out a numerical value/tensor. 
 then the natural following step would be considering the the loss value/tesnor and use a **Optimization Function** which 
 uses some special algorithms along with back propagation to bring down the loss value/tensor  by adjusting the network weights.
 
-**Epoch** : One Epoch is when an ENTIRE dataset is passed forward and backward through the neural network only ONCE.       
-**Batch Size** : Total number of training examples present in a single batch.    
+**Epoch** : One Epoch is when an ENTIRE dataset is passed forward and backward through the neural network only ONCE.
+       
+**Batch Size** : Total number of training examples present in a single batch.
+    
 **Iterations/Steps** : Iterations is the number of batches needed to complete one epoch.    
 
 ```

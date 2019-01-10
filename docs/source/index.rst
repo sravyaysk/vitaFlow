@@ -10,6 +10,7 @@ Welcome to vitaFlow's documentation!
    :maxdepth: 1
 
    README.md
+   vitaflow_env_setup.md
    api/developers.md
 
 .. toctree::

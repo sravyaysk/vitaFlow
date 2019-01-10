@@ -11,8 +11,12 @@ cycle. This slows down the training process because each layer must learn to ada
 in every training step.
 - Calculate the mean and variance of the layers input. Where $m$ is number of samples in the current batch.
 $$
-Batch\ mean : \mu_B = \frac{1}{m}\sum_{i=1}^m x_i \\
-Batch\ Variance :  \sigma_B^2 = \frac{1}{m} \sum_{i=1}^m (x_i - \mu_B)^2 \\
+\begin{align} 
+\begin{split} 
+Batch\ mean : \mu_B &= \frac{1}{m}\sum_{i=1}^m x_i \newline
+Batch\ Variance :  \sigma_B^2 &= \frac{1}{m} \sum_{i=1}^m (x_i - \mu_B)^2 \newline
+\end{split} 
+\end{align}
 $$
 
 - Normalize the layer inputs using the previously calculated batch statistics.
@@ -27,9 +31,13 @@ $$
 - During test (or inference) time, the mean and the variance are fixed. They are calculated using the previously calculated means and variances of each training batch.
 - So, if each batch had m samples and there where j batches:
 $$
-Inference mean : E_x = \frac{1}{m}\sum_{i=1}^j\mu_B^{i} \\
-Inference Variance : Var_x = (\frac{m}{m-1})\frac{1}{m}\sum_{i=1}^j\sigma_B^{2i} \\
-Inference scaling/shifting : y = x\frac{\gamma}{\sqrt{Var_x + \epsilon}}+\beta\frac{\gamma E_x}{\sqrt{Var_x + \epsilon}}
+\begin{align} 
+\begin{split} 
+Inference mean : E_x &= \frac{1}{m}\sum_{i=1}^j\mu_B^{i} \newline
+Inference Variance : Var_x &= (\frac{m}{m-1})\frac{1}{m}\sum_{i=1}^j\sigma_B^{2i} \newline
+Inference scaling/shifting : y &= x\frac{\gamma}{\sqrt{Var_x + \epsilon}}+\beta\frac{\gamma E_x}{\sqrt{Var_x + \epsilon}} \newline
+\end{split} 
+\end{align}
 $$
 
 ### API

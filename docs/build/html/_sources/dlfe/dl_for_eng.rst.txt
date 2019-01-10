@@ -6,7 +6,7 @@ Deep Learning for Engineers
 .. toctree::
    :maxdepth: 1
 
-   dl_for_engineers.md
+   intro.md
    activation_function.md
    layers.md
    loss.md

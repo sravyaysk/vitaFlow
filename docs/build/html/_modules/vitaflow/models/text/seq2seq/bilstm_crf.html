@@ -85,6 +85,8 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../README.html">vitaFlow - VideoImageTextAudioFlow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../vitaflow_env_setup.html">vitaFlow Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../vitaflow_env_setup.html#os">OS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../api/developers.html">Developers</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API:</span></p>
@@ -366,7 +368,7 @@
             <span class="n">token_ids</span> <span class="o">=</span> <span class="n">word_table</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">densewords</span><span class="p">)</span>  <span class="c1"># TODO check is it variable length or not?</span>
 
         <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">&quot;word-embed-layer&quot;</span><span class="p">):</span>
-            <span class="c1"># layer to take the words and convert them into vectors (embeddings)</span>
+            <span class="c1"># layer to take the words and convert_image them into vectors (embeddings)</span>
             <span class="c1"># This creates embeddings matrix of [VOCAB_SIZE, EMBEDDING_SIZE] and then</span>
             <span class="c1"># maps word indexes of the sequence into</span>
             <span class="c1"># [BATCH_SIZE, MAX_SEQ_LENGTH] ---&gt;  [BATCH_SIZE, MAX_SEQ_LENGTH, WORD_EMBEDDING_SIZE].</span>

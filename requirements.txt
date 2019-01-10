@@ -11,6 +11,13 @@ numpy
 sklearn
 tqdm
 overrides
+# image libraries
+wand
+pillow
+opencv-python
+# OCR liibs
+pytesseract
+pyocr
 
 
 ##################################################

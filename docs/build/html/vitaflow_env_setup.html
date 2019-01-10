@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; vitaFlow 0.0.1 documentation</title>
+  <title>vitaFlow Environment Setup &mdash; vitaFlow 0.0.1 documentation</title>
   
 
   
@@ -30,7 +30,9 @@
   <link rel="stylesheet" href="_static/css/custom_theme.css" type="text/css" />
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developers" href="api/developers.html" />
+    <link rel="prev" title="vitaFlow - VideoImageTextAudioFlow" href="README.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -66,7 +68,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -83,10 +85,17 @@
               
             
             
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="README.html">vitaFlow - VideoImageTextAudioFlow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vitaflow_env_setup.html">vitaFlow Environment Setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vitaflow_env_setup.html#os">OS</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">vitaFlow Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#os">OS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#python-environment">Python Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#system-dependencies">System Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference external" href="https://launchpad.net/~alex-p/+archive/ubuntu/tesseract-ocr">4.0</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api/developers.html">Developers</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API:</span></p>
@@ -148,12 +157,14 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li></li>
+      <li>vitaFlow Environment Setup</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/vitaflow_env_setup.md.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -165,24 +176,63 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="vitaflow-environment-setup">
+<span id="vitaflow-environment-setup"></span><h1>vitaFlow Environment Setup<a class="headerlink" href="#vitaflow-environment-setup" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="os">
+<span id="os"></span><h1>OS<a class="headerlink" href="#os" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Ubuntu 16+</li>
+</ul>
+<div class="section" id="python-environment">
+<span id="python-environment"></span><h2>Python Environment<a class="headerlink" href="#python-environment" title="Permalink to this headline">¶</a></h2>
+<p>Python interpreter : Python 3+</p>
+<p>Dependency and environment manager : Anaconda</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># One time setup</span>
+conda create -n vitaflow-gpu python3 pip 
+<span class="nb">source</span> activate vitaflow-gpu
+python --version
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /path/to/repo/vitaFlow
+<span class="nb">source</span> activate vitaflow-gpu
+pip install -r requirements.txt
+</pre></div>
+</div>
+</div>
+<div class="section" id="system-dependencies">
+<span id="system-dependencies"></span><h2>System Dependencies<a class="headerlink" href="#system-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Tesseract</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://launchpad.net/~alex-p/+archive/ubuntu/tesseract-ocr">4.0</a></li>
+</ul>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">add</span><span class="o">-</span><span class="n">apt</span><span class="o">-</span><span class="n">repository</span> <span class="n">ppa</span><span class="p">:</span><span class="n">alex</span><span class="o">-</span><span class="n">p</span><span class="o">/</span><span class="n">tesseract</span><span class="o">-</span><span class="n">ocr</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">tesseract</span><span class="o">-</span><span class="n">ocr</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api/developers.html" class="btn btn-neutral float-right" title="Developers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="README.html" class="btn btn-neutral" title="vitaFlow - VideoImageTextAudioFlow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -225,7 +275,6 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/javascript" src="_static/searchtools.js"></script>
     
 
   
@@ -236,14 +285,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>
