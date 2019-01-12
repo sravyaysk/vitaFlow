@@ -12,6 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class ImagePreproccessor:
+class ImagePreproccessorInterface:
+    def __init__(self):
+        pass
+
+    def resize(self, img, height, width):
+        raise NotImplementedError
+
+    def binarization(self, img):
+        raise NotImplementedError
+
+    def deskew(self, img):
+        raise NotImplementedError
+
+    def rotate(self, deg):
+        raise NotImplementedError
+
+    def stiching(self, images):
+        raise NotImplementedError
+
+    def sharpening(self, img):
+        raise NotImplementedError
+
+class OpenCV(ImagePreproccessorInterface):
     def __init__(self):
         pass

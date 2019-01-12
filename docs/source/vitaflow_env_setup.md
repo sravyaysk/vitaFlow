@@ -1,8 +1,16 @@
 # vitaFlow Environment Setup
 
-# OS
+## OS
 
 - Ubuntu 16+
+
+## Installation using Conda
+
+Run
+```bash
+conda env create -f vitaflow_gpu.yml
+```
+
 
 ## Python Environment
 

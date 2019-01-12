@@ -21,3 +21,13 @@ class DataInsights:
     """
     def __init__(self):
         pass
+
+    def price(self, line):
+        #(?:\$|RS|Rs|rs|Rupees|rupees|pkr)(\s*?)(\d+(?:\.\d{2}))
+        #(\d+(?:\.\d{2})?)(\s*?)((?:rs|RS|pkr|\$|Rupees|rupees))
+        pass
+
+
+    def quantity(self, line):
+        #(\d+(?:\.\d+)?)(\s*?)((?:grams|dozens|gm|kg|kilogram|kilo   gram|kgram|packets|pair|ounce|spoon|piece))
+        pass
