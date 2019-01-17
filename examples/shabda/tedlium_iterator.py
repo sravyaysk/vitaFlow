@@ -1,19 +1,13 @@
 import random
+from overrides import overrides
 import time
-
 import threading
 
 import numpy as np
 import librosa
 from numpy.lib import stride_tricks
 import os
-import numpy as np
-import librosa
-import pickle
-from numpy.lib import stride_tricks
-import os
-import argparse
-import glob
+
 
 import tensorflow as tf
 from tensorflow import TensorShape, Dimension
@@ -265,6 +259,53 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return ({self.FEATURE_1_NAME: sample,
                  self.FEATURE_2_NAME: vad}, label)
 
+    def _get_predict_samples(self, data_dir):
+        speech_mix, _ = librosa.load(data_dir, self._hparams.sampling_rate)
+        # fix the issue at the begining
+        speech_mix = np.concatenate((speech_mix, speech_mix, speech_mix), axis=0)
+        speech_mix_spec0 = stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
+        speech_mix_spec = np.abs(speech_mix_spec0)
+        speech_phase = speech_mix_spec0 / speech_mix_spec
+        speech_mix_spec = np.maximum(
+            speech_mix_spec, np.max(speech_mix_spec) / self._hparams.min_amp)
+        speech_mix_spec = 20. * np.log10(speech_mix_spec * self._hparams.amp_fac)
+        max_mag = np.max(speech_mix_spec)
+        speech_VAD = (speech_mix_spec > (max_mag - self._hparams.threshold)).astype(int)
+        speech_mix_spec = (speech_mix_spec - self._hparams.global_mean) / self._hparams.global_std
+        len_spec = speech_mix_spec.shape[0]
+        k = 0
+        self.ind = 0
+        self.samples = []
+        # feed the transformed data into a sample list
+        while (k + self._hparams.frames_per_sample < len_spec):
+            phase = speech_phase[k: k + self._hparams.frames_per_sample, :]
+            sample_mix = speech_mix_spec[k:k + self._hparams.frames_per_sample, :]
+            VAD = speech_VAD[k:k + self._hparams.frames_per_sample, :]
+            sample_dict = {'Sample': sample_mix,
+                           'VAD': VAD,
+                           'Phase': phase}
+            self.samples.append(sample_dict)
+            k = k + self._hparams.frames_per_sample
+            # import ipdb; ipdb.set_trace()
+        n_left = self._hparams.frames_per_sample - len_spec + k
+        print(n_left)
+        # store phase for waveform reconstruction
+        phase = np.concatenate((speech_phase[k:, :], np.zeros([n_left, self._hparams.neff])))
+        sample_mix = np.concatenate(
+            (speech_mix_spec[k:, :], np.zeros([n_left, self._hparams.neff])))
+        VAD = np.concatenate((speech_VAD[k:, :], np.zeros([n_left, self._hparams.neff])))
+
+        sample_dict = {'Sample': sample_mix,
+                       'VAD': VAD,
+                       'Phase': phase}
+        self.samples.append(sample_dict)
+        self.tot_samp = len(self.samples)
+        begin = self.ind
+        if begin >= self.tot_samp:
+            return None
+        self.ind += 1
+        return (self.samples[begin], np.zeros(1))
+
 
     def _get_train_input_fn(self):
         """
@@ -376,3 +417,26 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     #                    'Phase': phase}
     #     self.samples.append(sample_dict)
     #     self.tot_samp = len(self.samples)
+
+    @overrides
+    def _get_predict_single_input_function(self, data):
+        print("data: ", data)
+        # dataset = tf.data.Dataset.from_tensor_slices(list(data))
+        dataset1 = self._get_predict_samples(data)
+        dataset = tf.data.Dataset.from_tensor_slices(dataset1)
+
+        # dataset = dataset.map(self._user_resize_func, num_parallel_calls=self._hparams.num_parallel_calls)
+        # dataset = ({self.FEATURE_1_NAME: dataset[0]['Sample'],
+        #         self.FEATURE_2_NAME: dataset[0]['VAD']})
+        dataset = dataset.batch(batch_size=100, drop_remainder=True)
+        dataset = dataset.prefetch(100)
+        # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "val_data_cache"))
+
+        print(dataset)
+        return dataset
+
+    @overrides
+    def predict_on_instance(self, data):
+        print(data)
+        for i in data:
+            print(i)

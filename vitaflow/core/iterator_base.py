@@ -174,6 +174,15 @@ class IIteratorBase(ABC):
         '''
         raise NotImplementedError
 
+    def predict_on_instance(self, predict_fn):
+        '''
+
+        :type predict_fn: object
+        :param predict_fn:
+        :return:
+        '''
+        raise NotImplementedError
+
     def predict_on_text(self, predict_fn):
         '''
         

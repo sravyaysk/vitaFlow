@@ -212,3 +212,6 @@ class Experiments(object):
             #TODO: Prediction logic is pushed to iterator, since each iterator has the details on how to handle the data
             self._data_iterator.predict(executor=executor)
 
+        elif mode == "predict_instance":
+            executor.predict_instance("/mnt1/mageswaran/demo/mix.wav")
+

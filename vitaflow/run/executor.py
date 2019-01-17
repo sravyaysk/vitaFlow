@@ -174,3 +174,13 @@ class Executor(object):
         eval_spec = self._get_eval_spec(steps=eval_steps)
         tf.estimator.train_and_evaluate(self._estimator, train_spec, eval_spec)
 
+    def predict_instance(self, instance):
+        """
+        Runs prediction on a single sentence
+        :param sentence: A single sentence whose tokens are separated by space
+        :return: tuple of (words_n,tags_n)
+        """
+        predict_fn = self._estimator.predict(input_fn=lambda: self._data_iterator.test_instance_input_fn(instance))
+        results = self._data_iterator.predict_on_instance(predict_fn)
+        print(results)
+
