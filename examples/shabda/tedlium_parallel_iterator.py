@@ -1,16 +1,222 @@
 import os
 import random
+import itertools
 
 import numpy as np
 import tensorflow as tf
+from overrides import overrides
 from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
+import librosa
+from numpy.lib import stride_tricks
+from multiprocessing import Pool
+
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
 
 from examples.shabda.core.feature_types.shabda_wav_pair_feature import ShabdaWavPairFeature
-from examples.shabda.tools import yield_samples_multicore
+# from examples.shabda.tools import _yield_samples_multicore
 from vitaflow.core import HParams, IIteratorBase
 from vitaflow.helpers.print_helper import print_info
+from vitaflow.run import Executor
+from vitaflow.helpers.print_helper import print_error
 
+
+#=================================================================================================================
+
+enable_multiprocessing = True
+enable_file_pickling = False
+
+def _stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
+    """
+    short time fourier transform of audio signal
+    :param sig:
+    :param frameSize:
+    :param overlapFac:
+    :param window:
+    :return:
+    """
+    win = window(frameSize)
+    hopSize = int(frameSize - np.floor(overlapFac * frameSize))
+    samples = np.array(sig, dtype='float64')
+    # cols for windowing
+    cols = int(np.ceil((len(samples) - frameSize) / float(hopSize)) + 1)
+    # zeros at end (thus samples can be fully covered by frames)
+    samples = np.append(samples, np.zeros(frameSize))
+
+    frames = stride_tricks.as_strided(
+        samples,
+        shape=(cols, frameSize),
+        strides=(samples.strides[0] * hopSize, samples.strides[0])).copy()
+    frames *= win
+    return np.fft.rfft(frames)
+
+
+
+def _get_speech_samples(speech_1_features,
+                        speech_2_features,
+                        frames_per_sample,
+                        len_spec,
+                        speech_mix_features,
+                        speech_VAD):
+    """
+    Processes one audio pair
+    :param speech_1_features: Spectral audio features
+    :param speech_2_features: Spectral audio features
+    :param frames_per_sample:
+    :param len_spec:
+    :param speech_mix_features:
+    :param speech_VAD:
+    :return: Returns an array of shape ((self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff, 2))
+    """
+    #
+    k = 0
+    bag = []
+
+    while k + frames_per_sample < len_spec:
+        sample_mix = speech_mix_features[k:k + frames_per_sample, :].astype('float32')
+        VAD = speech_VAD[k:k + frames_per_sample, :].astype('bool')
+
+        sample_1 = speech_1_features[k:k + frames_per_sample, :]
+        sample_2 = speech_2_features[k:k + frames_per_sample, :]
+        # phase = speech_phase[k: k + frames_per_sample, :]
+        # Y: indicator of the belongings of the TF bin
+        # 1st speaker or second speaker
+        Y = np.array([sample_1 > sample_2,
+                      sample_1 < sample_2]
+                     ).astype('bool')
+        Y = np.transpose(Y, [1, 2, 0]).astype('bool')
+        bag.append((sample_mix, VAD, Y))
+        k = k + frames_per_sample
+    return bag
+
+
+def _get_log_spectrum_features(speech, frame_size, neff, amp_fac, min_amp):
+    """
+
+    :param speech:
+    :param frame_size:
+    :param neff:
+    :param amp_fac:
+    :param min_amp:
+    :return:
+    """
+    speech_features = np.abs(_stft(speech, frame_size)[:, :neff])
+    speech_features = np.maximum(speech_features, np.max(speech_features) / min_amp)
+    speech_features = 20. * np.log10(speech_features * amp_fac)
+    return speech_features
+
+
+def _get_speech_data(wav_file, sampling_rate):
+    """
+
+    :param wav_file:
+    :param sampling_rate:
+    :return:
+    """
+    speech, _ = librosa.core.load(wav_file, sr=sampling_rate)
+    # amp factor between -3 dB - 3 dB
+    fac = np.random.rand(1)[0] * 6 - 3
+    speech = 10. ** (fac / 20) * speech
+    return speech
+
+
+def _get_speech_features(args):
+    """
+
+    :param args:
+    :return:
+    """
+    (wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+     threshold, global_mean, global_std, frames_per_sample) = args
+
+    try:
+        # TODO: experimental though - is multi-processing required here? to reduce IO
+        speech_1 = _get_speech_data(wav_file_1, sampling_rate)
+        speech_2 = _get_speech_data(wav_file_2, sampling_rate)
+
+        # print(wav_file_1, wav_file_2)
+
+        # mix
+        length = min(len(speech_1), len(speech_2))
+        speech_1 = speech_1[:length]
+        speech_2 = speech_2[:length]
+        speech_mix = speech_1 + speech_2
+
+        speech_1_features = _get_log_spectrum_features(speech_1, frame_size, neff, amp_fac, min_amp)
+        speech_2_features = _get_log_spectrum_features(speech_2, frame_size, neff, amp_fac, min_amp)
+
+        # same for the mixture
+        speech_mix_spec0 = _stft(speech_mix, frame_size)[:, :neff]
+        speech_mix_features = np.abs(speech_mix_spec0)
+
+        # speech_phase = speech_mix_spec0 / speech_mix_spec
+        speech_mix_features = np.maximum(speech_mix_features, np.max(speech_mix_features) / min_amp)
+        speech_mix_features = 20. * np.log10(speech_mix_features * amp_fac)
+        max_mag = np.max(speech_mix_features)
+
+        speech_VAD = (speech_mix_features > (max_mag - threshold)).astype(int)
+        speech_mix_features = (speech_mix_features - global_mean) / global_std
+
+        len_spec = speech_1_features.shape[0]
+
+        new_data = _get_speech_samples(speech_1_features, speech_2_features, frames_per_sample, len_spec,
+                                       speech_mix_features, speech_VAD)
+    except Exception as err:
+        t = '-------------------------\n'
+        print_error(err)
+        print('{} Failed to Run: _get_speech_features {} {} \n {}'.format(t, wav_file_1, wav_file_2, t))
+        print('---' * 5)
+        new_data = []
+
+    return new_data
+
+
+def _yield_samples_multicore(speaker_file_match,
+                             sampling_rate,
+                             frame_size,
+                             amp_fac,
+                             neff,
+                             min_amp,
+                             threshold,
+                             global_mean,
+                             global_std,
+                             frames_per_sample,
+                             num_threads,
+                             tqdm_desc):
+    """
+
+    :param speaker_file_match: Pair of audio files thats needs to be mixed
+    :param sampling_rate:
+    :param frame_size:
+    :param self._hparams.amp_fac:
+    :param neff:
+    :param min_amp:
+    :param threshold:
+    :param global_mean:
+    :param global_std:
+    :param frames_per_sample:
+    :param num_threads:
+    :param tqdm_desc:
+    :return:
+    """
+
+    # for each file pair, generate their mixture and reference samples
+
+    p = Pool(num_threads)
+
+    input_params = [(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+                     threshold, global_mean, global_std, frames_per_sample) for (wav_file_1, wav_file_2) in
+                    speaker_file_match.items()]
+
+    with tqdm(total=len(speaker_file_match.items())) as pbar:
+        for i, res in tqdm(enumerate(p.imap_unordered(_get_speech_features, input_params)), desc=tqdm_desc):
+            pbar.update()
+            for data in res:
+                yield data
+
+
+#=================================================================================================================
 
 class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     def __init__(self, hparams=None, dataset=None):
@@ -52,7 +258,11 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
     @property
     def num_labels(self):
-        return -1
+        """
+        No labels associated with this data iterator, hence None
+        :return: None
+        """
+        return None
 
     @property
     def num_train_samples(self):
@@ -65,7 +275,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     @property
     def num_test_samples(self):
         return len(self.TEST_WAV_PAIR)
-    
+
     @staticmethod
     def default_hparams():
 
@@ -87,6 +297,75 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         }
         )
         return params
+
+
+    def _get_predict_samples(self, file_path):
+        """
+
+        :param file_path:
+        :return:
+        """
+        speech_mix, _ = librosa.load(file_path, self._hparams.sampling_rate)
+        # fix the issue at the begining
+        speech_mix = np.concatenate((speech_mix, speech_mix, speech_mix), axis=0)
+        speech_mix_spec0 = _stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
+        speech_mix_spec = np.abs(speech_mix_spec0)
+        speech_phase = speech_mix_spec0 / speech_mix_spec
+        speech_mix_spec = np.maximum(
+            speech_mix_spec, np.max(speech_mix_spec) / self._hparams.min_amp)
+        speech_mix_spec = 20. * np.log10(speech_mix_spec * self._hparams.amp_fac)
+        max_mag = np.max(speech_mix_spec)
+        speech_VAD = (speech_mix_spec > (max_mag - self._hparams.threshold)).astype(int)
+        speech_mix_spec = (speech_mix_spec - self._hparams.global_mean) / self._hparams.global_std
+        len_spec = speech_mix_spec.shape[0]
+        k = 0
+        self.ind = 0
+        self.samples = []
+        self.freq_features = []
+        self.VAD_features = []
+        self.phase_features = []
+
+        # feed the transformed data into a sample list
+        while (k + self._hparams.frames_per_sample < len_spec):
+            phase = speech_phase[k: k + self._hparams.frames_per_sample, :]
+            sample_mix = speech_mix_spec[k:k + self._hparams.frames_per_sample, :]
+            VAD = speech_VAD[k:k + self._hparams.frames_per_sample, :]
+            # sample_dict = {'Sample': sample_mix,
+            #                'VAD': VAD,
+            #                'Phase': phase}
+            # data = (sample_mix.astype('float32'), VAD.astype('bool'), phase.astype('float32'))
+            # self.samples.append(data)
+            self.freq_features.append(sample_mix.astype('float32'))
+            self.VAD_features.append(VAD.astype('bool'))
+            self.phase_features.append(phase)
+
+            k = k + self._hparams.frames_per_sample
+            # import ipdb; ipdb.set_trace()
+
+        n_left = self._hparams.frames_per_sample - len_spec + k
+        print(n_left)
+
+        # store phase for waveform reconstruction
+        phase = np.concatenate((speech_phase[k:, :], np.zeros([n_left, self._hparams.neff])))
+        sample_mix = np.concatenate(
+            (speech_mix_spec[k:, :], np.zeros([n_left, self._hparams.neff])))
+        VAD = np.concatenate((speech_VAD[k:, :], np.zeros([n_left, self._hparams.neff])))
+
+        # sample_dict = {'Sample': sample_mix,
+        #                'VAD': VAD,
+        #                'Phase': phase}
+        # data = (sample_mix.astype('float32'), VAD.astype('bool'), phase.astype('float32'))
+        # self.samples.append(data)
+        # self.tot_samp = len(self.samples)
+        # begin = self.ind
+        # if begin >= self.tot_samp:
+        #     return None
+        # self.ind += 1
+        #return (self.samples[begin], np.zeros(1))
+        self.freq_features.append(sample_mix.astype('float32'))
+        self.VAD_features.append(VAD.astype('bool'))
+        self.phase_features.append(phase)
+        return self.freq_features,  self.VAD_features, self.phase_features
 
     def _get_speaker_files(self, data_dir):
         """
@@ -143,6 +422,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
         return wav_file_pair
 
+
     def _yield_samples(self, speaker_file_match, tqdm_desc):
         '''Init the training data using the wav files'''
         sampling_rate = self._hparams.sampling_rate
@@ -155,18 +435,18 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         global_std = self._hparams.global_std
         frames_per_sample = self._hparams.frames_per_sample
 
-        for (sample_mix, VAD, Y) in yield_samples_multicore(speaker_file_match,
-                                                            sampling_rate,
-                                                            frame_size,
-                                                            amp_fac,
-                                                            neff,
-                                                            min_amp,
-                                                            threshold,
-                                                            global_mean,
-                                                            global_std,
-                                                            frames_per_sample,
-                                                            num_threads=self._hparams.num_threads,
-                                                            tqdm_desc=tqdm_desc):
+        for (sample_mix, VAD, Y) in _yield_samples_multicore(speaker_file_match,
+                                                             sampling_rate,
+                                                             frame_size,
+                                                             amp_fac,
+                                                             neff,
+                                                             min_amp,
+                                                             threshold,
+                                                             global_mean,
+                                                             global_std,
+                                                             frames_per_sample,
+                                                             num_threads=self._hparams.num_threads,
+                                                             tqdm_desc=tqdm_desc):
             # print_info((sample_mix, VAD, Y))
             yield sample_mix, VAD, Y
 
@@ -246,47 +526,204 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info(dataset.output_shapes)
         return dataset
 
-    # TODO: Remove dead code
-    # def load_data(self, data_dir):
-    #     '''
-    #     Load in the audio file and transform the signal into
-    #     the formats required by the model'''
-    #     # loading and transformation
-    #     speech_mix, _ = librosa.load(data_dir, self._hparams.sampling_rate)
-    #     # fix the issue at the begining
-    #     speech_mix = np.concatenate((speech_mix, speech_mix, speech_mix), axis=0)
-    #     speech_mix_spec0 = stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
-    #     speech_mix_spec = np.abs(speech_mix_spec0)
-    #     speech_phase = speech_mix_spec0 / speech_mix_spec
-    #     speech_mix_spec = np.maximum(
-    #         speech_mix_spec, np.max(speech_mix_spec) / self._hparams.min_amp)
-    #     speech_mix_spec = 20. * np.log10(speech_mix_spec * self._hparams.amp_fac)
-    #     max_mag = np.max(speech_mix_spec)
-    #     speech_VAD = (speech_mix_spec > (max_mag - self._hparams.threshold)).astype(int)
-    #     speech_mix_spec = (speech_mix_spec - self._hparams.global_mean) / self._hparams.global_std
-    #     len_spec = speech_mix_spec.shape[0]
-    #     k = 0
-    #     self.ind = 0
-    #     self.samples = []
-    #     # feed the transformed data into a sample list
-    #     while(k + self._hparams.frames_per_sample < len_spec):
-    #         phase = speech_phase[k: k + self._hparams.frames_per_sample, :]
-    #         sample_mix = speech_mix_spec[k:k + self._hparams.frames_per_sample, :]
-    #         VAD = speech_VAD[k:k + self._hparams.frames_per_sample, :]
-    #         sample_dict = {'Sample': sample_mix,
-    #                        'VAD': VAD,
-    #                        'Phase': phase}
-    #         self.samples.append(sample_dict)
-    #         k = k + self._hparams.frames_per_sample
-    #     # import ipdb; ipdb.set_trace()
-    #     n_left = self._hparams.frames_per_sample - len_spec + k
-    #     # store phase for waveform reconstruction
-    #     phase = np.concatenate((speech_phase[k:, :], np.zeros([n_left, self._hparams.neff])))
-    #     sample_mix = np.concatenate(
-    #         (speech_mix_spec[k:, :], np.zeros([n_left, self._hparams.neff])))
-    #     VAD = np.concatenate((speech_VAD[k:, :], np.zeros([n_left, self._hparams.neff])))
-    #     sample_dict = {'Sample': sample_mix,
-    #                    'VAD': VAD,
-    #                    'Phase': phase}
-    #     self.samples.append(sample_dict)
-    #     self.tot_samp = len(self.samples)
+
+    def predict_on_instance(self, executor, file_path):
+        """
+
+        :param executor:
+        :param test_file_path:
+        :return:
+        """
+
+        estimator = executor.estimator
+
+        in_data_features, VAD_data_features, phase_features = self._get_predict_samples(file_path=file_path)
+
+        in_data_features = np.asarray(in_data_features)
+        VAD_data_features = np.asarray(VAD_data_features)
+
+        N_frames = in_data_features.shape[0]
+
+
+        hop_size = self._hparams.frame_size // 4
+
+        # oracle flag to decide if a frame need to be seperated
+        sep_flag = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] * 10000
+        # oracle permutation to concatenate the chuncks of output frames
+        oracal_p = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] * 10000
+
+        out_audio1 = np.zeros([(N_frames * self._hparams.frames_per_sample - 1) *
+                               hop_size + self._hparams.frame_size])
+        out_audio2 = np.zeros([(N_frames *self._hparams.frames_per_sample - 1) *
+                               hop_size + self._hparams.frame_size])
+        mix = np.zeros([(N_frames *self._hparams.frames_per_sample - 1) *
+                        hop_size + self._hparams.frame_size])
+
+        def get_dataset():
+            dataset = tf.data.Dataset.from_tensor_slices((
+                {self.FEATURE_1_NAME: in_data_features,
+                 self.FEATURE_2_NAME: VAD_data_features},
+                np.ones_like(in_data_features)
+            ))
+            dataset = dataset.batch(batch_size=1)
+            print_info(dataset.output_shapes)
+            return dataset
+
+        predict_fn = estimator.predict(input_fn=lambda: get_dataset())
+
+        print_info("Shape of in data: {}".format(in_data_features.shape))
+        print_info("Number of frames for given file: {}".format(N_frames))
+
+        embeddings = []
+        i = 0
+        for predicted_value in predict_fn:
+            # print("i = {}".format(i))
+            embeddings.append(predicted_value)
+            i += 1
+
+        print_info("Number of embeddings predicted for given file: {}".format(len(embeddings)))
+        print_error(np.asarray(embeddings).shape)
+
+        N_assign = 0
+        step = 0
+
+        for frame_i in tqdm(range(N_frames)):
+
+            in_data_np = np.expand_dims(in_data_features[frame_i], axis=0)
+            in_phase_np = np.expand_dims(phase_features[frame_i], axis=0)
+            VAD_data_np = np.expand_dims(VAD_data_features[frame_i], axis=0)
+            embedding_np = np.asarray(embeddings[frame_i: frame_i+100])
+            #
+            # print_info("Shape of in in_data_np: {}".format(in_data_np.shape))
+            # print_info("Shape of in in_phase_np: {}".format(in_phase_np.shape))
+            # print_info("Shape of in VAD_data_np: {}".format(VAD_data_np.shape))
+            # print_info("Shape of in embedding_np: {}".format(embedding_np.shape))
+
+            # embedding_ac = [embedding_np[i, j, :]
+            #                 for i, j in itertools.product(range(self._hparams.frames_per_sample), range(self._hparams.neff))
+            #                 if VAD_data_np[0, i, j] == 1]
+
+            embedding_ac = []
+            for i, j in itertools.product(range(self._hparams.frames_per_sample), range(self._hparams.neff)):
+                # print(i,j)
+                if VAD_data_np[0, i, j] == 1:
+                    embedding_ac.append(embedding_np[i, j, :])
+
+            if(sep_flag[step] == 1):
+                # if the frame need to be seperated
+                # cluster the embeddings
+                # import ipdb; ipdb.set_trace()
+                if embedding_ac == []:
+                    break
+                kmean = KMeans(n_clusters=2, random_state=0).fit(embedding_ac)
+            else:
+                # if the frame don't need to be seperated
+                # don't split the embeddings
+                kmean = KMeans(n_clusters=1, random_state=0).fit(embedding_ac)
+            mask = np.zeros([self._hparams.frames_per_sample, self._hparams.neff, 2])
+            ind = 0
+            if N_assign == 0:
+                # if their is no existing speaker in previous frame
+                center = kmean.cluster_centers_
+                N_assign = center.shape[0]
+            elif N_assign == 1:
+                # if their is one speaker in previous frame
+                center_new = kmean.cluster_centers_
+                # assign the embedding for a speaker to the speaker with the
+                # closest centroid in previous frames
+                if center_new.shape[0] == 1:
+                    # update and smooth the centroid for 1 speaker
+                    center = 0.7 * center + 0.3 * center_new
+                else:
+                    # update and smooth the centroid for 2 speakers
+                    N_assign = 2
+                    # compute their relative affinity
+                    cor = np.matmul(center_new, np.transpose(center))
+                    # ipdb.set_trace()
+                    if(cor[1] > cor[0]):
+                        # rearrange their sequence if not consistant with
+                        # previous frames
+                        kmean.cluster_centers_ = np.array(
+                            [kmean.cluster_centers_[1],
+                             kmean.cluster_centers_[0]])
+                        kmean.labels_ = (kmean.labels_ == 0).astype('int')
+                    center = kmean.cluster_centers_
+            else:
+                # two speakers have appeared
+                center_new = kmean.cluster_centers_
+                cor = np.matmul(center_new[0, :], np.transpose(center))
+                # rearrange their sequence if not consistant with previous
+                # frames
+                if(cor[1] > cor[0]):
+                    if(sep_flag[step] == 1):
+                        kmean.cluster_centers_ = np.array(
+                            [kmean.cluster_centers_[1],
+                             kmean.cluster_centers_[0]])
+                        kmean.labels_ = (kmean.labels_ == 0).astype('int')
+                    else:
+                        kmean.labels_ = (kmean.labels_ == 1).astype('int')
+                # need permutation of their order(Oracle)
+                if(oracal_p[step]):
+                    kmean.cluster_centers_ = np.array(
+                        [kmean.cluster_centers_[1],
+                         kmean.cluster_centers_[0]])
+                    kmean.labels_ = (kmean.labels_ == 0).astype('int')
+                else:
+                    kmean.labels_ = (~kmean.labels_).astype('int')
+                center = center * 0.7 + 0.3 * kmean.cluster_centers_
+
+            # transform the clustering result and VAD info. into masks
+            for i in range(self._hparams.frames_per_sample):
+                for j in range(self._hparams.neff):
+                    if VAD_data_np[0, i, j] == 1:
+                        mask[i, j, kmean.labels_[ind]] = 1
+                        ind += 1
+            for i in range(self._hparams.frames_per_sample):
+                # apply the mask and reconstruct the waveform
+                tot_ind = step * self._hparams.frames_per_sample + i
+                # ipdb.set_trace()
+                # amp = (in_data_np[0, i, :] *
+                #        data_batch[0]['Std']) + data_batch[0]['Mean']
+                amp = in_data_np[0, i, :] * self._hparams.global_std + self._hparams.global_mean
+                out_data1 = (mask[i, :, 0] * amp *
+                             VAD_data_np[0, i, :])
+                out_data2 = (mask[i, :, 1] * amp *
+                             VAD_data_np[0, i, :])
+                out_mix = amp
+                out_data1_l = 10 ** (out_data1 / 20) / self._hparams.amp_fac
+                out_data2_l = 10 ** (out_data2 / 20) / self._hparams.amp_fac
+                out_mix_l = 10 ** (out_mix / 20) / self._hparams.amp_fac
+
+                out_stft1 = out_data1_l * in_phase_np[0, i, :]
+                out_stft2 = out_data2_l * in_phase_np[0, i, :]
+                out_stft_mix = out_mix_l * in_phase_np[0, i, :]
+
+                con_data1 = out_stft1[-2:0:-1].conjugate()
+                con_data2 = out_stft2[-2:0:-1].conjugate()
+                con_mix = out_stft_mix[-2:0:-1].conjugate()
+
+                out1 = np.concatenate((out_stft1, con_data1))
+                out2 = np.concatenate((out_stft2, con_data2))
+                out_mix = np.concatenate((out_stft_mix, con_mix))
+                frame_out1 = np.fft.ifft(out1).astype(np.float64)
+                frame_out2 = np.fft.ifft(out2).astype(np.float64)
+                frame_mix = np.fft.ifft(out_mix).astype(np.float64)
+
+                start = tot_ind * hop_size
+                out_audio1[start:(start + len(frame_out1))] += frame_out1 * 0.5016
+                out_audio2[start:(start + len(frame_out2))] += frame_out2 * 0.5016
+                mix[start:(start + len(frame_mix))] += frame_mix * 0.5016
+
+        ## the audio has been padded 3 times in AudioReader
+        ## restore the original audio
+        len1 = len(out_audio1) // 3
+        len2 = len(out_audio2) // 3
+        source1 = out_audio1[len1:2*len1]
+        source2 = out_audio2[len2:2*len2]
+
+        print_info("Writing file {}".format(os.path.splitext(file_path)[0] + "_source1.wav"))
+        print_info("Writing file {}".format(os.path.splitext(file_path)[0] + "_source2.wav"))
+
+        librosa.output.write_wav(os.path.splitext(file_path)[0] + "_source1.wav", source1, self._hparams.sampling_rate)
+        librosa.output.write_wav(os.path.splitext(file_path)[0] + "_source2.wav", source2, self._hparams.sampling_rate)
+        return [(source1, self._hparams.sampling_rate), (source2, self._hparams.sampling_rate)]

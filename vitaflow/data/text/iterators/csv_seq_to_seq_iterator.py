@@ -676,7 +676,7 @@ class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):
         return predicted_id
 
 
-    def predict(self,  executor: Executor):
+    def predict_on_test_files(self,  executor: Executor):
         """
         Runs the prediction on list of file to be tagged
         :return:

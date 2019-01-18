@@ -1,4 +1,5 @@
 import random
+import warnings
 
 import numpy as np
 import librosa
@@ -40,7 +41,10 @@ def stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
 
 
 class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
+
     def __init__(self, hparams=None, dataset=None):
+        warnings.warn("This takes lot of time to process the files. Use: examples.shabda.tedlium_parallel_iterator.TEDLiumIterator",
+                      DeprecationWarning)
         IIteratorBase.__init__(self, hparams=hparams)
         ShabdaWavPairFeature.__init__(self)
         self._hparams = HParams(hparams=hparams, default_hparams=self.default_hparams())

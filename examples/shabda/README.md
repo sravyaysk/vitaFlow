@@ -10,7 +10,7 @@ We have provided a [download.sh](download.sh) script that downloads data of size
 Please refer below on how to run the experiments.
 
 DeWave repo is sucked into three python classes that resides as [tedlium_dataset.py](tedlium_dataset.py), 
-[tedlium_iterator.py](tedlium_iterator2.py) and [deep_clustering.py](deep_clustering.py) respectively.
+[tedlium_iterator.py](tedlium_iterator_basic.py) and [deep_clustering.py](deep_clustering.py) respectively.
 
 
 ### Experiment
@@ -22,6 +22,13 @@ CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py --mode=run_iterator -config_py
 **Train**
 ```
 CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py --mode=train -config_python_file=examples/shabda/config.py
+```
+**Predict on single file**
+```
+CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py \
+--mode=predict_instance \ 
+--test_file_path=~/vitaFlow/TEDLiumDataset/mix.wav \
+-config_python_file=examples/shabda/config.py
 ```
 
 

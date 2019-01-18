@@ -1,3 +1,4 @@
+import warnings
 import random
 from overrides import overrides
 import time
@@ -38,6 +39,10 @@ def stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
 
 class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     def __init__(self, hparams=None, dataset=None):
+        warnings.warn("This takes lot of time to process the files even with "
+                      "TF data parallel support: examples.shabda.tedlium_parallel_iterator.TEDLiumIterator",
+                      DeprecationWarning)
+
         IIteratorBase.__init__(self, hparams=hparams)
         ShabdaWavPairFeature.__init__(self)
         self._hparams = HParams(hparams=hparams, default_hparams=self.default_hparams())
@@ -372,51 +377,6 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
-
-    # TODO: Remove dead code
-    # def load_data(self, data_dir):
-    #     '''
-    #     Load in the audio file and transform the signal into
-    #     the formats required by the model'''
-    #     # loading and transformation
-    #     speech_mix, _ = librosa.load(data_dir, self._hparams.sampling_rate)
-    #     # fix the issue at the begining
-    #     speech_mix = np.concatenate((speech_mix, speech_mix, speech_mix), axis=0)
-    #     speech_mix_spec0 = stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
-    #     speech_mix_spec = np.abs(speech_mix_spec0)
-    #     speech_phase = speech_mix_spec0 / speech_mix_spec
-    #     speech_mix_spec = np.maximum(
-    #         speech_mix_spec, np.max(speech_mix_spec) / self._hparams.min_amp)
-    #     speech_mix_spec = 20. * np.log10(speech_mix_spec * self._hparams.amp_fac)
-    #     max_mag = np.max(speech_mix_spec)
-    #     speech_VAD = (speech_mix_spec > (max_mag - self._hparams.threshold)).astype(int)
-    #     speech_mix_spec = (speech_mix_spec - self._hparams.global_mean) / self._hparams.global_std
-    #     len_spec = speech_mix_spec.shape[0]
-    #     k = 0
-    #     self.ind = 0
-    #     self.samples = []
-    #     # feed the transformed data into a sample list
-    #     while(k + self._hparams.frames_per_sample < len_spec):
-    #         phase = speech_phase[k: k + self._hparams.frames_per_sample, :]
-    #         sample_mix = speech_mix_spec[k:k + self._hparams.frames_per_sample, :]
-    #         VAD = speech_VAD[k:k + self._hparams.frames_per_sample, :]
-    #         sample_dict = {'Sample': sample_mix,
-    #                        'VAD': VAD,
-    #                        'Phase': phase}
-    #         self.samples.append(sample_dict)
-    #         k = k + self._hparams.frames_per_sample
-    #     # import ipdb; ipdb.set_trace()
-    #     n_left = self._hparams.frames_per_sample - len_spec + k
-    #     # store phase for waveform reconstruction
-    #     phase = np.concatenate((speech_phase[k:, :], np.zeros([n_left, self._hparams.neff])))
-    #     sample_mix = np.concatenate(
-    #         (speech_mix_spec[k:, :], np.zeros([n_left, self._hparams.neff])))
-    #     VAD = np.concatenate((speech_VAD[k:, :], np.zeros([n_left, self._hparams.neff])))
-    #     sample_dict = {'Sample': sample_mix,
-    #                    'VAD': VAD,
-    #                    'Phase': phase}
-    #     self.samples.append(sample_dict)
-    #     self.tot_samp = len(self.samples)
 
     @overrides
     def _get_predict_single_input_function(self, data):

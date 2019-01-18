@@ -58,7 +58,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
     def default_hparams():
         params = ModelBase.default_hparams()
         params.update({
-            "n_hidden" : 4,
+            "n_hidden" : 256,
             "batch_size" : 32,
             "p_keep_ff" : 0.5,
             "p_keep_rc" : 0.5,
@@ -280,7 +280,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
             state_concate4 = tf.concat(outputs4, 2)
 
 
-            # one layer of embedding output with tanh activation function
+        # one layer of embedding output with tanh activation function
         out_concate = tf.reshape(state_concate4, [-1, self.n_hidden * 2])
 
         tf.logging.info("state_concate4: =====> {}".format(state_concate4))
@@ -330,6 +330,11 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         :tf_main:`tf.estimator.Estimator <estimator/Estimator>`.
         """
 
+        if mode == tf.estimator.ModeKeys.PREDICT:
+            self.p_keep_ff = 1.0
+            self.p_keep_rc = 1.0
+            self.batch_size = 1
+
         self.weights = {
             'out': tf.Variable(
                 tf.random_normal([2 * self.n_hidden, self.embd_dim * self.neff]))
@@ -344,12 +349,14 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         # X_n = g_n(x) n : (0, ..., N}
         samples = features[self.FEATURE_1_NAME]
         vad = features[self.FEATURE_2_NAME] # [batch_size, FPS, NEFF]
+
         tf.logging.info("samples: =====> {}".format(samples))
         tf.logging.info("vad: =====> {}".format(vad))
 
-
         # V = f_teta(x) R^(NxK) K : self._haparams.emd_dim
         embeddings = self._build_layers(samples, mode)
+
+        tf.logging.info("embeddings: =====> {}".format(embeddings))
 
         loss = None
         optimizer = None
@@ -363,7 +370,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
 
         return tf.estimator.EstimatorSpec(
             mode=mode,
-            predictions=None,
+            predictions=embeddings,
             loss=loss,
             train_op=optimizer,
             eval_metric_ops=None)

@@ -185,7 +185,7 @@ class Experiments(object):
 
         exit(0)
 
-    def run(self):
+    def run(self, args):
         self.setup()
         num_samples = self._data_iterator.num_train_samples
         print_info("Number of trianing samples : {}".format(num_samples))
@@ -209,9 +209,8 @@ class Experiments(object):
                 executor.evaluate(steps=200)
 
         elif mode == "predict":
-            #TODO: Prediction logic is pushed to iterator, since each iterator has the details on how to handle the data
-            self._data_iterator.predict(executor=executor)
+            self._data_iterator.predict_on_test_files(executor=executor)
 
         elif mode == "predict_instance":
-            executor.predict_instance("/mnt1/mageswaran/demo/mix.wav")
+            self._data_iterator.predict_on_instance(executor=executor, file_path=args.test_file_path)
 

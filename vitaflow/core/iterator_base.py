@@ -24,6 +24,7 @@ from vitaflow.core.hyperparams import HParams
 from vitaflow.core import IPreprocessor
 from vitaflow.helpers.os_helper import check_n_makedirs
 from vitaflow.helpers.print_helper import print_info
+from vitaflow.run import Executor
 
 
 class IIteratorBase(ABC):
@@ -165,22 +166,21 @@ class IIteratorBase(ABC):
         """
         return self._get_predict_single_input_function(sentence)
 
-    def predict_on_test_files(self, predict_fn):
-        '''
-        Iterate through the files and use `predict_on_test_file`, for prediction
-        :param estimator: One of the models that support this data iterator
-        :param df_files_path: Files that can be opened by the pandas
-        :return: Creates a folder estimator.model_dir/predictions/ and adds the predicted files
-        '''
+    def predict_on_test_files(self, executor: Executor):
+        """
+        Iterate through the files and use `predict_on_test_files`, for prediction
+        :param executor:
+        :return:
+        """
         raise NotImplementedError
 
-    def predict_on_instance(self, predict_fn):
-        '''
+    def predict_on_instance(self, executor: Executor, test_file_path):
+        """
 
-        :type predict_fn: object
-        :param predict_fn:
+        :param executor:
+        :param test_file_path:
         :return:
-        '''
+        """
         raise NotImplementedError
 
     def predict_on_text(self, predict_fn):

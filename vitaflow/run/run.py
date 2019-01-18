@@ -16,7 +16,9 @@ from vitaflow.run.experiments import Experiments
 # tf.args works just like argparse
 flags = tf.flags
 flags.DEFINE_string("config_python_file", "config_python_file", "The config to use.")
-flags.DEFINE_string("mode", "train", "train/retrain/predict")
+flags.DEFINE_string("mode", "train", "train/retrain/predict/predict_instance")
+flags.DEFINE_string("test_file_path", "", "")
+
 FLAGS = flags.FLAGS
 config = FLAGS.config_python_file.replace("/", ".")
 config = config.replace(".py", "")
@@ -42,5 +44,5 @@ if __name__ == "__main__":
         print('Downloading missing package(command: {})'.format(download_en_core_web_md))
         print(' -' * 35)
     experiment = Experiments(hparams=config.experiments, mode=FLAGS.mode)
-    experiment.run()
+    experiment.run(args=FLAGS)
     print(' -' * 35)

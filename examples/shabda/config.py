@@ -22,7 +22,6 @@ P_DROPOUT_RC = 0.2
 N_HIDDEN = 300
 LEARNING_RATE = 1e-3
 MAX_STEP = 2000000
-TRAIN_BATCH_SIZE = 128
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
 experiment_name = "TEDLiumDataset"
@@ -33,10 +32,10 @@ experiments = {
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
     "iterator_class_with_path": "examples.shabda.tedlium_parallel_iterator.TEDLiumIterator",
     "model_class_with_path": "examples.shabda.deep_clustering.DeepClustering",
-    "save_checkpoints_steps": 10,
+    "save_checkpoints_steps": 1000,
     "keep_checkpoint_max": 5,
-    "save_summary_steps": 5,
-    "log_step_count_steps": 5,
+    "save_summary_steps": 100,
+    "log_step_count_steps": 100,
     "clear_model_data" : False,
 
     "examples.shabda.tedlium_dataset.TEDLiumDataset": {
@@ -70,7 +69,7 @@ experiments = {
         "frames_per_sample" : FRAMES_PER_SAMPLE,
         "batch_size" : batch_size,
         "prefetch_size" : 1,
-        "num_parallel_calls" : 8
+        "num_threads" : 8
     },
 
     "examples.shabda.deep_clustering.DeepClustering" : {
@@ -78,10 +77,10 @@ experiments = {
         "experiment_name": experiment_name,
         "neff" : NEFF,
         "batch_size" : batch_size,
-        "n_hidden" : 8,
+        "n_hidden" : 300,
         "p_keep_ff" : 0.5,
         "p_keep_rc" : 0.5,
-        "frames_per_sample" : 1247,
+        "frames_per_sample" : FRAMES_PER_SAMPLE,
         "embd_dim" : 30,
     }
 }
