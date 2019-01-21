@@ -356,7 +356,7 @@ class Cifar10BasicIterator(IIteratorBase, ImageFeature):
         print_info(dataset.output_shapes)
         return dataset
 
-    def predict(self, executor: Executor):
+    def predict_on_test_files(self, executor: Executor):
         model = executor.model
         estimator = executor.estimator
         data_iterator = executor.data_iterator
