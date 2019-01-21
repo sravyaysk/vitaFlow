@@ -21,7 +21,6 @@ P_DROPOUT_FF = 0.5
 P_DROPOUT_RC = 0.2
 N_HIDDEN = 300
 LEARNING_RATE = 1e-3
-MAX_STEP = 2000000
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
 experiment_name = "TEDLiumDataset"

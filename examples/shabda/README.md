@@ -26,7 +26,7 @@ CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py --mode=train -config_python_fi
 **Predict on single file**
 ```
 CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py \
---mode=predict_instance \ 
+--mode=predict_instance \
 --test_file_path=~/vitaFlow/TEDLiumDataset/mix.wav \
 -config_python_file=examples/shabda/config.py
 ```
