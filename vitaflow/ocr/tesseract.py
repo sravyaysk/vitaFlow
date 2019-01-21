@@ -15,19 +15,18 @@
 REsseract based OCR
 """
 
-import pytesseract
-import cv2
-import re
-import os
-import glob
 import concurrent.futures
-import time
-from tqdm import tqdm
-from wand.image import Image
-from PIL import Image as PI
+import glob
+import io
+import os
+
+import cv2
 import pyocr
 import pyocr.builders
-import io
+import pytesseract
+from PIL import Image as PI
+from tqdm import tqdm
+from wand.image import Image
 
 from vitaflow.helpers.print_helper import print_info
 
@@ -84,8 +83,8 @@ class TesseractOCR:
                 builder=pyocr.builders.TextBuilder()
             )
             text_file_path = os.path.join(self._text_out_dir, file_name+str(i)+".txt")
-            fd = open(text_file_path,"w")
-            fd.write("%s" % text)
+            with open(text_file_path, "w") as fd:
+                fd.write("%s" % text)
         return text_file_path
 
     def convert(self, path):
@@ -100,6 +99,9 @@ class TesseractOCR:
         with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
             image_list = glob.glob(self._image_dir+os.sep + "*.png")
             image_list.extend(glob.glob(self._image_dir+os.sep + "*.pdf"))
+            image_list.extend(glob.glob(self._image_dir + os.sep + "*.jpeg"))
+            image_list.extend(glob.glob(self._image_dir + os.sep + "*.jpg"))
+            image_list.extend(glob.glob(self._image_dir + os.sep + "*.tmp"))
             print_info(image_list)
             for img_path,out_file in zip(image_list, executor.map(self.convert, image_list)):
                 print(img_path,',',out_file,', processed')
