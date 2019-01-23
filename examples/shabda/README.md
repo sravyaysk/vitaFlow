@@ -15,6 +15,9 @@ DeWave repo is sucked into three python classes that resides as [tedlium_dataset
 
 ### Experiment
 
+```
+ find . -name "*.pyc" -exec rm -f {} \;
+```
 **Cache the Preprocessed Data Manually**
 ```
 CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py --mode=run_iterator -config_python_file=examples/shabda/config.py
@@ -48,5 +51,24 @@ Look to Listen/Cocktail Party:
 
 
 
-Dataset:
+### Dataset:
 * https://projets-lium.univ-lemans.fr/ted-lium/
+
+### Audio Basics
+- [Decibel](https://www.rapidtables.com/electric/decibel.html)
+- http://www.cs.princeton.edu/~fiebrink/314/2009/week12/FFT_handout.pdf
+
+### Maths Refresher:
+
+**Imaginary Numbers**
+    - https://www.youtube.com/watch?v=T647CGsuOVU 
+    - [imaginary_numbers_are_real_rev2_for_screen.pdf](https://static1.squarespace.com/static/54b90461e4b0ad6fb5e05581/t/5a6e7bd341920260ccd693cf/1517190204747/imaginary_numbers_are_real_rev2_for_screen.pdf)
+    - https://www.electronics-tutorials.ws/accircuits/complex-numbers.html
+    - Polar form vs Rectangular form
+**Euler's Formula**
+    - https://www.youtube.com/watch?v=m2MIpDrF7Es&t=23s
+    - https://betterexplained.com/articles/intuitive-understanding-of-eulers-formula/
+**FFT**
+    - https://www.youtube.com/watch?v=spUNpyF58BY
+    - https://betterexplained.com/articles/an-interactive-guide-to-the-fourier-transform/
+

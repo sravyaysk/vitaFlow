@@ -4,21 +4,17 @@ import itertools
 
 import numpy as np
 import tensorflow as tf
-from overrides import overrides
 from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
 import librosa
 from numpy.lib import stride_tricks
 from multiprocessing import Pool
 
-from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
 from examples.shabda.core.feature_types.shabda_wav_pair_feature import ShabdaWavPairFeature
-# from examples.shabda.tools import _yield_samples_multicore
 from vitaflow.core import HParams, IIteratorBase
 from vitaflow.helpers.print_helper import print_info
-from vitaflow.run import Executor
 from vitaflow.helpers.print_helper import print_error
 
 
@@ -35,30 +31,29 @@ def _get_speech_data(wav_file, sampling_rate):
     :param sampling_rate:
     :return:
     """
-    speech, _ = librosa.core.load(wav_file, sr=sampling_rate)
-    # amp factor between -3 dB - 3 dB
+    speech, _ = librosa.core.load(wav_file, sr=sampling_rate) 
+    # amplication factor between -3 (dB) to 3 (dB)
     fac = np.random.rand(1)[0] * 6 - 3
+    # randomly choose the amplification factor and applyt he factor to get gan or loss of the speech
+    # why so? randomly we are increasing/decreasing or amplification/damping the magnitude of the signals
+    # dB = 20 * log_10(p2/p1)
+    # fac / 20 = log_10(p2/p1)
+    # 10 ^ (fac/20) = p2/p1
+    #convert the `fac` to decibel and applyt it to the signal
+    #fac_db = 10. ** (fac / 20)
     speech = 10. ** (fac / 20) * speech
     return speech
 
-def _get_log_spectrum_features(speech, frame_size, neff, amp_fac, min_amp):
-    """
-
-    :param speech:
-    :param frame_size:
-    :param neff:
-    :param amp_fac:
-    :param min_amp:
-    :return:
-    """
-    speech_features = np.abs(_stft(speech, frame_size)[:, :neff])
-    speech_features = np.maximum(speech_features, np.max(speech_features) / min_amp)
-    speech_features = 20. * np.log10(speech_features * amp_fac)
-    return speech_features
-
 def _stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
     """
-    short time fourier transform of audio signal
+    Short time fourier transform of audio signal
+    computing STFTs is to divide a longer time signal into shorter segments of equal length and then compute
+    the Fourier transform separately on each shorter segment.
+    This reveals the Fourier spectrum on each shorter segment.
+
+    Reference:
+    - https://en.wikipedia.org/wiki/Hann_function
+
     :param sig:
     :param frameSize:
     :param overlapFac:
@@ -66,9 +61,12 @@ def _stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
     :return:
     """
     win = window(frameSize)
-    hopSize = int(frameSize - np.floor(overlapFac * frameSize))
+    # if frame size = 512, (512 - 384) = 128
+    hopSize = int(frameSize - np.floor(overlapFac * frameSize)) #number of slides
     samples = np.array(sig, dtype='float64')
+
     # cols for windowing
+    # 80512 - 512 / 128+1 = 621 + 1
     cols = int(np.ceil((len(samples) - frameSize) / float(hopSize)) + 1)
     # zeros at end (thus samples can be fully covered by frames)
     samples = np.append(samples, np.zeros(frameSize))
@@ -78,15 +76,41 @@ def _stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
         shape=(cols, frameSize),
         strides=(samples.strides[0] * hopSize, samples.strides[0])).copy()
     frames *= win
+    #discrete Fourier Transform
     return np.fft.rfft(frames)
 
+def _get_log_spectrum_features(speech, frame_size, neff, amp_fac, min_amp):
+    """
+    find short time fourier transform for the mixture and trim it to given NEFF
+        -  https://www.cds.caltech.edu/~murray/wiki/Why_is_dB_defined_as_20log_10%3F
+        -  http://www.sengpielaudio.com/calculator-FactorRatioLevelDecibel.htm
+    :param speech:
+    :param frame_size:
+    :param neff:
+    :param amp_fac:
+    :param min_amp:
+    :return:
+    """
+    speech_features = np.abs(_stft(speech, frame_size)[:, :neff])
+    # say if we have 1256 max of speech signal array and min_amp as follows
+    # 1256/1000 = maximum(speech, 1.256)
+    # 1256/50 = maximum(speech, 25.12)
+    # 1256/10 = maximum(speech, 125.6)
+    # 1256/5  = maximum(speech, 251.2)
+    # 1256/1  = maximum(speech, 1256)
+    # np.max : array wise 
+    # np.maximum : element wise
+    # scaling the speech features with respect to min_amp and its max value
+    speech_features = np.maximum(speech_features, np.max(speech_features) / min_amp)
+    speech_features = 20. * np.log10(speech_features * amp_fac)
+    return speech_features
 
 def _get_speech_samples(speech_1_features,
                         speech_2_features,
                         frames_per_sample,
-                        len_spec,
+                        number_frames,
                         speech_mix_features,
-                        speech_VAD):
+                        speech_voice_activity_detection):
     """
     Processes one audio pair
     :param speech_1_features: Spectral audio features
@@ -94,7 +118,7 @@ def _get_speech_samples(speech_1_features,
     :param frames_per_sample:
     :param len_spec: Total number of frames (to say?) in the given signal
     :param speech_mix_features:
-    :param speech_VAD:
+    :param speech_voice_activity_detection:
     :return: Returns an array of shape ((self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff, 2))
     """
     #
@@ -102,12 +126,12 @@ def _get_speech_samples(speech_1_features,
     current_frame = 0
     bag = []
 
-    while current_frame + frames_per_sample < len_spec:
+    while current_frame + frames_per_sample < number_frames: # we make sure we have enough data for slicing
         #simple array slicing on the first dimension (time/freq axis)
         sample_1 = speech_1_features[current_frame:current_frame + frames_per_sample, :]
         sample_2 = speech_2_features[current_frame:current_frame + frames_per_sample, :]
         sample_mix = speech_mix_features[current_frame:current_frame + frames_per_sample, :].astype('float32')
-        VAD = speech_VAD[current_frame:current_frame + frames_per_sample, :].astype('bool')
+        voice_activity_detection = speech_voice_activity_detection[current_frame:current_frame + frames_per_sample, :].astype('bool')
         # phase = speech_phase[k: k + frames_per_sample, :]
 
         # Y: indicator of the belongings of the TF bin
@@ -118,7 +142,7 @@ def _get_speech_samples(speech_1_features,
         # Y now will have 2-axis one for each signal comparision with other
         # returned Y will be [2, x, y], hence the transpose [x, y, 2]
         Y = np.transpose(Y, [1, 2, 0]).astype('bool')
-        bag.append((sample_mix, VAD, Y))
+        bag.append((sample_mix, voice_activity_detection, Y))
         current_frame = current_frame + frames_per_sample
     return bag
 
@@ -147,35 +171,29 @@ def _get_speech_features(args):
         # mix the signals
         speech_mix = speech_1 + speech_2
 
-        #get the spectral features
+        #get the spectral features in dB
         speech_1_features = _get_log_spectrum_features(speech_1, frame_size, neff, amp_fac, min_amp)
         speech_2_features = _get_log_spectrum_features(speech_2, frame_size, neff, amp_fac, min_amp)
-
-        # find short time fourier transform for the mixture and trim it to given NEFF
-        speech_mix_spec0 = _stft(speech_mix, frame_size)[:, :neff]
-        speech_mix_features = np.abs(speech_mix_spec0)
-
-        # speech_phase = speech_mix_spec0 / speech_mix_spec
-        # find the maximum amplitude between speech mix features and minimum amplititude w.r.t to its max value
-        speech_mix_features = np.maximum(speech_mix_features, np.max(speech_mix_features) / min_amp)
-        # https://www.cds.caltech.edu/~murray/wiki/Why_is_dB_defined_as_20log_10%3F
-        # http://www.sengpielaudio.com/calculator-FactorRatioLevelDecibel.htm
-        speech_mix_features = 20. * np.log10(speech_mix_features * amp_fac)
+        speech_mix_features = _get_log_spectrum_features(speech_mix, frame_size, neff, amp_fac, min_amp)
 
         max_mag = np.max(speech_mix_features)
-        # apply threshold to the feature signal
-        speech_VAD = (speech_mix_features > (max_mag - threshold)).astype(int)
-        #normalize the signal values with given global mean and std
+        # apply threshold to the feature signal, to find the silent portion of the signal and
+        # construct a boolean array as a feature
+        # https://en.wikipedia.org/wiki/Voice_activity_detection
+        speech_voice_activity_detection = (speech_mix_features > (max_mag - threshold)).astype(int)
+        # normalize the signal values with given global mean and std
         speech_mix_features = (speech_mix_features - global_mean) / global_std
 
-        len_spec = speech_1_features.shape[0]
+        number_frames = speech_1_features.shape[0]
 
         new_data = _get_speech_samples(speech_1_features,
                                        speech_2_features,
                                        frames_per_sample,
-                                       len_spec,
+                                       number_frames,
                                        speech_mix_features,
-                                       speech_VAD)
+                                       speech_voice_activity_detection)
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as err:
         # t = '-------------------------\n'
         # print_error(err)
@@ -217,17 +235,21 @@ def _yield_samples_multicore(speaker_file_match,
 
     # for each file pair, generate their mixture and reference samples
 
-    p = Pool(num_threads)
+    pool = Pool(num_threads)
 
     input_params = [(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
                      threshold, global_mean, global_std, frames_per_sample) for (wav_file_1, wav_file_2) in
                     speaker_file_match.items()]
 
-    with tqdm(total=len(speaker_file_match.items())) as pbar:
-        for i, res in tqdm(enumerate(p.imap_unordered(_get_speech_features, input_params)), desc=tqdm_desc):
-            pbar.update()
-            for data in res:
-                yield data
+    try:
+        with tqdm(total=len(speaker_file_match.items())) as pbar:
+            for i, res in tqdm(enumerate(pool.imap_unordered(_get_speech_features, input_params)), desc=tqdm_desc):
+                pbar.update()
+                for data in res:
+                    yield data
+    except (KeyboardInterrupt, SystemExit):
+        pool.terminate()
+        exit()
 
 
 #=================================================================================================================
@@ -237,6 +259,12 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         """
         Uses the TEDLium preprocessed (speaker wise folders) data and generates the mixture signals
         of two speakers
+
+        The features are as follows:
+            - spectral features in log scale of two speaker voices. shape: [frames_per_sample, neff]
+            - Voice activity detection array (0's/1's). shape: [frames_per_sample, neff]
+            - Active Speaker array as labels. shape: [frames_per_sample, neff, 2]
+
         :param hparams:
         :param dataset:
         """
@@ -364,7 +392,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         for speaker_1 in tqdm(speaker_wav_files_dict, desc="pair_dict"):
             for wav_file_1 in speaker_wav_files_dict[speaker_1]:
                 size_1 = self._get_size(wav_file_1)
-                if size_1 < 1000: #ignore files < 1KB
+                if size_1 < 100000: #ignore files < 100KB
                     continue
                 speaker_2 = random.choice(list(speaker_wav_files_dict))
 
@@ -375,7 +403,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
                 size_2 = self._get_size(wav_file_2)
 
-                while size_2 < 1000: #ignore files < 1KB
+                while size_2 < 100000: #ignore files < 100KB
                     wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
                     wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
                     size_2 = self._get_size(wav_file_2)
@@ -397,7 +425,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         global_std = self._hparams.global_std
         frames_per_sample = self._hparams.frames_per_sample
 
-        for (sample_mix, VAD, Y) in _yield_samples_multicore(speaker_file_match,
+        for (sample_mix, voice_activity_detection, Y) in _yield_samples_multicore(speaker_file_match,
                                                              sampling_rate,
                                                              frame_size,
                                                              amp_fac,
@@ -409,8 +437,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                                                              frames_per_sample,
                                                              num_threads=self._hparams.num_threads,
                                                              tqdm_desc=tqdm_desc):
-            # print_info((sample_mix, VAD, Y))
-            yield sample_mix, VAD, Y
+            # print_info((sample_mix, voice_activity_detection, Y))
+            yield sample_mix, voice_activity_detection, Y
 
     # To make easy integration with TF Data generator APIs, following methods are added
     def _yield_train_samples(self):
@@ -431,10 +459,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         # TF dataset APIs
         dataset = tf.data.Dataset.from_generator(self._yield_train_samples,
                                                  (tf.float32, tf.bool, tf.bool),
-                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129)]),
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
                                                                 TensorShape(
-                                                                    [Dimension(100), Dimension(129), Dimension(2)])))
+                                                                    [Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff), Dimension(2)])))
         # Map the generator output as features as a dict and labels
         dataset = dataset.map(lambda x, y, z: ({self.FEATURE_1_NAME: x,
                                                 self.FEATURE_2_NAME: y}, z))
@@ -454,10 +482,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         # TF dataset APIs
         dataset = tf.data.Dataset.from_generator(self._yield_val_samples,
                                                  (tf.float32, tf.bool, tf.bool),
-                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129)]),
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
                                                                 TensorShape(
-                                                                    [Dimension(100), Dimension(129), Dimension(2)])))
+                                                                    [Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff), Dimension(2)])))
         # Map the generator output as features as a dict and labels
         dataset = dataset.map(lambda x, y, z: ({self.FEATURE_1_NAME: x,
                                                 self.FEATURE_2_NAME: y}, z))
@@ -476,10 +504,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         """
         dataset = tf.data.Dataset.from_generator(self._yield_test_samples,
                                                  (tf.float32, tf.bool, tf.bool),
-                                                 output_shapes=(TensorShape([Dimension(100), Dimension(129)]),
-                                                                TensorShape([Dimension(100), Dimension(129)]),
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
                                                                 TensorShape(
-                                                                    [Dimension(100), Dimension(129), Dimension(2)])))
+                                                                    [Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff), Dimension(2)])))
         # Map the generator output as features as a dict and labels
         dataset = dataset.map(lambda x, y, z: ({self.FEATURE_1_NAME: x,
                                                 self.FEATURE_2_NAME: y}, z))
@@ -508,24 +536,25 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         speech_phase = speech_mix_spec0 / speech_mix_spec
         speech_mix_spec = np.maximum(speech_mix_spec, np.max(speech_mix_spec) / self._hparams.min_amp)
         speech_mix_spec = 20. * np.log10(speech_mix_spec * self._hparams.amp_fac)
+
         max_mag = np.max(speech_mix_spec)
-        speech_VAD = (speech_mix_spec > (max_mag - self._hparams.threshold)).astype(int)
+        speech_voice_activity_detection = (speech_mix_spec > (max_mag - self._hparams.threshold)).astype(int)
         speech_mix_spec = (speech_mix_spec - self._hparams.global_mean) / self._hparams.global_std
         len_spec = speech_mix_spec.shape[0] # number of frames
 
         current_frame = 0
         self.ind = 0
         self.freq_features = []
-        self.VAD_features = []
+        self.voice_activity_detection_features = []
         self.phase_features = []
 
         # feed the transformed data into a sample list
         while (current_frame + self._hparams.frames_per_sample < len_spec):
             phase = speech_phase[current_frame: current_frame + self._hparams.frames_per_sample, :]
             sample_mix = speech_mix_spec[current_frame:current_frame + self._hparams.frames_per_sample, :]
-            VAD = speech_VAD[current_frame:current_frame + self._hparams.frames_per_sample, :]
+            voice_activity_detection = speech_voice_activity_detection[current_frame:current_frame + self._hparams.frames_per_sample, :]
             self.freq_features.append(sample_mix.astype('float32'))
-            self.VAD_features.append(VAD.astype('bool'))
+            self.voice_activity_detection_features.append(voice_activity_detection.astype('bool'))
             self.phase_features.append(phase)
 
             current_frame = current_frame + self._hparams.frames_per_sample
@@ -539,12 +568,12 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         # store phase for waveform reconstruction
         phase = np.concatenate((speech_phase[current_frame:, :], np.zeros([remaining_frames, self._hparams.neff])))
         sample_mix = np.concatenate((speech_mix_spec[current_frame:, :], np.zeros([remaining_frames, self._hparams.neff])))
-        VAD = np.concatenate((speech_VAD[current_frame:, :], np.zeros([remaining_frames, self._hparams.neff])))
+        voice_activity_detection = np.concatenate((speech_voice_activity_detection[current_frame:, :], np.zeros([remaining_frames, self._hparams.neff])))
 
         self.freq_features.append(sample_mix.astype('float32'))
-        self.VAD_features.append(VAD.astype('bool'))
+        self.voice_activity_detection_features.append(voice_activity_detection.astype('bool'))
         self.phase_features.append(phase)
-        return self.freq_features,  self.VAD_features, self.phase_features
+        return self.freq_features,  self.voice_activity_detection_features, self.phase_features
 
     def predict_on_instance(self, executor, file_path):
         """
@@ -556,10 +585,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
         estimator = executor.estimator
 
-        in_data_features, VAD_data_features, phase_features = self._get_predict_samples(file_path=file_path)
+        in_data_features, voice_activity_detection_data_features, phase_features = self._get_predict_samples(file_path=file_path)
 
         in_data_features = np.asarray(in_data_features)
-        VAD_data_features = np.asarray(VAD_data_features)
+        voice_activity_detection_data_features = np.asarray(voice_activity_detection_data_features)
 
         N_frames = in_data_features.shape[0]
         hop_size = self._hparams.frame_size // 4
@@ -579,7 +608,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         def get_dataset():
             dataset = tf.data.Dataset.from_tensor_slices((
                 {self.FEATURE_1_NAME: in_data_features,
-                 self.FEATURE_2_NAME: VAD_data_features},
+                 self.FEATURE_2_NAME: voice_activity_detection_data_features},
                 np.ones_like(in_data_features)
             ))
             dataset = dataset.batch(batch_size=1)
@@ -618,14 +647,14 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             # expand the dimesion to be inline with TF batch size
             in_data_np = np.expand_dims(in_data_features[frame_i], axis=0)
             in_phase_np = np.expand_dims(phase_features[frame_i], axis=0)
-            VAD_data_np = np.expand_dims(VAD_data_features[frame_i], axis=0)
+            voice_activity_detection_data_np = np.expand_dims(voice_activity_detection_data_features[frame_i], axis=0)
             embedding_np = np.asarray(embeddings[frame_i: frame_i+self._hparams.frames_per_sample])
 
             # ----------------------------------------------
 
             embedding_ac = []
             for i, j in itertools.product(range(self._hparams.frames_per_sample), range(self._hparams.neff)):
-                if VAD_data_np[0, i, j] == 1:
+                if voice_activity_detection_data_np[0, i, j] == 1:
                     embedding_ac.append(embedding_np[i, j, :])
 
             if(sep_flag[step] == 1):
@@ -697,10 +726,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
             # ----------------------------------------------
 
-            # transform the clustering result and VAD info. into masks
+            # transform the clustering result and voice_activity_detection info. into masks
             for i in range(self._hparams.frames_per_sample):
                 for j in range(self._hparams.neff):
-                    if VAD_data_np[0, i, j] == 1:
+                    if voice_activity_detection_data_np[0, i, j] == 1:
                         mask[i, j, kmean.labels_[ind]] = 1
                         ind += 1
 
@@ -711,8 +740,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 # amp = (in_data_np[0, i, :] *
                 #        data_batch[0]['Std']) + data_batch[0]['Mean']
                 amp = in_data_np[0, i, :] * self._hparams.global_std + self._hparams.global_mean
-                out_data1 = (mask[i, :, 0] * amp * VAD_data_np[0, i, :])
-                out_data2 = (mask[i, :, 1] * amp * VAD_data_np[0, i, :])
+                out_data1 = (mask[i, :, 0] * amp * voice_activity_detection_data_np[0, i, :])
+                out_data2 = (mask[i, :, 1] * amp * voice_activity_detection_data_np[0, i, :])
                 out_mix = amp
                 out_data1_l = 10 ** (out_data1 / 20) / self._hparams.amp_fac
                 out_data2_l = 10 ** (out_data2 / 20) / self._hparams.amp_fac

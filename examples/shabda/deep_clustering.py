@@ -43,14 +43,13 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                             self.default_hparams())
 
         print_error(self._hparams)
-        self.n_hidden = self._hparams.n_hidden
+        self.lstm_hidden_size = self._hparams.lstm_hidden_size
         self.batch_size = self._hparams.batch_size
         self.p_keep_ff = self._hparams.p_keep_ff
         self.p_keep_rc = self._hparams.p_keep_rc
         self.neff = self._hparams.neff
-        self.embd_dim = self._hparams.embd_dim
+        self.embd_dim_k = self._hparams.embd_dim
         self.frames_per_sample = self._hparams.frames_per_sample
-
         self.weights = None
         self.biases = None
 
@@ -58,7 +57,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
     def default_hparams():
         params = ModelBase.default_hparams()
         params.update({
-            "n_hidden" : 256,
+            "lstm_hidden_size" : 256,
             "batch_size" : 32,
             "p_keep_ff" : 0.5,
             "p_keep_rc" : 0.5,
@@ -69,44 +68,52 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         return params
 
     @overrides
-    def _get_loss(self, labels, logits, VAD):
+    def _get_loss(self, labels, logits, voice_activity_detection):
         """
 
         :param labels:
         :param logits:
-        :param VAD:
+        :param voice_activity_detection:
         :return:
         """
         labels = tf.cast(labels, tf.float32)
-        VAD = tf.cast(VAD, tf.float32) #[batch_size, FPS, NEFF]
+        voice_activity_detection = tf.cast(voice_activity_detection, tf.float32) #[batch_size, FPS, NEFF]
         Y = labels  # [batch_size, FPS, NEFF, 2]
         embeddings = logits  # [batch_size * FPS, NEFF, embd_dim]
 
         Y = tf.reshape(Y, [self.batch_size*self.frames_per_sample, self.neff, 2]) # [batch_size * FPS, NEFF, 2]
         # [batch_size * FPS, NEFF]
-        VAD_reshaped = tf.reshape(VAD, [self.batch_size*self.frames_per_sample, self.neff], name="VAD_reshaped")
+        voice_activity_detection_reshaped = tf.reshape(voice_activity_detection,
+                                                       [self.batch_size*self.frames_per_sample, self.neff],
+                                                       name="voice_activity_detection_reshaped")
 
         '''Defining the loss function'''
-        embeddings_rs = tf.reshape(embeddings, shape=[self.batch_size*self.frames_per_sample*self.neff, self._hparams.embd_dim]) # [batch_size * FPS * NEFF, embd_dim]
+        # x \belongs R^NxK
+        embeddings_rs = tf.reshape(embeddings, shape=[self.batch_size*self.frames_per_sample*self.neff,
+                                                      self._hparams.embd_dim]) # [batch_size * FPS * NEFF, embd_dim]
 
         # [batch_size * FPS * NEFF]
-        VAD_rs = tf.reshape(VAD_reshaped, shape=[self.batch_size*self.frames_per_sample*self.neff], name="VAD_rs")
+        voice_activity_detection_rs = tf.reshape(voice_activity_detection_reshaped,
+                                                 shape=[self.batch_size*self.frames_per_sample*self.neff],
+                                                 name="voice_activity_detection_rs")
 
-        # get the embeddings with active VAD
+        # get the embeddings with active voice_activity_detection
         # [embd_dim, batch_size * FPS * NEFF]  x  [batch_size * FPS * NEFF]
         #  [batch_size * FPS * NEFF, embd_dim]
-        embeddings_rsv = tf.transpose(tf.multiply(tf.transpose(embeddings_rs), VAD_rs))
+        embeddings_rsv = tf.transpose(tf.multiply(tf.transpose(embeddings_rs), voice_activity_detection_rs))
         #[batch_size,  FPS * NEFF, embd_dim]
         embeddings_v = tf.reshape(embeddings_rsv, [self.batch_size,
                                                    self._hparams.frames_per_sample * self._hparams.neff,
                                                    self._hparams.embd_dim])
 
-        # get the Y(speaker indicator function) with active VAD
-        Y_rs = tf.reshape(Y, shape=[self.batch_size*self.frames_per_sample*self.neff, 2], name="Y_rs") # [batch_size * FPS * NEFF, 2]
+        # get the Y(speaker indicator function) with active voice_activity_detection
+        # [batch_size * FPS * NEFF, 2]
+        Y_rs = tf.reshape(Y, shape=[self.batch_size*self.frames_per_sample*self.neff, 2], name="Y_rs")
         # [batch_size * FPS * NEFF, 2] x [batch_size * FPS * NEFF]
-        Y_rsv = tf.transpose(tf.multiply(tf.transpose(Y_rs), VAD_rs))
+        Y_rsv = tf.transpose(tf.multiply(tf.transpose(Y_rs), voice_activity_detection_rs))
         # [batch_size, FPS * NEFF, 2]
-        Y_v = tf.reshape(Y_rsv, shape=[self.batch_size, self._hparams.frames_per_sample * self._hparams.neff, 2], name="Y_v")
+        Y_v = tf.reshape(Y_rsv, shape=[self.batch_size, self._hparams.frames_per_sample * self._hparams.neff, 2],
+                         name="Y_v")
 
         # fast computation format of the embedding loss function
         embeddings_v_t = tf.transpose(embeddings_v, [0, 2, 1]) # [batch_size, embd_dim, FPS * NEFF]
@@ -127,17 +134,17 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         # V^T x V - 2 * (V^T x Y_v) +  Y^T x Y
         loss_batch = tf.nn.l2_loss(loss_1) - 2 * tf.nn.l2_loss(loss_2) + tf.nn.l2_loss(loss_3)
 
-        loss_v = (loss_batch) / self.batch_size / (self._hparams.frames_per_sample^2)
+        loss_v = (loss_batch) / self.batch_size #/ (self._hparams.frames_per_sample^2)
         tf.summary.scalar('loss', loss_v)
 
         tf.logging.info("embeddings: =====> {}".format(embeddings))
         tf.logging.info("Y: =====> {}".format(Y))
-        tf.logging.info("VAD: =====> {}".format(VAD))
-        tf.logging.info("VAD_reshaped: =====> {}".format(VAD_reshaped))
+        tf.logging.info("voice_activity_detection: =====> {}".format(voice_activity_detection))
+        tf.logging.info("voice_activity_detection_reshaped: =====> {}".format(voice_activity_detection_reshaped))
 
 
         tf.logging.info("embeddings_rs: =====> {}".format(embeddings_rs))
-        tf.logging.info("VAD_rs: =====> {}".format(VAD_rs))
+        tf.logging.info("voice_activity_detection_rs: =====> {}".format(voice_activity_detection_rs))
         tf.logging.info("embeddings_rsv: =====> {}".format(embeddings_rsv))
         tf.logging.info("embeddings_v: =====> {}".format(embeddings_v))
 
@@ -162,13 +169,14 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
     def _build_layers(self, features, mode):
         '''The structure of the network'''
         # four layer of LSTM cell blocks
-
+        # [batch_of_sentence, max_number_of_tokens, token_or_embedding_dimension] ~ [batch_size, FPS, NEFF]
+        # input : [batch_size, FPS, NEFF] output: [batch_size, FPS, 2*LSTM hidden size]
         tf.logging.info(" =====> features {}".format(features))
 
         tf.logging.info(" =====> BLSTM1")
         with tf.variable_scope('BLSTM1') as scope:
             lstm_fw_cell = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden,
+                self.lstm_hidden_size,
                 layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_fw_cell = tf.nn.rnn_cell.DropoutWrapper(
@@ -176,7 +184,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                 input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             lstm_bw_cell = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden,
+                self.lstm_hidden_size,
                 layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_bw_cell = tf.nn.rnn_cell.DropoutWrapper(
@@ -195,11 +203,11 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         tf.logging.info(" =====> BLSTM2")
         with tf.variable_scope('BLSTM2') as scope:
             # lstm_fw_cell2 = tf.nn.rnn_cell.LSTMCell(
-            #     self.n_hidden)
+            #     self.lstm_hidden_size)
             # lstm_bw_cell2 = tf.nn.rnn_cell.LSTMCell(
-            #     self.n_hidden)
+            #     self.lstm_hidden_size)
             lstm_fw_cell2 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden,
+                self.lstm_hidden_size,
                 layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_fw_cell2 = tf.nn.rnn_cell.DropoutWrapper(
@@ -207,7 +215,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                 input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             lstm_bw_cell2 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden,
+                self.lstm_hidden_size,
                 layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_bw_cell2 = tf.nn.rnn_cell.DropoutWrapper(
@@ -227,7 +235,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         tf.logging.info(" =====> BLSTM3")
         with tf.variable_scope('BLSTM3') as scope:
             lstm_fw_cell3 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden,
+                self.lstm_hidden_size,
                 layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_fw_cell3 = tf.nn.rnn_cell.DropoutWrapper(
@@ -235,7 +243,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                 input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             lstm_bw_cell3 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden,
+                self.lstm_hidden_size,
                 layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_bw_cell3 = tf.nn.rnn_cell.DropoutWrapper(
@@ -256,7 +264,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         tf.logging.info(" =====> BLSTM4")
         with tf.variable_scope('BLSTM4') as scope:
             lstm_fw_cell4 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden,
+                self.lstm_hidden_size,
                 layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_fw_cell4 = tf.nn.rnn_cell.DropoutWrapper(
@@ -264,7 +272,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                 input_keep_prob=1,
                 output_keep_prob=self.p_keep_ff)
             lstm_bw_cell4 = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                self.n_hidden, layer_norm=False,
+                self.lstm_hidden_size, layer_norm=False,
                 dropout_keep_prob=self.p_keep_rc)
             lstm_bw_cell4 = tf.nn.rnn_cell.DropoutWrapper(
                 lstm_bw_cell4,
@@ -275,15 +283,14 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                 sequence_length=[self._hparams.frames_per_sample] * self.batch_size,
                 dtype=tf.float32)
 
-            tf.logging.info(" =====> outputs4{}".format(outputs4))
+            tf.logging.info(" =====> outputs4{}".format(outputs4)) #[batch_size, FPS, LSTM hidden size]
 
-            state_concate4 = tf.concat(outputs4, 2)
-
-
-        # one layer of embedding output with tanh activation function
-        out_concate = tf.reshape(state_concate4, [-1, self.n_hidden * 2])
+            state_concate4 = tf.concat(outputs4, 2) #[batch_size, FPS, LSTM hidden size]
 
         tf.logging.info("state_concate4: =====> {}".format(state_concate4))
+
+        # one layer of embedding output with tanh activation function
+        out_concate = tf.reshape(state_concate4, [-1, self.lstm_hidden_size * 2]) # [batch_size * FPS, 2*LSTM hidden size]
         tf.logging.info("out_concate: =====> {}".format(out_concate))
 
         emb_out = tf.matmul(out_concate,
@@ -337,26 +344,33 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
 
         self.weights = {
             'out': tf.Variable(
-                tf.random_normal([2 * self.n_hidden, self.embd_dim * self.neff]))
+                tf.random_normal([2 * self.lstm_hidden_size, self.embd_dim_k * self.neff]))
         }
 
         self.biases = {
             'out': tf.Variable(
-                tf.random_normal([self.embd_dim * self.neff]))
+                tf.random_normal([self.embd_dim_k * self.neff]))
         }
 
-        # [batch_size, FPS, NEFF]
+
         # X_n = g_n(x) n : (0, ..., N}
-        samples = features[self.FEATURE_1_NAME]
+        samples = features[self.FEATURE_1_NAME] # [batch_size, FPS, NEFF]
         vad = features[self.FEATURE_2_NAME] # [batch_size, FPS, NEFF]
+        
+        """
+        Small recap on LSTMs with text:
+        
+        [text] -> [[tokens]] -> [[word_dimension]]
+        [batch_of_sentence, max_number_of_tokens, token_or_embedding_dimension] ~ [batch_size, FPS, NEFF]
+        """
 
         tf.logging.info("samples: =====> {}".format(samples))
         tf.logging.info("vad: =====> {}".format(vad))
 
-        # V = f_teta(x) R^(NxK) K : self._haparams.emd_dim
+        # V = f_teta(x) \belongs R^(NxK)
         embeddings = self._build_layers(samples, mode)
 
-        tf.logging.info("embeddings: =====> {}".format(embeddings))
+        tf.logging.info("embeddings: =====> {}".format(embeddings)) #[batch * frames_per_sample, NEFF, embd_dim]
 
         loss = None
         optimizer = None
@@ -364,7 +378,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
                 # labels = tf.reshape(labels, shape=(-1, self._out_dim), name="labels")
             tf.logging.info('labels: -----> {}'.format(labels))
 
-            loss = self._get_loss(labels=labels, logits=embeddings, VAD=vad)
+            loss = self._get_loss(labels=labels, logits=embeddings, voice_activity_detection=vad)
             optimizer = self._get_optimizer(loss=loss)
             # eval_metric_ops = self._get_eval_metrics(predictions=predictions, labels=ner_ids)
 

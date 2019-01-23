@@ -15,7 +15,7 @@ class TEDLiumDataset(IPreprocessor):
 
     .. code-block:: text
 
-        ~/vitaflow/ #this can be anywhere on your system
+        ~/vitaflow/                     #this can be anywhere on your system
             TEDLiumDataset/
                 raw_data/
                     train/
@@ -28,6 +28,7 @@ class TEDLiumDataset(IPreprocessor):
                     test/
                         sph/
                             speaker_1.sph ...
+
                     processed_data/ #created as part of this class output
                         train/
                            speaker_1/
@@ -115,7 +116,8 @@ class TEDLiumDataset(IPreprocessor):
                    output_dir,
                    sampling_rate):
         """
-
+        Creates a folder for each *.sph/*.wav file under given data directory and
+        clips the original file by given duration along with starting and end time
         :param data_dir:input data folder
         :param num_clips: The number of clips for each speaker
         :param start_time: starting time of the audio from which the clip is sampled

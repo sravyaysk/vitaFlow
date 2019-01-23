@@ -1,25 +1,18 @@
 import os
 
-FRAMES_PER_SAMPLE = 100  # number of frames forming a chunk of data
+FRAMES_PER_SAMPLE = 200  # number of frames forming a chunk of data
 SAMPLING_RATE = 16000
-FRAME_SIZE = 256
-NEFF = 129  # effective FFT points
+FRAME_SIZE = 512
+NEFF = 256  # effective FFT points
 # amplification factor of the waveform sig
-AMP_FAC = 10000
+AMP_FAC = 10000 # i.e log(10000) = 4
 MIN_AMP = 10000
 # TF bins smaller than THRESHOLD will be
 # considered inactive
 THRESHOLD = 40
-# embedding dimention
-EMBBEDDING_D = 40
 # prams for pre-whitening
 GLOBAL_MEAN = 44
 GLOBAL_STD = 15.5
-# feed forward dropout prob
-P_DROPOUT_FF = 0.5
-# recurrent dropout prob
-P_DROPOUT_RC = 0.2
-N_HIDDEN = 300
 LEARNING_RATE = 1e-3
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
@@ -27,7 +20,7 @@ experiment_name = "TEDLiumDataset"
 batch_size = 64
 
 experiments = {
-    "num_epochs": 25,
+    "num_epochs": 5,
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
     "iterator_class_with_path": "examples.shabda.tedlium_parallel_iterator.TEDLiumIterator",
     "model_class_with_path": "examples.shabda.deep_clustering.DeepClustering",
@@ -35,7 +28,7 @@ experiments = {
     "keep_checkpoint_max": 5,
     "save_summary_steps": 100,
     "log_step_count_steps": 100,
-    "clear_model_data" : False,
+    "clear_model_data" : True,
 
     "examples.shabda.tedlium_dataset.TEDLiumDataset": {
         "experiment_root_directory": experiment_root_directory,
@@ -76,10 +69,10 @@ experiments = {
         "experiment_name": experiment_name,
         "neff" : NEFF,
         "batch_size" : batch_size,
-        "n_hidden" : 300,
+        "lstm_hidden_size" : 320,
         "p_keep_ff" : 0.5,
-        "p_keep_rc" : 0.5,
+        "p_keep_rc" : 0.2,
         "frames_per_sample" : FRAMES_PER_SAMPLE,
-        "embd_dim" : 30,
+        "embd_dim" : 512,
     }
 }
