@@ -28,7 +28,7 @@ experiments = {
     "keep_checkpoint_max": 5,
     "save_summary_steps": 100,
     "log_step_count_steps": 100,
-    "clear_model_data" : True,
+    "clear_model_data" : False,
 
     "examples.shabda.tedlium_dataset.TEDLiumDataset": {
         "experiment_root_directory": experiment_root_directory,
