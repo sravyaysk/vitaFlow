@@ -1,9 +1,9 @@
 import os
 
-FRAMES_PER_SAMPLE = 200  # number of frames forming a chunk of data
+FRAMES_PER_SAMPLE = 100  # number of frames forming a chunk of data
 SAMPLING_RATE = 16000
-FRAME_SIZE = 512
-NEFF = 256  # effective FFT points
+FRAME_SIZE = 256
+NEFF = 129  # effective FFT points
 # amplification factor of the waveform sig
 AMP_FAC = 10000 # i.e log(10000) = 4
 MIN_AMP = 10000
@@ -13,22 +13,23 @@ THRESHOLD = 40
 # prams for pre-whitening
 GLOBAL_MEAN = 44
 GLOBAL_STD = 15.5
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-2
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
 experiment_name = "TEDLiumDataset"
-batch_size = 64
+batch_size = 32
 
 experiments = {
-    "num_epochs": 5,
+    "num_epochs": 10,
     "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
     "iterator_class_with_path": "examples.shabda.tedlium_parallel_iterator.TEDLiumIterator",
     "model_class_with_path": "examples.shabda.deep_clustering.DeepClustering",
-    "save_checkpoints_steps": 1000,
+    "save_checkpoints_steps": 100,
     "keep_checkpoint_max": 5,
-    "save_summary_steps": 100,
-    "log_step_count_steps": 100,
+    "save_summary_steps": 10,
+    "log_step_count_steps": 10,
     "clear_model_data" : False,
+    "plug_dataset" : True,
 
     "examples.shabda.tedlium_dataset.TEDLiumDataset": {
         "experiment_root_directory": experiment_root_directory,
@@ -38,8 +39,6 @@ experiments = {
         "test_data_path": "test",
         "num_clips": 128,
         "duration": 5,
-        "start_time": 0,
-        "end_time": 600,
         "sampling_rate": SAMPLING_RATE,
     },
 
@@ -61,7 +60,8 @@ experiments = {
         "frames_per_sample" : FRAMES_PER_SAMPLE,
         "batch_size" : batch_size,
         "prefetch_size" : 1,
-        "num_threads" : 8
+        "num_threads" : 8,
+        "reinit_file_pair" : True
     },
 
     "examples.shabda.deep_clustering.DeepClustering" : {
@@ -69,10 +69,11 @@ experiments = {
         "experiment_name": experiment_name,
         "neff" : NEFF,
         "batch_size" : batch_size,
-        "lstm_hidden_size" : 320,
-        "p_keep_ff" : 0.5,
-        "p_keep_rc" : 0.2,
+        "lstm_hidden_size" : 300,
+        "p_keep_ff" : 0.9,
+        "p_keep_rc" : 0.8,
         "frames_per_sample" : FRAMES_PER_SAMPLE,
-        "embd_dim" : 512,
+        "embd_dim_k" : 40, # 5 to 60
+        "learning_rate" : LEARNING_RATE
     }
 }

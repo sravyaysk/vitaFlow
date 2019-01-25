@@ -62,6 +62,7 @@ class Experiments(object):
             "save_summary_steps" : 25,
             "log_step_count_steps" : 10,
             "clear_model_data" : False,
+            "plug_dataset" : True
         }
 
     def _get_class(self, package, name):
@@ -115,7 +116,8 @@ class Experiments(object):
 
     def check_interoperability_n_import(self):
         # Using factory classes get the handle for the actual classes from string
-        self._dataset = self.get_dataset_reference(self._hparams['dataset_class_with_path'])
+        if self._hparams.plug_dataset:
+            self._dataset = self.get_dataset_reference(self._hparams['dataset_class_with_path'])
         self._data_iterator = self.get_iterator_reference(self._hparams['iterator_class_with_path'])
         self._model = self.get_model_reference(self._hparams['model_class_with_path'])
 
@@ -152,7 +154,8 @@ class Experiments(object):
     def setup(self):
         self.check_interoperability_n_import()
         # Initialize the handles and call any user specific init() methods
-        self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_class_with_path']])
+        if self._hparams.plug_dataset:
+            self._dataset = self._dataset(hparams=self._hparams[self._hparams['dataset_class_with_path']])
         #TODO avoid loading train data while prediction
         self._data_iterator = self._data_iterator(hparams=self._hparams[self._hparams['iterator_class_with_path']],
                                                   dataset=self._dataset)
@@ -204,7 +207,7 @@ class Experiments(object):
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
                 print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
-                executor.train(max_steps=current_max_steps)  # , eval_steps=None)
+                executor.train()#(max_steps=current_max_steps)  # , eval_steps=None)
                 print("\n\n Evaluating for epoch\n\n", current_epoch)
                 executor.evaluate(steps=200)
 

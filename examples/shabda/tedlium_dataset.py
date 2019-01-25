@@ -99,8 +99,6 @@ class TEDLiumDataset(IPreprocessor):
         hparams.update({
             "experiment_name": "TEDLiumDataset",
             "num_clips" : 128,
-            "start_time" : 0,
-            "end_time" : 600,
             "sampling_rate" : 16000,
             "duration": 5
         })
@@ -110,8 +108,6 @@ class TEDLiumDataset(IPreprocessor):
     def audio_clip(self,
                    data_dir,
                    num_clips,
-                   start_time,
-                   end_time,
                    duration,
                    output_dir,
                    sampling_rate):
@@ -139,9 +135,10 @@ class TEDLiumDataset(IPreprocessor):
                 os.makedirs(speaker_dir)
 
                 y, _ = librosa.load(file_path, sr=sampling_rate)
+                end_time = librosa.get_duration(y=y, sr=sampling_rate)
                 for j in range(num_clips):
                     wav_file = os.path.join(speaker_dir, str(j)) + ".wav"
-                    k = int(np.random.randint(start_time, end_time, size=1))
+                    k = int(np.random.randint(0, end_time, size=1))
                     librosa.output.write_wav(wav_file,
                                              y[k*sampling_rate : (k+duration)*sampling_rate],
                                              sampling_rate)
@@ -155,24 +152,18 @@ class TEDLiumDataset(IPreprocessor):
         # TODO - Create a dict `inputs` and pass the input as **inputs
         self.audio_clip(data_dir=os.path.join(self.TRAIN_IN_PATH, "sph"),
                         num_clips=self._hparams.num_clips,
-                        start_time=self._hparams.start_time,
-                        end_time=self._hparams.end_time,
                         duration=self._hparams.duration,
                         output_dir=self.TRAIN_OUT_PATH,
                         sampling_rate=self._hparams.sampling_rate)
 
         self.audio_clip(data_dir=os.path.join(self.VAL_IN_PATH, "sph"),
                         num_clips=self._hparams.num_clips,
-                        start_time=self._hparams.start_time,
-                        end_time=self._hparams.end_time,
                         duration=self._hparams.duration,
                         output_dir=self.VAL_OUT_PATH,
                         sampling_rate=self._hparams.sampling_rate)
 
         self.audio_clip(data_dir=os.path.join(self.TEST_IN_PATH, "sph"),
                         num_clips=self._hparams.num_clips,
-                        start_time=self._hparams.start_time,
-                        end_time=self._hparams.end_time,
                         duration=self._hparams.duration,
                         output_dir=self.TEST_OUT_PATH,
                         sampling_rate=self._hparams.sampling_rate)

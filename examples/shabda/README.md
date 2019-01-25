@@ -30,7 +30,7 @@ CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py --mode=train -config_python_fi
 ```
 CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py \
 --mode=predict_instance \
---test_file_path=~/vitaFlow/TEDLiumDataset/mix.wav \
+--test_file_path=mix.wav \
 -config_python_file=examples/shabda/config.py
 ```
 
@@ -38,11 +38,13 @@ CUDA_VISIBLE_DEVICES=0 python vitaflow/run/run.py \
 ### Reference: 
 
 * https://ai.googleblog.com/2018/04/looking-to-listen-audio-visual-speech.html
+* https://github.com/zhr1201/Multi-channel-speech-extraction-using-DNN/blob/master/Manuscript-InterNoise2017-ZhouHaoran_0525.pdf
 
 Look to Listen/Cocktail Party:
+* https://github.com/chaodengusc/DeWave
+* https://github.com/TotallyFine/deep-clustering
 * https://github.com/avivga/audio-visual-speech-enhancement
 * https://github.com/andrewowens/multisensory
-* https://github.com/chaodengusc/DeWave
 * https://github.com/crystal-method/Looking-to-Listen
 * https://github.com/Kajiyu/LLLNet
 * https://github.com/vishwajeet97/Cocktail-Party-Problem
@@ -53,6 +55,7 @@ Look to Listen/Cocktail Party:
 
 ### Dataset:
 * https://projets-lium.univ-lemans.fr/ted-lium/
+* [TPS](http://www-mmsp.ece.mcgill.ca/Documents/Data/)
 
 ### Audio Basics
 - [Decibel](https://www.rapidtables.com/electric/decibel.html)

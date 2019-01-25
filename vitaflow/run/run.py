@@ -43,6 +43,10 @@ if __name__ == "__main__":
         print(' -' * 35)
         print('Downloading missing package(command: {})'.format(download_en_core_web_md))
         print(' -' * 35)
+
+    if FLAGS.mode != "train":
+        config.experiments['clear_model_data'] = False #make sure we are not deleting the model accidentally
+
     experiment = Experiments(hparams=config.experiments, mode=FLAGS.mode)
     experiment.run(args=FLAGS)
     print(' -' * 35)
