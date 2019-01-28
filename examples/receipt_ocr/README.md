@@ -22,11 +22,21 @@ Scanned PDFs/Images  ---> Image Preprocessing
                         ---> Word combiners
 ``` 
 
-**Code @ https://github.com/Imaginea/vitaFlow/tree/master/examples/receipt_ocr**
+## receipt OCR
 
-- Classifying documents into invoice versus others and extracting the invoice numbers of those classified as invoice
-- Incoming documents are images/PDFs. 
-- No labels available.
+- Dataset
+    - http://expressexpense.com/view-receipts.php 
+- Data Preparation
+    - Web scrabbing : scrapy
+- Data Annotation
+    - https://github.com/frederictost/images_annotation_programme
+- Object Detection
+    - https://github.com/tensorflow/models/tree/master/research/object_detection
+- Image Segmentation and Cropping
+- OCR : Tesseract
+- Text Postprocessing
+
+## Explorations
 
 **Python Libs:**
 - https://pypi.org/project/pytesseract/

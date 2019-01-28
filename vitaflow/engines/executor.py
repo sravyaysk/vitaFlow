@@ -101,18 +101,16 @@ class Executor(object):
         return self._data_iterator
 
     def _get_train_spec(self, max_steps=None):
-        input_fn = self._data_iterator.train_input_fn()
         # Estimators expect an input_fn to take no arguments.
         # To work around this restriction, we use lambda to capture the arguments and provide the expected interface.
         return tf.estimator.TrainSpec(
-            input_fn=lambda: input_fn,
+            input_fn=lambda: self._data_iterator.train_input_fn(),
             max_steps=max_steps,
             hooks=self._train_hooks)
 
     def _get_eval_spec(self, steps):
-        input_fn = self._data_iterator.val_input_fn()
         return tf.estimator.EvalSpec(
-            input_fn=lambda: input_fn,
+            input_fn=lambda: self._data_iterator.val_input_fn(),
             steps=steps,
             hooks=self._eval_hooks)
 
@@ -127,9 +125,9 @@ class Executor(object):
                 data generates the OutOfRange exception. If OutOfRange occurs
                 in the middle, training stops before :attr:`max_steps` steps.
         """
-        train_spec = self._get_train_spec(max_steps=max_steps)  # TODO
+        train_spec = self._get_train_spec(max_steps=max_steps)
         self._estimator.train(
-            input_fn=lambda: self._data_iterator.train_input_fn(),  # TODO
+            input_fn=train_spec.input_fn,
             hooks=train_spec.hooks,
             max_steps=train_spec.max_steps)
 
@@ -148,9 +146,9 @@ class Executor(object):
                 in :attr:`model_dir`, evaluation is run with newly initialized
                 variables instead of restored from checkpoint.
         """
-        eval_spec = self._get_eval_spec(steps=steps)  # TODO
+        eval_spec = self._get_eval_spec(steps=steps)
         self._estimator.evaluate(
-            input_fn=lambda: self._data_iterator.val_input_fn(),
+            input_fn=eval_spec.input_fn,
             steps=eval_spec.steps,
             hooks=eval_spec.hooks,
             checkpoint_path=checkpoint_path)

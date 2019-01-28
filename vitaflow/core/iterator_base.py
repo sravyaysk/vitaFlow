@@ -24,7 +24,7 @@ from vitaflow.core.hyperparams import HParams
 from vitaflow.core import IPreprocessor
 from vitaflow.helpers.os_helper import check_n_makedirs
 from vitaflow.helpers.print_helper import print_info
-from vitaflow.run import Executor
+from vitaflow.engines import Executor
 
 
 class IIteratorBase(ABC):

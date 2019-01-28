@@ -110,17 +110,17 @@ conda install tensorflow
 ## How to run
 
 Like every machine learning project, we have train and predict mode which needs to be passed as an argument while running the experiment.
-The entry point in the system is *run.py*. The arguments passed to it are the config file and mode in which it has to run. By default it supports three modes (train, retrain and predict).
+The entry point in the system is *run_experiments.py*. The arguments passed to it are the config file and mode in which it has to run. By default it supports three modes (train, retrain and predict).
 
 ### 1. Train
 
 ```bash
-python vitaflow/run/run.py \
+python vitaflow/bin/run_experiments.py \
 	--mode=train \
 	--config_python_file=examples/conll2003/config.py 
 ```
 
-We start the training by passing **--mode = train** . *run.py* will pickup the config file provided to it  and look for the dataset. 
+We start the training by passing **--mode = train** . *run_experiments.py* will pickup the config file provided to it  and look for the dataset. 
 
 **--option= train** is an optional parameter and defaults to train when not present.
 
@@ -148,7 +148,7 @@ conll_2003_dataset
 Incase the experiments needs to be repeated for more number of epochs or requires to be resumed from earlier point of interruption, it can done so using the following command. It will continue the training from the last point.
 
 ```bash
-python vitaflow/run/run.py \
+python vitaflow/bin/run_experiments.py \
 	--mode=retrain \
 	--config_python_file=examples/conll2003/config.py 
 ```
@@ -170,7 +170,7 @@ Place all the files to be predicted in the val folder
    ```
 
 2. ```bash
-   python vitaflow/run/run.py \
+   python vitaflow/bin/run_experiments.py \
    	--mode=predict \
    	--config_python_file=examples/conll2003/config.py 	
    ```

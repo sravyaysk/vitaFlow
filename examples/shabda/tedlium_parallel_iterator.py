@@ -1,6 +1,11 @@
+import gc
 import os
 import random
+from contextlib import closing
+import datetime
+
 import itertools
+import tracemalloc
 
 import numpy as np
 import tensorflow as tf
@@ -8,7 +13,7 @@ from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
 import librosa
 from numpy.lib import stride_tricks
-from multiprocessing import Pool
+from multiprocessing.pool import ThreadPool
 
 from sklearn.cluster import KMeans
 from matplotlib import pyplot as plt
@@ -20,251 +25,6 @@ from vitaflow.core import HParams, IIteratorBase
 from vitaflow.helpers.print_helper import print_info
 from vitaflow.helpers.print_helper import print_error
 
-
-#=================================================================================================================
-
-enable_multiprocessing = True
-enable_file_pickling = False
-
-
-def _get_speech_data(wav_file, sampling_rate):
-    """
-
-    :param wav_file:
-    :param sampling_rate:
-    :return:
-    """
-    speech, _ = librosa.core.load(wav_file, sr=sampling_rate) 
-    # amplication factor between -3 (dB) to 3 (dB)
-    fac = np.random.rand(1)[0] * 6 - 3
-    # randomly choose the amplification factor and applyt he factor to get gan or loss of the speech
-    # why so? randomly we are increasing/decreasing or amplification/damping the magnitude of the signals
-    # dB = 20 * log_10(p2/p1)
-    # fac / 20 = log_10(p2/p1)
-    # 10 ^ (fac/20) = p2/p1
-    #convert the `fac` to decibel and applyt it to the signal
-    #fac_db = 10. ^ (fac / 20)
-    speech = 10. ** (fac / 20) * speech
-    return speech
-
-def _stft(sig, frameSize, overlapFac=0.75, window=np.hanning):
-    """
-    Short time fourier transform of audio signal
-    computing STFTs is to divide a longer time signal into shorter segments of equal length and then compute
-    the Fourier transform separately on each shorter segment.
-    This reveals the Fourier spectrum on each shorter segment.
-
-    Reference:
-    - https://en.wikipedia.org/wiki/Hann_function
-
-    :param sig: 10 seconds 8000 SR wav file. 30 seconds 8000 SR wav file.
-    :param frameSize: 256 default
-    :param overlapFac:
-    :param window:
-    :return:
-    """
-
-    #Eg :  30 seconds 8000 SR wav file.
-
-    win = window(frameSize)
-
-    # 256  - (0.75 * 256) = 64
-    hopSize = int(frameSize - np.floor(overlapFac * frameSize)) # number of slides
-    samples = np.array(sig, dtype='float64') # 240000
-
-    # cols for windowing
-    cols = int(np.ceil((len(samples) - frameSize) / float(hopSize)) + 1) # 3747
-    # zeros at end (thus samples can be fully covered by frames)
-    samples = np.append(samples, np.zeros(frameSize)) # 240256
-
-    frames = stride_tricks.as_strided(
-        samples,
-        shape=(cols, frameSize),
-        strides=(samples.strides[0] * hopSize, samples.strides[0])).copy()
-    frames *= win # (3747, 256)
-    #discrete Fourier Transform
-    return np.fft.rfft(frames)
-
-def replaceZeroes(data):
-    min_nonzero = np.min(data[np.nonzero(data)])
-    data[data == 0] = min_nonzero
-    return data
-
-def _get_log_spectrum_features(speech, frame_size, neff, amp_fac, min_amp):
-    """
-    find short time fourier transform for the mixture and trim it to given NEFF
-        -  https://www.cds.caltech.edu/~murray/wiki/Why_is_dB_defined_as_20log_10%3F
-        -  http://www.sengpielaudio.com/calculator-FactorRatioLevelDecibel.htm
-    :param speech:
-    :param frame_size:
-    :param neff:
-    :param amp_fac:
-    :param min_amp:
-    :return:
-    """
-    speech_features = np.abs(_stft(speech, frame_size)[:, :neff])
-    # say if we have 1256 max of speech signal array and min_amp as follows
-    # 1256/1000 = maximum(speech, 1.256)
-    # 1256/50 = maximum(speech, 25.12)
-    # 1256/10 = maximum(speech, 125.6)
-    # 1256/5  = maximum(speech, 251.2)
-    # 1256/1  = maximum(speech, 1256)
-    # np.max : array wise 
-    # np.maximum : element wise
-    # scaling the speech features with respect to min_amp and its max value
-    speech_features = np.maximum(speech_features, np.max(speech_features) / min_amp)
-    speech_features = replaceZeroes(speech_features)
-    speech_features = 20. * np.log10(speech_features * amp_fac)
-    return speech_features
-
-def _get_speech_samples(speech_1_features,
-                        speech_2_features,
-                        frames_per_sample,
-                        number_frames,
-                        speech_mix_features,
-                        speech_voice_activity_detection):
-    """
-    Processes one audio pair
-    :param speech_1_features: Spectral audio features
-    :param speech_2_features: Spectral audio features
-    :param frames_per_sample:
-    :param len_spec: Total number of frames (to say?) in the given signal
-    :param speech_mix_features:
-    :param speech_voice_activity_detection:
-    :return: Returns an array of shape ((self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff, 2))
-    """
-    #
-
-    current_frame = 0
-    bag = []
-
-    while current_frame + frames_per_sample < number_frames: # we make sure we have enough data for slicing
-        #simple array slicing on the first dimension (time/freq axis)
-        sample_1 = speech_1_features[current_frame:current_frame + frames_per_sample, :]
-        sample_2 = speech_2_features[current_frame:current_frame + frames_per_sample, :]
-        sample_mix = speech_mix_features[current_frame:current_frame + frames_per_sample, :].astype('float32')
-        voice_activity_detection = speech_voice_activity_detection[current_frame:current_frame + frames_per_sample, :].astype('bool')
-        # phase = speech_phase[k: k + frames_per_sample, :]
-
-        # Y: indicator of the belongings of the TF bin
-        # 1st speaker or second speaker
-        Y = np.array([sample_1 > sample_2,
-                      sample_1 < sample_2]
-                     ).astype('bool')
-        # Y now will have 2-axis one for each signal comparision with other
-        # returned Y will be [2, x, y], hence the transpose [x, y, 2]
-        Y = np.transpose(Y, [1, 2, 0]).astype('bool')
-        bag.append((sample_mix, voice_activity_detection, Y))
-        current_frame = current_frame + frames_per_sample
-    return bag
-
-
-def _get_speech_features(args):
-    """
-
-    :param args:
-    :return:
-    """
-    (wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
-     threshold, global_mean, global_std, frames_per_sample) = args
-
-    try:
-        # TODO: experimental though - is multi-processing required here? to reduce IO
-        speech_1 = _get_speech_data(wav_file_1, sampling_rate)
-        speech_2 = _get_speech_data(wav_file_2, sampling_rate)
-
-        # print(wav_file_1, wav_file_2)
-
-        # find the minimum length of two speeches
-        length = min(len(speech_1), len(speech_2))
-        #trim both the speeches to the minimum length
-        speech_1 = speech_1[:length]
-        speech_2 = speech_2[:length]
-        # mix the signals
-        speech_mix = speech_1 + speech_2
-
-        #get the spectral features in dB
-        speech_1_features = _get_log_spectrum_features(speech_1, frame_size, neff, amp_fac, min_amp)
-        speech_2_features = _get_log_spectrum_features(speech_2, frame_size, neff, amp_fac, min_amp)
-        speech_mix_features = _get_log_spectrum_features(speech_mix, frame_size, neff, amp_fac, min_amp)
-
-        max_mag = np.max(speech_mix_features)
-        # apply threshold to the feature signal, to find the silent portion of the signal and
-        # construct a boolean array as a feature
-        # https://en.wikipedia.org/wiki/Voice_activity_detection
-        speech_voice_activity_detection = (speech_mix_features > (max_mag - threshold)).astype(int)
-        # normalize the signal values with given global mean and std
-        speech_mix_features = (speech_mix_features - global_mean) / global_std
-
-        number_frames = speech_1_features.shape[0]
-
-        new_data = _get_speech_samples(speech_1_features,
-                                       speech_2_features,
-                                       frames_per_sample,
-                                       number_frames,
-                                       speech_mix_features,
-                                       speech_voice_activity_detection)
-    except (KeyboardInterrupt, SystemExit):
-        raise
-    except Exception as err:
-        # t = '-------------------------\n'
-        # print_error(err)
-        # print('{} Failed to Run: _get_speech_features {} {} \n {}'.format(t, wav_file_1, wav_file_2, t))
-        # print('---' * 5)
-        new_data = []
-
-    return new_data
-
-
-def _yield_samples_multicore(speaker_file_match,
-                             sampling_rate,
-                             frame_size,
-                             amp_fac,
-                             neff,
-                             min_amp,
-                             threshold,
-                             global_mean,
-                             global_std,
-                             frames_per_sample,
-                             num_threads,
-                             tqdm_desc):
-    """
-
-    :param speaker_file_match: Pair of audio files thats needs to be mixed
-    :param sampling_rate:
-    :param frame_size:
-    :param self._hparams.amp_fac:
-    :param neff:
-    :param min_amp:
-    :param threshold:
-    :param global_mean:
-    :param global_std:
-    :param frames_per_sample:
-    :param num_threads:
-    :param tqdm_desc:
-    :return:
-    """
-
-    # for each file pair, generate their mixture and reference samples
-
-    pool = Pool(num_threads)
-
-    input_params = [(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
-                     threshold, global_mean, global_std, frames_per_sample) for (wav_file_1, wav_file_2) in
-                    speaker_file_match.items()]
-
-    try:
-        with tqdm(total=len(speaker_file_match.items())) as pbar:
-            for i, res in tqdm(enumerate(pool.imap_unordered(_get_speech_features, input_params)), desc=tqdm_desc):
-                pbar.update()
-                for data in res:
-                    yield data
-    except (KeyboardInterrupt, SystemExit):
-        pool.terminate()
-        exit()
-
-
-#=================================================================================================================
 
 class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
     def __init__(self, hparams=None, dataset=None):
@@ -284,6 +44,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         ShabdaWavPairFeature.__init__(self)
         self._hparams = HParams(hparams=hparams, default_hparams=self.default_hparams())
         self._dataset = dataset
+
+        tracemalloc.start()
 
         # get dict of {speaker : [files], ...}
         if self._dataset:
@@ -435,6 +197,256 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return wav_file_pair
 
 
+    def _get_speech_data(self, wav_file, sampling_rate):
+        """
+
+        :param wav_file:
+        :param sampling_rate:
+        :return:
+        """
+        speech, _ = librosa.core.load(wav_file, sr=sampling_rate)
+        # amplication factor between -3 (dB) to 3 (dB)
+        fac = np.random.rand(1)[0] * 6 - 3
+        # randomly choose the amplification factor and applyt he factor to get gan or loss of the speech
+        # why so? randomly we are increasing/decreasing or amplification/damping the magnitude of the signals
+        # dB = 20 * log_10(p2/p1)
+        # fac / 20 = log_10(p2/p1)
+        # 10 ^ (fac/20) = p2/p1
+        #convert the `fac` to decibel and applyt it to the signal
+        #fac_db = 10. ^ (fac / 20)
+        speech = 10. ** (fac / 20) * speech
+        return speech
+
+    def _stft(self, sig, frameSize, overlapFac=0.75, window=np.hanning):
+        """
+        Short time fourier transform of audio signal
+        computing STFTs is to divide a longer time signal into shorter segments of equal length and then compute
+        the Fourier transform separately on each shorter segment.
+        This reveals the Fourier spectrum on each shorter segment.
+
+        Reference:
+        - https://en.wikipedia.org/wiki/Hann_function
+
+        :param sig: 10 seconds 8000 SR wav file. 30 seconds 8000 SR wav file.
+        :param frameSize: 256 default
+        :param overlapFac:
+        :param window:
+        :return:
+        """
+
+        #Eg :  30 seconds 8000 SR wav file.
+
+        win = window(frameSize)
+
+        # 256  - (0.75 * 256) = 64
+        hopSize = int(frameSize - np.floor(overlapFac * frameSize)) # number of slides
+        samples = np.array(sig, dtype='float64') # 240000
+
+        # cols for windowing
+        cols = int(np.ceil((len(samples) - frameSize) / float(hopSize)) + 1) # 3747
+        # zeros at end (thus samples can be fully covered by frames)
+        samples = np.append(samples, np.zeros(frameSize)) # 240256
+
+        frames = stride_tricks.as_strided(
+            samples,
+            shape=(cols, frameSize),
+            strides=(samples.strides[0] * hopSize, samples.strides[0])).copy()
+        frames *= win # (3747, 256)
+        #discrete Fourier Transform
+        return np.fft.rfft(frames)
+
+    def replaceZeroes(self, data):
+        min_nonzero = np.min(data[np.nonzero(data)])
+        data[data == 0] = min_nonzero
+        return data
+
+    def _get_log_spectrum_features(self, speech, frame_size, neff, amp_fac, min_amp):
+        """
+        find short time fourier transform for the mixture and trim it to given NEFF
+            -  https://www.cds.caltech.edu/~murray/wiki/Why_is_dB_defined_as_20log_10%3F
+            -  http://www.sengpielaudio.com/calculator-FactorRatioLevelDecibel.htm
+        :param speech:
+        :param frame_size:
+        :param neff:
+        :param amp_fac:
+        :param min_amp:
+        :return:
+        """
+        speech_features = np.abs(self._stft(speech, frame_size)[:, :neff])
+        # say if we have 1256 max of speech signal array and min_amp as follows
+        # 1256/1000 = maximum(speech, 1.256)
+        # 1256/50 = maximum(speech, 25.12)
+        # 1256/10 = maximum(speech, 125.6)
+        # 1256/5  = maximum(speech, 251.2)
+        # 1256/1  = maximum(speech, 1256)
+        # np.max : array wise
+        # np.maximum : element wise
+        # scaling the speech features with respect to min_amp and its max value
+        speech_features = np.maximum(speech_features, np.max(speech_features) / min_amp)
+        speech_features = self.replaceZeroes(speech_features)
+        speech_features = 20. * np.log10(speech_features * amp_fac)
+        return speech_features
+
+    def _get_speech_samples(self,
+                            speech_1_features,
+                            speech_2_features,
+                            frames_per_sample,
+                            number_frames,
+                            speech_mix_features,
+                            speech_voice_activity_detection):
+        """
+        Processes one audio pair
+        :param speech_1_features: Spectral audio features
+        :param speech_2_features: Spectral audio features
+        :param frames_per_sample:
+        :param len_spec: Total number of frames (to say?) in the given signal
+        :param speech_mix_features:
+        :param speech_voice_activity_detection:
+        :return: Returns an array of shape ((self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff, 2))
+        """
+        #
+
+        current_frame = 0
+        bag = []
+
+        while current_frame + frames_per_sample < number_frames: # we make sure we have enough data for slicing
+            #simple array slicing on the first dimension (time/freq axis)
+            sample_1 = speech_1_features[current_frame:current_frame + frames_per_sample, :]
+            sample_2 = speech_2_features[current_frame:current_frame + frames_per_sample, :]
+            sample_mix = speech_mix_features[current_frame:current_frame + frames_per_sample, :]
+            voice_activity_detection = speech_voice_activity_detection[current_frame:current_frame + frames_per_sample, :]
+            # phase = speech_phase[k: k + frames_per_sample, :]
+
+            # Y: indicator of the belongings of the TF bin
+            # 1st speaker or second speaker
+            Y = np.array([sample_1 > sample_2, sample_1 < sample_2])
+            # Y now will have 2-axis one for each signal comparision with other
+            # returned Y will be [2, x, y], hence the transpose [x, y, 2]
+            Y = np.transpose(Y, [1, 2, 0])
+            bag.append((sample_mix, voice_activity_detection, Y))
+            current_frame = current_frame + frames_per_sample
+
+            del sample_1, sample_2, sample_mix, voice_activity_detection, Y
+        return bag
+
+    # @profile
+    def _get_speech_features(self, args):
+        """
+
+
+        :param args:
+        :return:
+        """
+        (wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+         threshold, global_mean, global_std, frames_per_sample) = args
+
+        try:
+            # TODO: experimental though - is multi-processing required here? to reduce IO
+            # print_info("{} {}".format(wav_file_1, wav_file_2))
+            def _get_data():
+                speech_1 = self._get_speech_data(wav_file_1, sampling_rate)
+                speech_2 = self._get_speech_data(wav_file_2, sampling_rate)
+
+                # print(wav_file_1, wav_file_2)
+
+                # find the minimum length of two speeches
+                length = min(len(speech_1), len(speech_2))
+                #trim both the speeches to the minimum length
+                speech_1 = speech_1[:length]
+                speech_2 = speech_2[:length]
+                # mix the signals
+                speech_mix = speech_1 + speech_2
+
+                #get the spectral features in dB
+                speech_1_features = self._get_log_spectrum_features(speech_1, frame_size, neff, amp_fac, min_amp)
+                speech_2_features = self._get_log_spectrum_features(speech_2, frame_size, neff, amp_fac, min_amp)
+                speech_mix_features = self._get_log_spectrum_features(speech_mix, frame_size, neff, amp_fac, min_amp)
+
+                max_mag = np.max(speech_mix_features)
+                # apply threshold to the feature signal, to find the silent portion of the signal and
+                # construct a boolean array as a feature
+                # https://en.wikipedia.org/wiki/Voice_activity_detection
+                speech_voice_activity_detection = (speech_mix_features > (max_mag - threshold))
+                # normalize the signal values with given global mean and std
+                speech_mix_features_final = (speech_mix_features - global_mean) / global_std
+
+                number_frames = speech_1_features.shape[0]
+
+                new_data = self._get_speech_samples(speech_1_features,
+                                               speech_2_features,
+                                               frames_per_sample,
+                                               number_frames,
+                                                speech_mix_features_final,
+                                               speech_voice_activity_detection)
+                # print_error("deleting speech_1_features, speech_2_features, speech_voice_activity_detection, speech_mix_features")
+                # del speech_1_features, speech_2_features, speech_voice_activity_detection, speech_mix_features, speech_mix_features_final
+                return new_data
+
+            new_data = _get_data()
+            print_info("len of new_data {}".format(len(new_data)))
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except Exception as err:
+            new_data = []
+
+        return new_data
+
+
+    def _yield_samples_multicore(self,
+                                 speaker_file_match,
+                                 sampling_rate,
+                                 frame_size,
+                                 amp_fac,
+                                 neff,
+                                 min_amp,
+                                 threshold,
+                                 global_mean,
+                                 global_std,
+                                 frames_per_sample,
+                                 num_threads,
+                                 tqdm_desc):
+        """
+
+        :param speaker_file_match: Pair of audio files thats needs to be mixed
+        :param sampling_rate:
+        :param frame_size:
+        :param self._hparams.amp_fac:
+        :param neff:
+        :param min_amp:
+        :param threshold:
+        :param global_mean:
+        :param global_std:
+        :param frames_per_sample:
+        :param num_threads:
+        :param tqdm_desc:
+        :return:
+        """
+
+        # for each file pair, generate their mixture and reference samples
+
+        input_params = [(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+                         threshold, global_mean, global_std, frames_per_sample) for (wav_file_1, wav_file_2) in
+                        speaker_file_match.items()]
+        prev = datetime.datetime.now()
+
+
+        with closing( ThreadPool(num_threads) ) as pool:
+            with tqdm(total=len(speaker_file_match.items()), desc=tqdm_desc) as pbar:
+                for i, res in enumerate(pool.imap_unordered(self._get_speech_features, input_params)):
+                    pbar.update()
+                    for data in res:
+                        # now = datetime.datetime.now()
+                        # if abs(now.minute - prev.minute) > 2:
+                        #
+                        #     snapshot = tracemalloc.take_snapshot()
+                        #     top_stats = snapshot.statistics('lineno')
+                        #     print("[ Top 10 ]")
+                        #     for stat in top_stats[:10]:
+                        #         print(stat)
+                        #     gc.collect()
+                        #     prev = datetime.datetime.now()
+                        yield data
+
     def _yield_samples(self, speaker_file_match, tqdm_desc):
         '''Init the training data using the wav files'''
         sampling_rate = self._hparams.sampling_rate
@@ -447,7 +459,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         global_std = self._hparams.global_std
         frames_per_sample = self._hparams.frames_per_sample
 
-        for (sample_mix, voice_activity_detection, Y) in _yield_samples_multicore(speaker_file_match,
+        for (sample_mix, voice_activity_detection, Y) in self._yield_samples_multicore(speaker_file_match,
                                                              sampling_rate,
                                                              frame_size,
                                                              amp_fac,
@@ -558,7 +570,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                                                                                                    librosa.get_duration(y=speech_mix, sr=self._hparams.sampling_rate),
                                                                                                    self._hparams.sampling_rate))
         # feature enginerring like before
-        speech_mix_spec0 = _stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
+        speech_mix_spec0 = self._stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
         speech_mix_spec = np.abs(speech_mix_spec0)
         speech_phase = speech_mix_spec0 / speech_mix_spec
         speech_mix_spec = np.maximum(speech_mix_spec, np.max(speech_mix_spec) / self._hparams.min_amp)
@@ -694,47 +706,23 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             mask = np.zeros([self._hparams.frames_per_sample, self._hparams.neff, 2])
             ind = 0
 
-            print_info("N_assign : {}".format(N_assign))
+            # print_info("N_assign : {}".format(N_assign))
 
-            if N_assign == 0:
-                # if their is no existing speaker in previous frame
-                center = kmean.cluster_centers_
-                N_assign = center.shape[0]
-            elif N_assign == 1:
-                # if their is one speaker in previous frame
-                center_new = kmean.cluster_centers_
-                # assign the embedding for a speaker to the speaker with the
-                # closest centroid in previous frames
-                if center_new.shape[0] == 1:
-                    # update and smooth the centroid for 1 speaker
-                    center = 0.7 * center + 0.3 * center_new
-                else:
-                    # update and smooth the centroid for 2 speakers
-                    N_assign = 2
-                    # compute their relative affinity
-                    cor = np.matmul(center_new, np.transpose(center))
-                    print_info("Correlation : {}".format(cor))
-                    # ipdb.set_trace()
-                    if(cor[1] > cor[0]):
-                        # rearrange their sequence if not consistant with
-                        # previous frames
-                        kmean.cluster_centers_ = np.array([kmean.cluster_centers_[1], kmean.cluster_centers_[0]])
-                        kmean.labels_ = (kmean.labels_ == 0).astype('int')
-                    center = kmean.cluster_centers_
-            else:
-                # two speakers have appeared
-                # print_info("Found 2 speakers ...")
-                center_new = kmean.cluster_centers_
-                cor = np.matmul(center_new[0, :], np.transpose(center))
-                # rearrange their sequence if not consistant with previous
-                # frames
-                print_info("Correlation : {}".format(cor))
+            center = kmean.cluster_centers_
+            # two speakers have appeared
+            # print_info("Found 2 speakers ...")
+            center_new = kmean.cluster_centers_
+            cor = np.matmul(center_new[0, :], np.transpose(center))
+            # rearrange their sequence if not consistant with previous
+            # frames
+            # print_info("Correlation : {}".format(cor))
 
-                if(cor[1] > cor[0]):
-                    kmean.cluster_centers_ = np.array([kmean.cluster_centers_[1], kmean.cluster_centers_[0]])
-                    kmean.labels_ = (kmean.labels_ == 0).astype('int')
+            if(cor[1] > cor[0]):
+                kmean.cluster_centers_ = np.array([kmean.cluster_centers_[1], kmean.cluster_centers_[0]])
+                kmean.labels_ = (kmean.labels_ == 0).astype('int')
 
-                center = center * 0.7 + 0.3 * kmean.cluster_centers_
+            kmean.labels_ = (~kmean.labels_).astype('int')
+            center = center * 0.7 + 0.3 * kmean.cluster_centers_
 
             # print_info("center : {}".format(center))
             # print_info("kmean.labels_ : {}".format(kmean.labels_))

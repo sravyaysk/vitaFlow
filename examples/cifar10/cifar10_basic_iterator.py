@@ -31,7 +31,7 @@ from vitaflow.core import IPreprocessor
 from vitaflow.core import IIteratorBase
 from vitaflow.core.models import ClassifierBase
 from vitaflow.helpers.os_helper import check_n_makedirs, print_info, print_error, print_warn
-from vitaflow.run import Executor
+from vitaflow.engines import Executor
 
 
 class Cifar10BasicIterator(IIteratorBase, ImageFeature):

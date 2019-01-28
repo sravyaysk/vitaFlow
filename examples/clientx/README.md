@@ -196,7 +196,7 @@ hparams.update({
 ### 1. Train
 
 ```bash
-python vitaflow/run/run.py \
+python vitaflow/bin/run_experiments.py \
 	--mode=train \
 	--config_python_file=examples/clientx/config.py 
 ```
@@ -204,7 +204,7 @@ python vitaflow/run/run.py \
 ### 2. Retrain
 
 ```bash
-python vitaflow/run/run.py \
+python vitaflow/bin/run_experiments.py \
 	--mode=retrain \
 	--config_python_file=examples/clientx/config.py 
 ```
@@ -226,7 +226,7 @@ Place all the files to be predicted in the val folder
    ```
 
 2. ```bash
-   python vitaflow/run/run.py \
+   python vitaflow/bin/run_experiments.py \
    	--mode=predict \
    	--config_python_file=examples/clientx/config.py 	
    ```

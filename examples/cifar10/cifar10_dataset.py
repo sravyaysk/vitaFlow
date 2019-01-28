@@ -25,7 +25,7 @@ from vitaflow.core import IPreprocessor
 from vitaflow.core.features import ImageFeature
 from vitaflow.core.models import ClassifierBase
 from vitaflow.helpers.print_helper import print_info
-from vitaflow.run import Executor
+from vitaflow.engines import Executor
 from vitaflow.utils.data_io import maybe_download
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelBinarizer

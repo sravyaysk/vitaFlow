@@ -19,13 +19,14 @@ import os
 import shutil
 import time
 from importlib import import_module
+import tracemalloc
 
 import tensorflow as tf
 from tqdm import tqdm
 
 from vitaflow.core.hyperparams import HParams
 from vitaflow.helpers.print_helper import *
-from vitaflow.run.executor import Executor
+from vitaflow.engines.executor import Executor
 
 # get TF logger
 log = logging.getLogger('tensorflow')
@@ -169,19 +170,34 @@ class Experiments(object):
         num_samples = self._data_iterator.num_train_samples
         next_element = iterator.get_next()
         batch_size = self._hparams[self._hparams['iterator_class_with_path']].batch_size
-        current_max_steps = (num_samples // batch_size) * (1)
 
         with tf.Session() as sess:
             sess.run(training_init_op)
             start_time = time.time()
 
-            for i in tqdm(range(current_max_steps), "steps: "):
-                res = sess.run(next_element)
-                print("Data shapes : ", end=" ")
-                for key in res[0].keys():
-                    print(res[0][key].shape, end=", ")
-                print(" label shape : {}".format(res[1].shape))
+            pbar = tqdm(desc="steps", total=num_samples)
 
+            i = 0
+            while (True):
+                res = sess.run(next_element)
+                pbar.update()
+                try:
+                    if False:
+                        print("Data shapes : ", end=" ")
+                        for key in res[0].keys():
+                            print(res[0][key].shape, end=", ")
+                        print(" label shape : {}".format(res[1].shape))
+
+                    if i % 50:
+                        snapshot = tracemalloc.take_snapshot()
+                        top_stats = snapshot.statistics('lineno')
+                        print("[ Top 10 ]")
+                        for stat in top_stats[:10]:
+                            print(stat)
+                    i += 1
+
+                except tf.errors.OutOfRangeError:
+                    break
             end_time = time.time()
 
             print_debug("time taken is {} ".format(end_time - start_time))
@@ -189,6 +205,7 @@ class Experiments(object):
         exit(0)
 
     def run(self, args):
+        tracemalloc.start()
         self.setup()
         num_samples = self._data_iterator.num_train_samples
         print_info("Number of trianing samples : {}".format(num_samples))
@@ -205,11 +222,17 @@ class Experiments(object):
 
         if mode in ["train", "retrain"]:
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
+
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
                 print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
-                executor.train()#(max_steps=current_max_steps)  # , eval_steps=None)
-                print("\n\n Evaluating for epoch\n\n", current_epoch)
-                executor.evaluate(steps=200)
+                executor.train(max_steps=10)
+                # print("\n\n Evaluating for epoch\n\n", current_epoch)
+                # executor.evaluate(steps=200)
+                snapshot = tracemalloc.take_snapshot()
+                top_stats = snapshot.statistics('lineno')
+                print("[ Top 10 ]")
+                for stat in top_stats[:10]:
+                    print(stat)
 
         elif mode == "predict":
             self._data_iterator.predict_on_test_files(executor=executor)

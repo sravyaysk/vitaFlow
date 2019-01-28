@@ -32,7 +32,7 @@ from vitaflow.core.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, 
 from vitaflow.data.text.vocabulary import SpecialTokens
 from vitaflow.helpers.os_helper import check_n_makedirs
 from vitaflow.helpers.print_helper import print_info
-from vitaflow.run import Executor
+from vitaflow.engines import Executor
 
 
 class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):

@@ -16,7 +16,7 @@ GLOBAL_STD = 15.5
 LEARNING_RATE = 1e-2
 
 experiment_root_directory = os.path.join(os.path.expanduser("~"), "vitaFlow/")
-experiment_name = "TEDLiumDataset"
+experiment_name = "TEDLiumTestDataset"
 batch_size = 32
 
 experiments = {
@@ -28,7 +28,7 @@ experiments = {
     "keep_checkpoint_max": 5,
     "save_summary_steps": 10,
     "log_step_count_steps": 10,
-    "clear_model_data" : False,
+    "clear_model_data" : True,
     "plug_dataset" : True,
 
     "examples.shabda.tedlium_dataset.TEDLiumDataset": {
@@ -38,7 +38,7 @@ experiments = {
         "validation_data_path": "dev",
         "test_data_path": "test",
         "num_clips": 128,
-        "duration": 5,
+        "duration": 20,
         "sampling_rate": SAMPLING_RATE,
     },
 
@@ -60,7 +60,7 @@ experiments = {
         "frames_per_sample" : FRAMES_PER_SAMPLE,
         "batch_size" : batch_size,
         "prefetch_size" : 1,
-        "num_threads" : 8,
+        "num_threads" : 3,
         "reinit_file_pair" : True
     },
 
