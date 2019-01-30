@@ -41,8 +41,7 @@ class TextPostProcessor:
             for text_file in text_files:
                 file_name = text_file.split("/")[-2]
                 tag_name = text_file.split("/")[-1].split(".")[0]
-                info_dict[tag_name] = open(text_file, "r").read()
-                bag.append((tag_name, open(text_file, "r").read()))
+                bag.append((tag_name, open(text_file, "r").read().replace(",", "")))
 
             df = pd.DataFrame(bag, columns=["Tag", "Text"])
             df.to_csv(os.path.join(self._receipt_text_dir, file_name + ".csv"))

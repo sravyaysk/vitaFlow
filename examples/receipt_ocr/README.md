@@ -20,14 +20,14 @@ Scanned PDFs/Images  ---> Image Preprocessing
                      ---> Text PostProcessing
                         ---> Spell checks
                         ---> Word combiners
-``` 
+```
 
 ## Receipt OCR
- 
+
 ### Introduction
 	In this example, we show solution for extracting information from the given documents.
 ### Aim
-	Given a receipt, the aim is to extract the following fields by using deep-learning techinques.
+	Given a receipt, the aim is to extract the domain specific fields by using deep-learning techinques.
 ### Steps
 ![](./docs/images/block-diagram.jpg)
 
@@ -57,8 +57,25 @@ The above diagram depicts the various
 - Object Detection
     - We leverage the existing pre-trained models for the detecting the above points of interest by using [Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
 - Image Segmentation and Cropping
-- OCR : Tesseract
-- Text Postprocessing
+    - Following folder structure is adopted to output the images by croping the receipt image for predicted co-ordinates and labels
+        ```
+        image_name_1\
+            label_1.jpg
+            label_2.jpg
+            label_3.jpg
+         ...
+        ```
+- OCR : Tesseract. Converts the cropped images to text
+
+        image_name_1\
+            label_1.txt
+            label_2.txt
+            label_3.txt
+        ...  
+- Text Postprocessing : Domain specific 
+
+        image_name_1.csv
+        ...
 
 ### Experiment Goal
 - Provide a end-to-end solution for information extraction from images.
