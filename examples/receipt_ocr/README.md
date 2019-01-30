@@ -22,19 +22,47 @@ Scanned PDFs/Images  ---> Image Preprocessing
                         ---> Word combiners
 ``` 
 
-## receipt OCR
+## Receipt OCR
+ 
+### Introduction
+	In this example, we show solution for extracting information from the given documents.
+### Aim
+	Given a receipt, the aim is to extract the following fields by using deep-learning techinques.
+### Steps
+![](./docs/images/block-diagram.jpg)
 
+The above diagram depicts the various 
 - Dataset
-    - http://expressexpense.com/view-receipts.php 
+    - We use the dataset present on the [website](http://expressexpense.com/view-receipts.php).
+    These are the receipts collected from various sources and are of various types.
+    
 - Data Preparation
-    - Web scrabbing : scrapy
+    - Web scrabbing : scrapy 
+    - We use the python library called scrapy in order to crawl and download all the images
+    - we have around ~2k receipt images.
+    ![](./docs/images/ReceiptSwiss.jpg)
+    
 - Data Annotation
-    - https://github.com/frederictost/images_annotation_programme
+    - We annotate around 125 images using image annotation [tool](https://github.com/frederictost/images_annotation_programme). 
+    - The information we are interested from the receipts are 
+        - Merchant - name of the store
+        - Receipt number - bill id
+        - Date-  receipt issue date
+        - Line items and their value - items in cart and their value
+        - Total - final total value paid
+        - Tax - tax calculated on line items
+        - Mode of payment - card/cash
+    ![](./docs/images/image-anno.png)
+    
 - Object Detection
-    - https://github.com/tensorflow/models/tree/master/research/object_detection
+    - We leverage the existing pre-trained models for the detecting the above points of interest by using [Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
 - Image Segmentation and Cropping
 - OCR : Tesseract
 - Text Postprocessing
+
+### Experiment Goal
+- Provide a end-to-end solution for information extraction from images.
+- Achieve decent accuracy with very few annotated images. 
 
 ## Explorations
 
