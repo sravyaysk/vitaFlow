@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import os
 
 
-class ImageToTextImages:
+class ImageCropping:
     """
     To split Image to single line text Images.
 
@@ -18,8 +18,8 @@ class ImageToTextImages:
         self.source, self.fname = os.path.split(image_loc)
         # dest - location preparation
         self.dest = dest
-        self._newfolder = self.fname.split('.')[0]
-        self._ext = self.fname.split('.')[1]
+        self._newfolder = self.fname.rsplit('.')[0]
+        self._ext = self.fname.rsplit('.')[1]
         if self.dest is None:
             self.dest = os.path.join(self.source, self._newfolder)
         else:
@@ -39,10 +39,10 @@ class ImageToTextImages:
         plt.imsave(dest_file, cropped_image)
         print('Saved file to {}'.format(dest_file))
 
-    def multiple_crop_and_save(self, cords_list, fnames_list):
+    def multiple_crop_and_save(self, cords_list, labels_list):
         i = 0
-        for cords, fname in zip(cords_list, fnames_list):
-            self.crop_and_save(cords, '{}{}.{}'.format(fname, i, self._ext))
+        for cords, label in zip(cords_list, labels_list):
+            self.crop_and_save(cords, '{}_{}.{}'.format(label, i, self._ext))
             i += 1
 
     def show_image(self, cords=None):
