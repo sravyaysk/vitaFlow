@@ -16,7 +16,7 @@ Get started by creating a tmux session in the machine having GPU hardware (_you 
 ```bash 
 ssh rpx@172.17.0.5
 # One time setup
-tmux new -s av_connector_detection
+tmux new -s text_detection
 conda create -n tensorflow-gpu python=2.7 pip 
 source activate tensorflow-gpu
 python --version
@@ -78,7 +78,7 @@ TensorFlow provides several object detection models (pre-trained classifiers wit
 You can choose which model to train your objection detection classifier on. If you are planning on using the object detector on a device with low computational power (such as a smart phone or Raspberry Pi), use the SDD-MobileNet model. If you will be running your detector on a decently powered laptop or desktop PC, use one of the RCNN models.
 
 We have used the MASK-RCNN-Inception-V2 model. 
-[Download the model here.](http://download.tensorflow.org/models/object_detection/mask_rcnn_inception_v2_coco_2018_01_28.tar.gz) Open the downloaded faster_rcnn_inception_v2_coco_2018_01_28.tar.gz file with a file archiver such as WinZip or 7-Zip and extract the faster_rcnn_inception_v2_coco_2018_01_28 folder to the ~/ROD/models/research/object_detection folder.
+[Download the model here.](http://download.tensorflow.org/models/object_detection/mask_rcnn_inception_v2_coco_2018_01_28.tar.gz) Open the downloaded mask_rcnn_inception_v2_coco_2018_01_28.tar.gz file with a file archiver such as WinZip or 7-Zip and extract the mask_rcnn_inception_v2_coco_2018_01_28 folder to the ~/ROD/models/research/object_detection folder.
 
 #### 2d. Moving and placing  files in correct folder
  Move all the files present in this repository directly into the ~/ROD/models/research/object_detection directory.
@@ -103,17 +103,14 @@ We have used the MASK-RCNN-Inception-V2 model.
  - test.jpeg _file for testing model_
  - test1.jpeg _another file for testing model_
 
-This repository contains the images and its corresponding annotations along with the .csv files and the TFRecords needed to train a "Audio Video Connector" detector. Either these images and data can be used for running the code or new data can be introduced for creating a new detector. It also contains Python scripts that are used to generate the training data. It has scripts to test out the object detection classifier on images, videos or a webcam feed. You can ignore the ./doc folder as it is used to store images used for this readme.
 
-You can also download the frozen inference graph for our trained Audio Video Connector detector [from this Google Drive link]() and extract the contents to /object_detection/inference_graph. This inference graph will work "out of the box". You can test it after all the setup instructions in Step 2a - 2f have been completed by running the Object_detection_image.py (or video or webcam) script.
-
-If you want to train your own object detector, delete the following files (do not delete the folders):
+To train your own object detector, delete the following files (do not delete the folders):
 - All files in /object_detection/images/train and /object_detection/images/test
 - The “test_labels.csv” and “train_labels.csv” files in /object_detection/images
 - All files in /object_detection/training
 -	All files in /object_detection/inference_graph
 
-Now, you are ready to start from scratch in training your AV connector detector.
+
 ### 3. Gather and Label Pictures
 #### 3a. Gather Pictures
 A deep learning model needs hundreds of images of an object to train a good detection classifier. To train a robust classifier, the training images should have variety of backgrounds, lighting conditions and should be of different size and should vary in image quality along with desired objects. There could be some images where the desired objects are obscured, overlapped with something else, or only halfway in the picture.
@@ -125,7 +122,80 @@ The TF Object Detection API work with images with their annotation in [**Pascal 
 The tools saves a .xml file containing the label data for each image. The xml files are used to generate the TFRecords, which are one of the inputs to the TF trainer. Once the image are labelled , there should be one .xml file for each image in the /test and /train directories.
 
 ```xml
-<annotation><folder>collection_01/part_1</folder><filename>11cityroom-rcpt-articleInline-v2.jpg</filename><path/><source><database>Unknown</database></source><size_part><width>190</width><height>373</height><depth>3</depth></size_part><segmented>0</segmented><object><name>Merchant</name><pose>Unspecified</pose><truncated>0</truncated><difficult>0</difficult><bndbox><xmin>7.8571395874023</xmin><ymin>12</ymin><xmax>172.8571395874</xmax><ymax>45</ymax></bndbox></object><object><name>Line items and their value</name><pose>Unspecified</pose><truncated>0</truncated><difficult>0</difficult><bndbox><xmin>2.8571395874023</xmin><ymin>242</ymin><xmax>178.8571395874</xmax><ymax>255</ymax></bndbox></object><object><name>Line items and their value</name><pose>Unspecified</pose><truncated>0</truncated><difficult>0</difficult><bndbox><xmin>0</xmin><ymin>254</ymin><xmax>178.8571395874</xmax><ymax>269</ymax></bndbox></object><object><name>Tax</name><pose>Unspecified</pose><truncated>0</truncated><difficult>0</difficult><bndbox><xmin>2.8571395874023</xmin><ymin>291</ymin><xmax>184.8571395874</xmax><ymax>303</ymax></bndbox></object><object><name>Total</name><pose>Unspecified</pose><truncated>0</truncated><difficult>0</difficult><bndbox><xmin>7.8571395874023</xmin><ymin>304</ymin><xmax>179.8571395874</xmax><ymax>318</ymax></bndbox></object></annotation>
+<annotation>
+	<folder>collection_01/part_1</folder>
+	<filename>11cityroom-rcpt-articleInline-v2.jpg</filename>
+	<path/>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size_part>
+		<width>190</width>
+		<height>373</height>
+		<depth>3</depth>
+	</size_part>
+	<segmented>0</segmented>
+	<object>
+		<name>Merchant</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>7.8571395874023</xmin>
+			<ymin>12</ymin>
+			<xmax>172.8571395874</xmax>
+			<ymax>45</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Line items and their value</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>2.8571395874023</xmin>
+			<ymin>242</ymin>
+			<xmax>178.8571395874</xmax>
+			<ymax>255</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Line items and their value</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>0</xmin>
+			<ymin>254</ymin>
+			<xmax>178.8571395874</xmax>
+			<ymax>269</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Tax</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>2.8571395874023</xmin>
+			<ymin>291</ymin>
+			<xmax>184.8571395874</xmax>
+			<ymax>303</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Total</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>7.8571395874023</xmin>
+			<ymin>304</ymin>
+			<xmax>179.8571395874</xmax>
+			<ymax>318</ymax>
+		</bndbox>
+	</object>
+</annotation>
 ```
 
   
@@ -145,34 +215,34 @@ For example, say you are training a classifier to detect basketballs, shirts, an
 ```
 # TO-DO replace this with label map
 def class_text_to_int(row_label):
-    if row_label == 'hdmi_port':
-        return 1
-    elif row_label == 'audio_port':
-        return 2
-    elif row_label == 'speaker':   
-        return 3
-    elif row_label == 'video_component_port':
-        return 4
-    else:
-        None
+    .....
 ```
 With this:
 ```
 # TO-DO replace this with label map
 def class_text_to_int(row_label):
-    if row_label == 'basketball':
+    if row_label == "merchant":
         return 1
-    elif row_label == 'shirt':
+    elif row_label == "receipt_number":
         return 2
-    elif row_label == 'shoe':
+    elif row_label == "date" :   
         return 3
+    elif row_label == "line_items_and_value":
+        return 4
+    elif row_label == "total":
+        return 5
+    elif row_label == "tax":
+        return 6
+    elif row_label == "mode_of_payment":
+        return 7
     else:
-        return None
+        None
 ```
 Then, generate the TFRecord files by issuing these commands from the /object_detection folder:
 
 ```
 python object_detection/generate_tfrecord.py --csv_input=object_detection/images/train_labels.csv --image_dir=object_detection/images/train --output_path=object_detection/train.record
+
 python object_detection/generate_tfrecord.py --csv_input=object_detection/images/test_labels.csv --image_dir=object_detection/images/test --output_path=object_detection/test.record
 ```
 These generate a train.record and a test.record file in /object_detection. These will be used to train the new object detection classifier.
@@ -182,7 +252,7 @@ The last thing to do before training is to create a label map and edit the train
 
 #### 5a. Label map
 The label map tells the trainer what each object is by defining a mapping of class names to class ID numbers. Use a text editor to create a new file and save it as labelmap.pbtxt in the ~/ROD/models/research/object_detection/training folder. 
-(Make sure the file type is .pbtxt, not .txt !) In the text editor, copy or type in the label map in the format below (the example below is the label map for our Audio Video Connector Detector):
+(Make sure the file type is .pbtxt, not .txt !) In the text editor, copy or type in the label map in the format below (the example below is the label map for our Text Detector):
 ```
 item {
  id: 1
@@ -218,6 +288,8 @@ item {
  id: 7
  name: 'mode_of_payment'
 }
+
+  
 
   
 
@@ -258,9 +330,9 @@ If everything has been set up correctly, TensorFlow will initialize the training
 
 
 
-Each step of training reports the loss. It will start high and get lower and lower as training progresses. For our training on the Faster-RCNN-Inception-V2 model, it started at about 3.0 and quickly dropped below 0.8. We recommend allowing your model to train until the loss consistently drops below 0.05, which will take about 40,000 steps, or about 2 hours (depending on how powerful your CPU and GPU are). Note: The loss numbers will be different if a different model is used. MobileNet-SSD starts with a loss of about 20, and should be trained until the loss is consistently under 2.
+Each step of training reports the loss. It will start high and get lower and lower as training progresses. For our training on the faster_rcnn_inception_v2_coco_2018_01_28 model, it started at about 3.0 and quickly dropped below 0.3. We recommend allowing your model to train until the loss consistently drops below 0.05, which will take about 40,000 steps, or about 2 hours (depending on how powerful your CPU and GPU are). Note: The loss numbers will be different if a different model is used. MobileNet-SSD starts with a loss of about 20, and should be trained until the loss is consistently under 2.
 
-You can view the progress of the training job by using TensorBoard. To do this, open a new instance of Anaconda Prompt, activate the *av_connector_detection* virtual environment, change to the AVCD/models/research/object_detection directory, and issue the following command:
+You can view the progress of the training job by using TensorBoard. To do this, open a new instance of Anaconda Prompt, activate the *text_detection* virtual environment, change to the ROD/models/research/object_detection directory, and issue the following command:
 ```
 ROD/models/research/object_detection>tensorboard --logdir=training
 ```
