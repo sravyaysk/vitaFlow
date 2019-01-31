@@ -30,7 +30,7 @@ $ratio_new_old = 80;
 ?>
 ```
 ### 2. Images
-Images to be annotated are located in **data/images/collection_01/part_1**
+Images to be annotated are located in **data/images/collection_01/**
 
 ### 3. List of classes
 
@@ -47,8 +47,6 @@ The list of classes can be customized in the file **resources/list_of_tags.json*
 ]
 
 ```
-The result is quite cool !<br />
-![Screen Shot](http://bipbipavertisseur.alwaysdata.net/example/images/list_species.jpg)
 
 ### 4. Annotations Target directory 
 Each image will generate one XML file in the directory **data/annotations**
