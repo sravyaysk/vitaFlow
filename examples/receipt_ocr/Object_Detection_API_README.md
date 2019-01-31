@@ -350,11 +350,9 @@ python object_detection/export_inference_graph.py  --input_type image_tensor --p
 This creates a frozen_inference_graph.pb file in the /object_detection/inference_graph folder. The .pb file contains the object detection classifier.
 
 ### 8. Use Your Newly Trained Object Detection Classifier!
-The object detection classifier is all ready to go! use the written Python scripts to test it out on an image, video, or webcam feed.
+The object detection classifier is all ready to go! use the written Python scripts to test it out on an image.
 
 Before running the Python scripts, you need to modify the NUM_CLASSES variable in the script to equal the number of classes you want to detect. ( currently NUM_CLASSES = 7.)
-
-
 
 It will run your object detection model found at `output_inference_graph/frozen_inference_graph.pb` on all the images in the `test_images` directory and output the results in the `output/test_images` directory.
 
