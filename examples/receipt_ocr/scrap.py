@@ -9,7 +9,7 @@ baseUrl = 'http://expressexpense.com/view-receipts.php?page='
 headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:64.0) Gecko/20100101 Firefox/64.0'}
 
 failed = []
-for i in range(2, 91):
+for i in range(1, 91):
     url = baseUrl + str(i)
     response = requests.get(url, headers=headers)
     time.sleep(1)
