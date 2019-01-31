@@ -1,13 +1,13 @@
 # Images Annotation
 
 ### 1. Start Server
-
+```
 cd annotate_server
 
 sudo apt install php7.0-cli
 
 php -S localhost:8000
-
+```
 
 ### 1. Configuration
 
