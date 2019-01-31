@@ -27,8 +27,8 @@ import pytesseract
 from PIL import Image as PI
 from tqdm import tqdm
 from wand.image import Image
-
-from vitaflow.helpers.print_helper import print_info
+from tqdm import tqdm
+from vitaflow.helpers.print_helper import print_info, print_error
 
 
 class TesseractOCR:
@@ -42,8 +42,13 @@ class TesseractOCR:
         img = cv2.imread(image_path)
         text = pytesseract.image_to_string(img,lang='eng',config='--psm 6')
         image_path = os.path.normpath(image_path)
-        file_name = image_path.split(os.sep)[-1].split(".")[0]
-        text_file_path = os.path.join(self._text_out_dir, file_name+".txt")
+        file_name = image_path.split(os.sep)[-2]
+        tag_name = image_path.split(os.sep)[-1].split(".")[0]
+        file_path = os.path.join(self._text_out_dir, file_name)
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
+        text_file_path = os.path.join(file_path, tag_name+".txt")
+        print_error(text_file_path)
         fd = open(text_file_path,"w")
         fd.write("%s" % text)
         return text_file_path
@@ -96,13 +101,13 @@ class TesseractOCR:
 
 
     def parallel_convert(self):
+        print_info("Running OCR : {}".format(self._image_dir))
         with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
-            image_list = glob.glob(self._image_dir+os.sep + "*.png")
-            image_list.extend(glob.glob(self._image_dir+os.sep + "*.pdf"))
-            image_list.extend(glob.glob(self._image_dir + os.sep + "*.jpeg"))
-            image_list.extend(glob.glob(self._image_dir + os.sep + "*.jpg"))
-            image_list.extend(glob.glob(self._image_dir + os.sep + "*.tmp"))
-            print_info(image_list)
+            image_list = glob.glob(self._image_dir+ os.sep + "*/*.jpg")
+            image_list.extend(glob.glob(self._image_dir+ os.sep + "*/*.jpeg"))
+            image_list.extend(glob.glob(self._image_dir+ os.sep + "*/*.png"))
+
+            # print_info(image_list)
             for img_path,out_file in zip(image_list, executor.map(self.convert, image_list)):
                 print(img_path,',',out_file,', processed')
 

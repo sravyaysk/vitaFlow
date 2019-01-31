@@ -2,22 +2,15 @@ from matplotlib import pyplot as plt
 
 import numpy as np
 import tensorflow as tf
+from examples.receipt_ocr.image_cropping import ImageCropping
+
 from glob import glob
 
-images_src = '/Users/sampathm/Desktop/test_images/*'
-images_dest = '/Users/sampathm/Desktop/test_images2/'
+from vitaflow.helpers.print_helper import print_info
+from tqdm import tqdm
 
+def image_annotations(path_to_tensorflow_model, category_index, images_src, images_dest):
 
-def image_annotations(images_src=images_src, images_dest=images_dest):
-    path_to_tensorflow_model = '/Users/sampathm/devbox/object_detector_app/inference_graph/frozen_inference_graph.pb'
-    category_index = \
-        {1: {'id': 1, 'name': 'merchant'},
-         2: {'id': 2, 'name': 'receipt_number'},
-         3: {'id': 3, 'name': 'date'},
-         4: {'id': 4, 'name': 'line_items_and_value'},
-         5: {'id': 5, 'name': 'total'},
-         6: {'id': 6, 'name': 'tax'},
-         7: {'id': 7, 'name': 'mode_of_payment'}}
 
     def get_box_dims(box, image_shape):
         ymin, xmin, ymax, xmax = box
@@ -43,7 +36,8 @@ def image_annotations(images_src=images_src, images_dest=images_dest):
 
     bag = []
 
-    for image_path in glob(images_src):
+    for image_path in tqdm(glob(images_src+"/*")):
+        print_info("Processing {}".format(image_path))
         image = plt.imread(image_path)
         image_expanded = np.expand_dims(image, axis=0)
 
@@ -68,11 +62,3 @@ def image_annotations(images_src=images_src, images_dest=images_dest):
     # pprint(bag)
     return bag
 
-
-if __name__ == '__main__':
-    # pprint(image_annotations())
-    from image_processing import ImageToTextImages
-
-    for each in image_annotations(images_src, images_dest):
-        t = ImageToTextImages(each['image_loc'], each['dest'])
-        t.multiple_crop_and_save(each['coords'], each['tags'])
