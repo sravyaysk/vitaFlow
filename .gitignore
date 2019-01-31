@@ -119,3 +119,5 @@ venv.bak/
 vitaflow/annotate_server/data/annotations/*.*
 vitaflow/annotate_server/data/images/collection_01/part_1/*.*
 
+# Ignore annotation - tags
+vitaflow/annotate_server/resources/list_of_tags.json
