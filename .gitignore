@@ -113,3 +113,9 @@ venv.bak/
 
 # VS Code
 .vscode/
+
+# Ignore test images & annotated data
+
+vitaflow/annotate_server/data/annotations/*.*
+vitaflow/annotate_server/data/images/collection_01/part_1/*.*
+
