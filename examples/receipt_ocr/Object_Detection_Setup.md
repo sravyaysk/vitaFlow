@@ -1,6 +1,7 @@
 
 ## Setup
-Please run object_detection_setup.sh for running all the following steps. Incase you have any issue, refer to this document.
+> Please run object_detection_setup.sh for running all the following steps. Incase you have any issue, refer to this document.
+
 **Prerequisites**
 We recommend you to use python2 as the preferred interpretor.  Reason being the Tensorflow Object Dectection API, on top of which this full experiment revolves, is written in python2. For all the experiments we have used **GEFORCE GTX 1080 Ti 11GB** without which the training time is extended by factor of 8 (3 hours on GPU = 24 hours in CPU)
 
