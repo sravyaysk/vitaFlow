@@ -19,8 +19,8 @@ To customize the directories used, edit the PHP file **inc/configuration.php**
 $IMAGE_WEB_DIR = "data/images";
 
 # Image path for internal PHP use
-$IMAGE_ROOT_DIR  = "../data/images";
-$ANNOTATIONS_DIR = "../data/annotations";
+$IMAGE_ROOT_DIR  = "/Users/sampathm/Desktop/test_images";
+$ANNOTATIONS_DIR = "/Users/sampathm/Desktop/test_images2";
 
 # Collection name 
 $COLLECTION_NAME = "collection_01";

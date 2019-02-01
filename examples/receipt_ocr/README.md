@@ -1,7 +1,7 @@
 # Receipt OCR
 
 ```
-Scanned PDFs/Images  ---> Image Preprocessing 
+Scanned PDFs/Images  --> Image Preprocessing 
                         ---> Resizing
                         ---> Deskewing
                         ---> Rotation
@@ -9,12 +9,12 @@ Scanned PDFs/Images  ---> Image Preprocessing
                         ---> Background noise removal
                         ---> Binarization 
                         ---> Stiching etc.,
-                     ---> OCR (Tesseract/DL Models)
-                     ---> Doc/Text Classifiers
+                     --> OCR (Tesseract/DL Models)
+                     --> Doc/Text Classifiers
                         ---> Identifying the receipts etc.,
-                     ---> Annotators (Optional)
-                     ---> ML/DL Model (Optional)
-                     ---> Data Insights 
+                     --> Annotators (Optional)
+                     --> ML/DL Model (Optional)
+                     --> Data Insights 
                         ---> Format templates
                         ---> Regex
                      ---> Text PostProcessing
@@ -56,6 +56,7 @@ The above diagram depicts the various
     
 - Object Detection
     - We leverage the existing pre-trained models for the detecting the above points of interest by using [Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
+
 - Image Segmentation and Cropping
     - Following folder structure is adopted to output the images by croping the receipt image for predicted co-ordinates and labels
         ```
