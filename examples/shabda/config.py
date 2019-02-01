@@ -20,9 +20,9 @@ experiment_name = "TEDLiumTestDataset"
 batch_size = 32
 
 experiments = {
-    "num_epochs": 10,
-    "dataset_class_with_path": "examples.shabda.tedlium_dataset.TEDLiumDataset",
-    "iterator_class_with_path": "examples.shabda.tedlium_parallel_iterator.TEDLiumIterator",
+    "num_epochs": 2,
+    "dataset_class_with_path": "examples.shabda.tedlium_dataset_spark.TEDLiumDatasetOnCloud",
+    "iterator_class_with_path": "examples.shabda.tedlium_parallel_iterator_tfrecord.TEDLiumIterator",
     "model_class_with_path": "examples.shabda.deep_clustering.DeepClustering",
     "save_checkpoints_steps": 100,
     "keep_checkpoint_max": 5,
@@ -31,18 +31,32 @@ experiments = {
     "clear_model_data" : True,
     "plug_dataset" : True,
 
-    "examples.shabda.tedlium_dataset.TEDLiumDataset": {
+
+    "examples.shabda.tedlium_dataset_spark.TEDLiumDatasetOnCloud": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "train_data_path": "train",
         "validation_data_path": "dev",
         "test_data_path": "test",
-        "num_clips": 128,
-        "duration": 20,
-        "sampling_rate": SAMPLING_RATE,
+        "num_clips": 25,
+        "duration": 30,
+        "sampling_rate" : SAMPLING_RATE,
+        "frame_size" : FRAME_SIZE,
+        "neff" : NEFF,
+        "min_amp" : MIN_AMP,
+        "amp_fac" : AMP_FAC,
+        "threshold" : THRESHOLD,
+        "global_mean" : GLOBAL_MEAN,
+        "global_std" : GLOBAL_STD,
+        "frames_per_sample" : FRAMES_PER_SAMPLE,
+        "reinit_file_pair" : False,
+        "spark_master" : "local[4]",
+        "clips_output_dir" : "/tmp/clips/",
+        "speech_mix_output_dir" : "/tmp/speech/mix"
     },
 
-    "examples.shabda.tedlium_parallel_iterator.TEDLiumIterator": {
+
+    "examples.shabda.tedlium_parallel_iterator_tfrecord.TEDLiumIterator": {
         "experiment_root_directory": experiment_root_directory,
         "experiment_name": experiment_name,
         "preprocessed_data_path": "preprocessed_data",
@@ -63,6 +77,7 @@ experiments = {
         "num_threads" : 3,
         "reinit_file_pair" : True
     },
+
 
     "examples.shabda.deep_clustering.DeepClustering" : {
         "model_root_directory": experiment_root_directory,

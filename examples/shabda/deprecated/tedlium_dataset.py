@@ -7,7 +7,6 @@ from tqdm import tqdm
 from vitaflow.core import IPreprocessor, HParams
 from vitaflow.helpers.print_helper import print_error, print_warn, print_info
 
-
 class TEDLiumDataset(IPreprocessor):
     """
     Download the dataset from https://projets-lium.univ-lemans.fr/wp-content/uploads/corpus/TED-LIUM/TEDLIUM_release1.tar.gz

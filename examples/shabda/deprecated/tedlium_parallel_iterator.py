@@ -1,11 +1,12 @@
 import gc
 import os
 import random
+import traceback
 from contextlib import closing
 import datetime
+from scipy.io import wavfile
 
 import itertools
-import tracemalloc
 
 import numpy as np
 import tensorflow as tf
@@ -13,7 +14,10 @@ from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
 import librosa
 from numpy.lib import stride_tricks
+from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
+from memory_profiler import profile
+
 
 from sklearn.cluster import KMeans
 from matplotlib import pyplot as plt
@@ -44,8 +48,6 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         ShabdaWavPairFeature.__init__(self)
         self._hparams = HParams(hparams=hparams, default_hparams=self.default_hparams())
         self._dataset = dataset
-
-        tracemalloc.start()
 
         # get dict of {speaker : [files], ...}
         if self._dataset:
@@ -129,6 +131,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         )
         return params
 
+    @profile
     def _get_speaker_files(self, data_dir):
         """
 
@@ -165,6 +168,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         st = os.stat(wav_file)
         return st.st_size
 
+    @profile
     def _generate_match_dict(self, speaker_wav_files_dict):
         """
         Generates pair of files from given dict of speakers and their speeches
@@ -197,6 +201,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return wav_file_pair
 
 
+    @profile
     def _get_speech_data(self, wav_file, sampling_rate):
         """
 
@@ -204,7 +209,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         :param sampling_rate:
         :return:
         """
-        speech, _ = librosa.core.load(wav_file, sr=sampling_rate)
+        # speech, _ = librosa.core.load(wav_file, sr=sampling_rate)
+        sr, speech = wavfile.read(wav_file)
         # amplication factor between -3 (dB) to 3 (dB)
         fac = np.random.rand(1)[0] * 6 - 3
         # randomly choose the amplification factor and applyt he factor to get gan or loss of the speech
@@ -217,6 +223,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         speech = 10. ** (fac / 20) * speech
         return speech
 
+    @profile
     def _stft(self, sig, frameSize, overlapFac=0.75, window=np.hanning):
         """
         Short time fourier transform of audio signal
@@ -255,11 +262,13 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         #discrete Fourier Transform
         return np.fft.rfft(frames)
 
+    @profile
     def replaceZeroes(self, data):
         min_nonzero = np.min(data[np.nonzero(data)])
         data[data == 0] = min_nonzero
         return data
 
+    @profile
     def _get_log_spectrum_features(self, speech, frame_size, neff, amp_fac, min_amp):
         """
         find short time fourier transform for the mixture and trim it to given NEFF
@@ -287,6 +296,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         speech_features = 20. * np.log10(speech_features * amp_fac)
         return speech_features
 
+    @profile
     def _get_speech_samples(self,
                             speech_1_features,
                             speech_2_features,
@@ -329,7 +339,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             del sample_1, sample_2, sample_mix, voice_activity_detection, Y
         return bag
 
-    # @profile
+    @profile
     def _get_speech_features(self, args):
         """
 
@@ -379,19 +389,20 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                                                 speech_mix_features_final,
                                                speech_voice_activity_detection)
                 # print_error("deleting speech_1_features, speech_2_features, speech_voice_activity_detection, speech_mix_features")
-                # del speech_1_features, speech_2_features, speech_voice_activity_detection, speech_mix_features, speech_mix_features_final
+                del speech_1_features, speech_2_features, speech_voice_activity_detection, speech_mix_features, speech_mix_features_final
                 return new_data
 
             new_data = _get_data()
-            print_info("len of new_data {}".format(len(new_data)))
         except (KeyboardInterrupt, SystemExit):
             raise
         except Exception as err:
+            print_error(traceback.print_exc())
             new_data = []
 
         return new_data
 
 
+    @profile
     def _yield_samples_multicore(self,
                                  speaker_file_match,
                                  sampling_rate,
@@ -430,23 +441,15 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         prev = datetime.datetime.now()
 
 
-        with closing( ThreadPool(num_threads) ) as pool:
+        with closing( Pool(num_threads, maxtasksperchild=100) ) as pool:
             with tqdm(total=len(speaker_file_match.items()), desc=tqdm_desc) as pbar:
                 for i, res in enumerate(pool.imap_unordered(self._get_speech_features, input_params)):
                     pbar.update()
                     for data in res:
-                        # now = datetime.datetime.now()
-                        # if abs(now.minute - prev.minute) > 2:
-                        #
-                        #     snapshot = tracemalloc.take_snapshot()
-                        #     top_stats = snapshot.statistics('lineno')
-                        #     print("[ Top 10 ]")
-                        #     for stat in top_stats[:10]:
-                        #         print(stat)
-                        #     gc.collect()
-                        #     prev = datetime.datetime.now()
                         yield data
+            # pool.join()
 
+    @profile
     def _yield_samples(self, speaker_file_match, tqdm_desc):
         '''Init the training data using the wav files'''
         sampling_rate = self._hparams.sampling_rate
@@ -475,15 +478,19 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             yield sample_mix, voice_activity_detection, Y
 
     # To make easy integration with TF Data generator APIs, following methods are added
+    @profile
     def _yield_train_samples(self):
         return self._yield_samples(self.TRAIN_WAV_PAIR, tqdm_desc="Train: ")
 
+    @profile
     def _yield_val_samples(self):
         return self._yield_samples(self.VAL_WAV_PAIR, tqdm_desc="Val: ")
 
+    @profile
     def _yield_test_samples(self):
         return self._yield_samples(self.TEST_WAV_PAIR, tqdm_desc="Test: ")
 
+    @profile
     def _get_train_input_fn(self):
         """
         Inheriting class must implement this
@@ -508,6 +515,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info(dataset.output_shapes)
         return dataset
 
+    @profile
     def _get_val_input_fn(self):
         """
         Inheriting class must implement this
@@ -531,6 +539,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info(dataset.output_shapes)
         return dataset
 
+    @profile
     def _get_test_input_function(self):
         """
         Inheriting class must implement this
@@ -553,7 +562,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info(dataset.output_shapes)
         return dataset
 
-
+    @profile
     def _get_predict_samples(self, file_path):
         """
 
@@ -616,6 +625,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         self.phase_features.append(phase)
         return np.asarray(self.freq_features),  self.voice_activity_detection_features, self.phase_features
 
+
+    @profile
     def predict_on_instance(self, executor, file_path):
         """
 
@@ -794,6 +805,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return [(source1, self._hparams.sampling_rate), (source2, self._hparams.sampling_rate)]
 
 
+    @profile
     def visulaize(self, executor, file_path):
         """
 

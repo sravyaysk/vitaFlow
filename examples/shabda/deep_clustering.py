@@ -20,6 +20,8 @@ from overrides import overrides
 import numpy as np
 import tensorflow as tf
 
+from memory_profiler import profile
+
 from tensorflow.contrib.learn import ModeKeys
 from tensorflow.contrib import lookup
 
@@ -68,6 +70,7 @@ class DeepClustering(ModelBase, ShabdaWavPairFeature):
         })
         return params
 
+    
     def _build_layers(self, features, mode):
         '''The structure of the network'''
         # four layer of LSTM cell blocks
