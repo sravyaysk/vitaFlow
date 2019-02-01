@@ -27,7 +27,7 @@ import pytesseract
 from PIL import Image as PI
 from tqdm import tqdm
 from wand.image import Image
-from tqdm import tqdm
+
 from vitaflow.helpers.print_helper import print_info, print_error
 
 
@@ -108,9 +108,8 @@ class TesseractOCR:
             image_list.extend(glob.glob(self._image_dir+ os.sep + "*/*.png"))
 
             # print_info(image_list)
-            for img_path,out_file in zip(image_list, executor.map(self.convert, image_list)):
-                print(img_path,',',out_file,', processed')
-
-
-
-
+            try:
+                for img_path, out_file in zip(image_list, executor.map(self.convert, image_list)):
+                    print(img_path, ',', out_file, ', processed')
+            except:
+                pass
