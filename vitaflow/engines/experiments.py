@@ -19,7 +19,7 @@ import os
 import shutil
 import time
 from importlib import import_module
-import tracemalloc
+from memory_profiler import profile
 
 import tensorflow as tf
 from tqdm import tqdm
@@ -75,6 +75,7 @@ class Experiments(object):
         """
         return getattr(import_module(package), name)
 
+    #@profile
     def get_dataset_reference(self, dataset_class_with_path):
         """
         Uses the dataset name to get the reference from the dataset factory class
@@ -89,6 +90,7 @@ class Experiments(object):
         dataset = self._get_class(package=package, name=name)
         return dataset
 
+    #@profile
     def get_iterator_reference(self, iterator_class_with_path):
         """
         Uses the iterator name to get the reference from the iterator factory class
@@ -102,6 +104,7 @@ class Experiments(object):
         iterator = self._get_class(package=package, name=name)
         return iterator
 
+    #@profile
     def get_model_reference(self, model_class_with_path):
         """
         Uses the model name to get the reference from the model factory class
@@ -132,6 +135,7 @@ class Experiments(object):
         #                format(ModelsFactory.get_supported_data_iterators(self._dataset.dataset_type)))
         #     raise RuntimeError("Selected model and data iterator can't be used together")
 
+    #@profile
     def _init_tf_config(self):
         run_config = tf.ConfigProto()
         run_config.gpu_options.allow_growth = True
@@ -152,6 +156,7 @@ class Experiments(object):
                                                   log_step_count_steps=self._hparams.log_step_count_steps)
         return run_config
 
+    #@profile
     def setup(self):
         self.check_interoperability_n_import()
         # Initialize the handles and call any user specific init() methods
@@ -182,19 +187,11 @@ class Experiments(object):
                 res = sess.run(next_element)
                 pbar.update()
                 try:
-                    if False:
+                    if True:
                         print("Data shapes : ", end=" ")
                         for key in res[0].keys():
                             print(res[0][key].shape, end=", ")
                         print(" label shape : {}".format(res[1].shape))
-
-                    if i % 50:
-                        snapshot = tracemalloc.take_snapshot()
-                        top_stats = snapshot.statistics('lineno')
-                        print("[ Top 10 ]")
-                        for stat in top_stats[:10]:
-                            print(stat)
-                    i += 1
 
                 except tf.errors.OutOfRangeError:
                     break
@@ -204,8 +201,9 @@ class Experiments(object):
 
         exit(0)
 
+
+    #@profile
     def run(self, args):
-        tracemalloc.start()
         self.setup()
         num_samples = self._data_iterator.num_train_samples
         print_info("Number of trianing samples : {}".format(num_samples))
@@ -214,29 +212,24 @@ class Experiments(object):
         mode = self.mode
         self._init_tf_config()
 
-        if mode == "run_iterator":
+        if mode == "test_iterator":
             self.test_iterator()
 
         executor = Executor(model=self._model, data_iterator=self._data_iterator, config=self._run_config)
 
-
         if mode in ["train", "retrain"]:
             for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
-
                 current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
                 print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
-                executor.train(max_steps=10)
-                # print("\n\n Evaluating for epoch\n\n", current_epoch)
-                # executor.evaluate(steps=200)
-                snapshot = tracemalloc.take_snapshot()
-                top_stats = snapshot.statistics('lineno')
-                print("[ Top 10 ]")
-                for stat in top_stats[:10]:
-                    print(stat)
+                executor.train(max_steps=None)
+                print("\n\n Evaluating for epoch\n\n", current_epoch)
+                executor.evaluate(steps=200)
 
         elif mode == "predict":
             self._data_iterator.predict_on_test_files(executor=executor)
 
         elif mode == "predict_instance":
             self._data_iterator.predict_on_instance(executor=executor, file_path=args.test_file_path)
+        else:
+            print_error("Given mode is not avaialble!")
 

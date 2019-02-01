@@ -15,6 +15,9 @@
 """
 Preprocessor interface for data sets
 """
+import pickle
+
+from vitaflow.helpers.print_helper import print_info
 
 __all__ = ["IPreprocessor"]
 __version__ = '0.0.1'
@@ -63,13 +66,13 @@ class IPreprocessor:
                                          "raw_data",
                                          self._hparams.test_data_path)
 
-        self.PROCESSED_DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
-                                                   self._hparams.preprocessed_data_path)
-        self.TRAIN_OUT_PATH = os.path.join(self.PROCESSED_DATA_OUT_DIR,
+        self.PREPROCESSED_DATA_OUT_DIR = os.path.join(self.EXPERIMENT_ROOT_DIR,
+                                                      self._hparams.preprocessed_data_path)
+        self.TRAIN_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
                                            self._hparams.train_data_path)
-        self.VAL_OUT_PATH = os.path.join(self.PROCESSED_DATA_OUT_DIR,
+        self.VAL_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
                                          self._hparams.validation_data_path)
-        self.TEST_OUT_PATH = os.path.join(self.PROCESSED_DATA_OUT_DIR,
+        self.TEST_OUT_PATH = os.path.join(self.PREPROCESSED_DATA_OUT_DIR,
                                           self._hparams.test_data_path)
 
     @staticmethod
@@ -123,6 +126,19 @@ class IPreprocessor:
             "test_data_path": "test"
         }
 
+    @property
+    def dataset_dir(self):
+        """
+        Returns iterator directory `experiment_root_directory`/`experiment_name`/`iterator_name`
+        :return:
+        """
+        path = os.path.join(self._hparams.experiment_root_directory,
+                            self._hparams.experiment_name,
+                            type(self).__name__)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path
+
     def _create_target_directories(self):
         """
         Inheriting class must take care of creating experiment folder and all needed
@@ -147,3 +163,20 @@ class IPreprocessor:
         """
         self._create_target_directories()
         self._prepare_data()
+
+    def store_as_pickle(self, data, file_name):
+        file_path = os.path.join(self.dataset_dir, file_name)
+        print_info("Writing the pickle file {}...".format(file_path))
+        with open(file_path, 'wb') as f:
+            pickle.dump(data, f)
+        return None
+
+    def read_pickle(self, file_name):
+        file_path = os.path.join(self.dataset_dir, file_name)
+        if os.path.exists(file_path):
+            print_info("Reading the pickle file {}...".format(file_path))
+            with open(file_path, 'rb') as f:
+                data = pickle.load(f)
+            return data
+        else:
+            return None

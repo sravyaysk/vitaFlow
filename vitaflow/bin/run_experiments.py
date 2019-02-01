@@ -27,6 +27,7 @@ import os
 import sys
 
 import tensorflow as tf
+from memory_profiler import profile
 
 # Appending vitaFlow main Path
 sys.path.append(os.path.abspath('.'))
@@ -45,8 +46,8 @@ config = FLAGS.config_python_file.replace("/", ".")
 config = config.replace(".py", "")
 config = importlib.import_module(config)
 
-
-if __name__ == "__main__":
+#@profile
+def main():
     print(' -' * 35)
     print('Running Experiment:',config.experiment_name)
     print(' -' * 35)
@@ -71,3 +72,6 @@ if __name__ == "__main__":
     experiment = Experiments(hparams=config.experiments, mode=FLAGS.mode)
     experiment.run(args=FLAGS)
     print(' -' * 35)
+
+if __name__ == "__main__":
+    main()
