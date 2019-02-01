@@ -267,19 +267,19 @@ $(document).ready(function ()
 		// Check region size
 		if (isAreaTooSmall(area))
 		{
-			setStatusAndColor("The region is too small (must be >80px).", RED_COLOR)
+			setStatusAndColor("The region is too small (must be >10px).", RED_COLOR)
 
 			newWidth = area.width;
 			newHeight = area.height;
 
-			if (newWidth < 80)
+			if (newWidth < 10)
 			{
-				newWidth = 80;
+				newWidth = 10;
 			}
 
-			if (newHeight < 80)
+			if (newHeight < 10)
 			{
-				newHeight = 80;
+				newHeight = 10;
 			}
 
 			$('#image_to_process').selectAreas('resizeArea', current_area.id, newWidth, newHeight);
@@ -492,19 +492,19 @@ function isTagInAuthorizedList()
 		// Check region size
 		if (isAreaTooSmall(area))
 		{
-			setStatusAndColor("The region is too small (must be >80px).", RED_COLOR)
+			setStatusAndColor("The region is too small (must be >10px).", RED_COLOR)
 
 			newWidth = area.width;
 			newHeight = area.height;
 
-			if (newWidth < 80)
+			if (newWidth < 10)
 			{
-				newWidth = 80;
+				newWidth = 10;
 			}
 
-			if (newHeight < 80)
+			if (newHeight < 10)
 			{
-				newHeight = 80;
+				newHeight = 10;
 			}
 
 			$('#image_to_process').selectAreas('resizeArea', current_area.id, newWidth, newHeight);
@@ -520,7 +520,7 @@ function isTagInAuthorizedList()
 
 	function isAreaTooSmall(area)
 	{
-		if ((area.width<80) || (area.height<80))
+		if ((area.width<10) || (area.height<10))
 		{
 			return true;
 		}

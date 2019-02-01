@@ -1,15 +1,15 @@
 # Images Annotation
 
 ### 1. Start Server
-
+```
 cd annotate_server
 
 sudo apt install php7.0-cli
 
 php -S localhost:8000
+```
 
-
-### 1. Configuration
+### 2. Configuration
 
 
 To customize the directories used, edit the PHP file **inc/configuration.php**
@@ -29,10 +29,10 @@ $COLLECTION_NAME = "collection_01";
 $ratio_new_old = 80;
 ?>
 ```
-### 2. Images
+### 3. Images
 Images to be annotated are located in **data/images/collection_01/**
 
-### 3. List of classes
+### 4. List of classes
 
 The list of classes can be customized in the file **resources/list_of_tags.json**
 ```json
@@ -48,7 +48,7 @@ The list of classes can be customized in the file **resources/list_of_tags.json*
 
 ```
 
-### 4. Annotations Target directory 
+### 5. Annotations Target directory 
 Each image will generate one XML file in the directory **data/annotations**
 
 ## Output as Pascal VOC xml files
