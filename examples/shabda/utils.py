@@ -48,7 +48,7 @@ def to_clips(file_path, data, num_clips=128, duration=20, output_dir="/tmp/"):
     return None
 
 
-def _get_speech_data(wav_file, sampling_rate):
+def _get_speech_data(wav_file, sampling_rate): #TODO S3 support
     """
 
     :param wav_file:
@@ -279,18 +279,6 @@ def _generate_tf_Records(index,
                          global_std,
                          frames_per_sample,
                          out_dir):
-    print_info(wav_file_1)
-    print_info(wav_file_2)
-    print(sampling_rate,
-          frame_size,
-          amp_fac,
-          neff,
-          min_amp,
-          threshold,
-          global_mean,
-          global_std,
-          frames_per_sample,
-          out_dir)
     data = _get_speech_features(wav_file_1,
                                 wav_file_2,
                                 sampling_rate,

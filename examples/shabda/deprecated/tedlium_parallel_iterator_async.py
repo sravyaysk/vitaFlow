@@ -1,21 +1,11 @@
-# Copyright 2019 The vitaFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-import glob
+import gc
 import os
-
-
+import random
+import traceback
+from contextlib import closing
+import datetime
+from scipy.io import wavfile
+from multiprocessing import get_context
 import itertools
 
 import numpy as np
@@ -23,6 +13,9 @@ import tensorflow as tf
 from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
 import librosa
+from numpy.lib import stride_tricks
+from multiprocessing import Pool
+from multiprocessing.pool import ThreadPool
 from memory_profiler import profile
 
 
@@ -32,10 +25,11 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA
 
 from examples.shabda.core.feature_types.shabda_wav_pair_feature import ShabdaWavPairFeature
-from examples.shabda.utils import _stft
 from vitaflow.core import HParams, IIteratorBase
 from vitaflow.helpers.print_helper import print_info
 from vitaflow.helpers.print_helper import print_error
+
+
 
 
 class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
@@ -57,7 +51,43 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         self._hparams = HParams(hparams=hparams, default_hparams=self.default_hparams())
         self._dataset = dataset
 
+        # get dict of {speaker : [files], ...}
+        if self._dataset:
+            self.TRAIN_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=dataset.TRAIN_OUT_PATH)
+            self.VAL_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=dataset.VAL_OUT_PATH)
+            self.TEST_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=dataset.TEST_OUT_PATH)
+        else:
+            preprocessed_data_path = os.path.join(self._hparams.experiment_root_directory, self._hparams.experiment_name, "preprocessed_data")
+            self.TRAIN_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=os.path.join(preprocessed_data_path, "train"))
+            self.VAL_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=os.path.join(preprocessed_data_path, "dev"))
+            self.TEST_SPEAKER_WAV_FILES_DICT = self._get_speaker_files(data_dir=os.path.join(preprocessed_data_path, "test"))
 
+        if self._hparams.reinit_file_pair:
+            # Generate speaker pair
+            self.TRAIN_WAV_PAIR = self._generate_match_dict(self.TRAIN_SPEAKER_WAV_FILES_DICT)
+            self.store_as_pickle(self.TRAIN_WAV_PAIR, "train_wav_pair.p")
+
+            self.VAL_WAV_PAIR = self._generate_match_dict(self.VAL_SPEAKER_WAV_FILES_DICT)
+            self.store_as_pickle(self.VAL_WAV_PAIR, "val_wav_pair.p")
+
+            self.TEST_WAV_PAIR = self._generate_match_dict(self.TEST_SPEAKER_WAV_FILES_DICT)
+            self.store_as_pickle(self.TEST_WAV_PAIR, "test_wav_pair.p")
+
+        else:
+            self.TRAIN_WAV_PAIR = self.read_pickle("train_wav_pair.p")
+            if self.TRAIN_WAV_PAIR is None:
+                self.TRAIN_WAV_PAIR = self._generate_match_dict(self.TRAIN_SPEAKER_WAV_FILES_DICT)
+                self.store_as_pickle(self.TRAIN_WAV_PAIR, "train_wav_pair.p")
+
+            self.VAL_WAV_PAIR = self.read_pickle("val_wav_pair.p")
+            if self.VAL_WAV_PAIR is None:
+                self.VAL_WAV_PAIR = self._generate_match_dict(self.VAL_SPEAKER_WAV_FILES_DICT)
+                self.store_as_pickle(self.VAL_WAV_PAIR, "val_wav_pair.p")
+
+            self.TEST_WAV_PAIR = self.read_pickle("test_wav_pair.p")
+            if self.TEST_WAV_PAIR is None:
+                self.TEST_WAV_PAIR = self._generate_match_dict(self.TEST_SPEAKER_WAV_FILES_DICT)
+                self.store_as_pickle(self.TEST_WAV_PAIR, "test_wav_pair.p")
 
     @property
     def num_labels(self):
@@ -69,19 +99,19 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
 
     @property
     def num_train_samples(self):
-        return len(self._dataset.TRAIN_WAV_PAIR)
+        return len(self.TRAIN_WAV_PAIR)
 
     @property
     def num_val_samples(self):
-        return len(self._dataset.VAL_WAV_PAIR)
+        return len(self.VAL_WAV_PAIR)
 
     @property
     def num_test_samples(self):
-        return len(self._dataset.TEST_WAV_PAIR)
+        return len(self.TEST_WAV_PAIR)
 
     @staticmethod
     def default_hparams():
-        #TODO add doc
+
         params = IIteratorBase.default_hparams()
         params.update({
             "sampling_rate": 16000,
@@ -96,87 +126,200 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             "frames_per_sample": 100,
             "reinit_file_pair": False,
             "prefetch_size": 32,
-            "num_threads" : 4
+            "num_threads" : 8
         }
         )
         return params
 
-    def decode(self, serialized_example):
-        # 1. define a parser
-        features = tf.parse_single_example(
-            serialized_example,
-            # Defaults are not specified since both keys are required.
-            features={
-                'speech_mix': tf.FixedLenFeature([self._hparams.frames_per_sample * self._hparams.neff], tf.float32),
-                'VAD': tf.FixedLenFeature([self._hparams.frames_per_sample * self._hparams.neff], tf.int64),
-                'Y': tf.FixedLenFeature([2*self._hparams.frames_per_sample * self._hparams.neff], tf.int64),
-                'FPS': tf.FixedLenFeature([], tf.int64),
-                'NEFF': tf.FixedLenFeature([], tf.int64),
-            })
-        FPS = tf.cast(features['FPS'], tf.int32)
-        NEFF = tf.cast(features['NEFF'], tf.int32)
-        sample_mix = tf.reshape(tf.cast(features['speech_mix'], tf.float32), shape=[self._hparams.frames_per_sample, self._hparams.neff])
-        VAD = tf.reshape(tf.cast(features['VAD'], tf.float32), shape=[self._hparams.frames_per_sample, self._hparams.neff])
-        Y = tf.reshape(tf.cast(features['Y'], tf.float32), shape=[self._hparams.frames_per_sample, self._hparams.neff, 2])
+    #@profile
+    def _get_speaker_files(self, data_dir):
+        """
 
-        return {self.FEATURE_1_NAME: sample_mix, self.FEATURE_2_NAME: VAD}, Y
+        :param data_dir: dir containing the training data (root_dir + speaker_dir + wavfiles)
+        :returns:  speaker_wav_files (dict) : {speaker : [files]}
+        """
+        # get dirs for each speaker
+        speakers_dirs = [os.path.join(data_dir, speaker) for speaker in os.listdir(data_dir) \
+                         if os.path.isdir(os.path.join(data_dir, speaker))]
 
-    # 
+        speaker_wav_files_dict = {}
+
+        # get the files in each speakers dir
+        # TODO: Convert below to dict-comprehension using collections.defaultdict
+        for speaker_dir in speakers_dirs:
+            speaker = speaker_dir.split("/")[-1]
+            wav_files = [os.path.join(speaker_dir, file) for file in os.listdir(speaker_dir) if file.endswith("wav")]
+            for wav_file in wav_files:
+                if speaker not in speaker_wav_files_dict:
+                    speaker_wav_files_dict[speaker] = []
+                speaker_wav_files_dict[speaker].append(wav_file)
+
+        if len(speaker_wav_files_dict) == 0:
+            raise RuntimeError("shabda: No files are not under directory .... {}".format(data_dir))
+
+        return speaker_wav_files_dict
+
+    def _get_size(self, wav_file):
+        """
+        Finds the size of the given file
+        :param wav_file: Wav file
+        :return: int Size in bytes
+        """
+        st = os.stat(wav_file)
+        return st.st_size
+
+    #@profile
+    def _generate_match_dict(self, speaker_wav_files_dict):
+        """
+        Generates pair of files from given dict of speakers and their speeches
+        :param speaker_wav_files_dict: {speaker : [files]}
+        :return: dict of files to files
+        """
+        wav_file_pair = {}
+        # generate match dict
+        for speaker_1 in tqdm(speaker_wav_files_dict, desc="pair_dict"):
+            for wav_file_1 in speaker_wav_files_dict[speaker_1]:
+                size_1 = self._get_size(wav_file_1)
+                if size_1 < 100: #ignore files < 100 bytes
+                    continue
+                speaker_2 = random.choice(list(speaker_wav_files_dict))
+
+                while (speaker_1 == speaker_2): #make sure we are not using the same speakers for mixture
+                    speaker_2 = random.choice(list(speaker_wav_files_dict))
+
+                wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
+                wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
+                size_2 = self._get_size(wav_file_2)
+
+                while size_2 < 100: #ignore files < 100 bytes
+                    wav_file_2_pos = np.random.randint(len(speaker_wav_files_dict[speaker_2]))
+                    wav_file_2 = speaker_wav_files_dict[speaker_2][wav_file_2_pos]
+                    size_2 = self._get_size(wav_file_2)
+
+                wav_file_pair[wav_file_1] = wav_file_2
+
+        return wav_file_pair
+
+
+    # To make easy integration with TF Data generator APIs, following methods are added
+    #@profile
+    def _yield_train_samples(self):
+        return _yield_samples(self.TRAIN_WAV_PAIR,
+                              tqdm_desc="Train: ",
+                              num_threads=self._hparams.num_threads,
+                              sampling_rate = self._hparams.sampling_rate,
+                              frame_size = self._hparams.frame_size,
+                              amp_fac = self._hparams.amp_fac,
+                              neff = self._hparams.neff,
+                              min_amp = self._hparams.min_amp,
+                              threshold = self._hparams.threshold,
+                              global_mean = self._hparams.global_mean,
+                              global_std = self._hparams.global_std,
+                              frames_per_sample = self._hparams.frames_per_sample)
+
+    #@profile
+    def _yield_val_samples(self):
+        return _yield_samples(self.VAL_WAV_PAIR,
+                              tqdm_desc="Val: ",
+                              num_threads=self._hparams.num_threads,
+                              sampling_rate = self._hparams.sampling_rate,
+                              frame_size = self._hparams.frame_size,
+                              amp_fac = self._hparams.amp_fac,
+                              neff = self._hparams.neff,
+                              min_amp = self._hparams.min_amp,
+                              threshold = self._hparams.threshold,
+                              global_mean = self._hparams.global_mean,
+                              global_std = self._hparams.global_std,
+                              frames_per_sample = self._hparams.frames_per_sample)
+
+    #@profile
+    def _yield_test_samples(self):
+        return _yield_samples(self.TEST_WAV_PAIR,
+                              tqdm_desc="Test: ",
+                              num_threads=self._hparams.num_threads,
+                              sampling_rate = self._hparams.sampling_rate,
+                              frame_size = self._hparams.frame_size,
+                              amp_fac = self._hparams.amp_fac,
+                              neff = self._hparams.neff,
+                              min_amp = self._hparams.min_amp,
+                              threshold = self._hparams.threshold,
+                              global_mean = self._hparams.global_mean,
+                              global_std = self._hparams.global_std,
+                              frames_per_sample = self._hparams.frames_per_sample)
+
+    #@profile
     def _get_train_input_fn(self):
         """
         Inheriting class must implement this
         :return: dataset
         """
+
         # TF dataset APIs
-        dataset = tf.data.TFRecordDataset(glob.glob(os.path.join(self._dataset.TRAIN_OUT_PATH, "tfrecords/*.tfrecord")),
-                                          num_parallel_reads=self._hparams.num_threads)
+        dataset = tf.data.Dataset.from_generator(self._yield_train_samples,
+                                                 (tf.float32, tf.bool, tf.bool),
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape(
+                                                                    [Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff), Dimension(2)])))
         # Map the generator output as features as a dict and labels
-        dataset = dataset.map(self.decode)
+        dataset = dataset.map(lambda x, y, z: ({self.FEATURE_1_NAME: x,
+                                                self.FEATURE_2_NAME: y}, z))
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
         # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "train_data_cache"))
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
-
         return dataset
 
-    #
+    #@profile
     def _get_val_input_fn(self):
         """
         Inheriting class must implement this
         :return: callable
         """
         # TF dataset APIs
-        dataset = tf.data.TFRecordDataset(glob.glob(os.path.join(self._dataset.VAL_OUT_PATH, "tfrecords/*.tfrecord")),
-                                          num_parallel_reads=self._hparams.num_threads)
+        dataset = tf.data.Dataset.from_generator(self._yield_val_samples,
+                                                 (tf.float32, tf.bool, tf.bool),
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape(
+                                                                    [Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff), Dimension(2)])))
         # Map the generator output as features as a dict and labels
-        dataset = dataset.map(self.decode)
+        dataset = dataset.map(lambda x, y, z: ({self.FEATURE_1_NAME: x,
+                                                self.FEATURE_2_NAME: y}, z))
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
+        # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "val_data_cache")) TODO: cache file grows in size
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
 
-
+    #@profile
     def _get_test_input_function(self):
         """
         Inheriting class must implement this
         :return: callable
         """
-        dataset = tf.data.TFRecordDataset(glob.glob(os.path.join(self._dataset.TEST_OUT_PATH, "tfrecords/*.tfrecord")),
-                                          num_parallel_reads=self._hparams.num_threads)
+        dataset = tf.data.Dataset.from_generator(self._yield_test_samples,
+                                                 (tf.float32, tf.bool, tf.bool),
+                                                 output_shapes=(TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape([Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff)]),
+                                                                TensorShape(
+                                                                    [Dimension(self._hparams.frames_per_sample), Dimension(self._hparams.neff), Dimension(2)])))
         # Map the generator output as features as a dict and labels
-        dataset = dataset.map(self.decode)
+        dataset = dataset.map(lambda x, y, z: ({self.FEATURE_1_NAME: x,
+                                                self.FEATURE_2_NAME: y}, z))
 
         dataset = dataset.batch(batch_size=self._hparams.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(self._hparams.prefetch_size)
+        # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "test_data_cache"))
         print_info("Dataset output sizes are: ")
         print_info(dataset.output_shapes)
         return dataset
 
-
+    #@profile
     def _get_predict_samples(self, file_path):
         """
 
@@ -193,7 +336,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                                                                                                            librosa.get_duration(y=speech_mix, sr=self._hparams.sampling_rate),
                                                                                                            self._hparams.sampling_rate))
         # feature enginerring like before
-        speech_mix_spec0 = _stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
+        speech_mix_spec0 = self._stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
         speech_mix_spec = np.abs(speech_mix_spec0)
         speech_phase = speech_mix_spec0 / speech_mix_spec
         speech_mix_spec = np.maximum(speech_mix_spec, np.max(speech_mix_spec) / self._hparams.min_amp)
@@ -240,11 +383,10 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return np.asarray(self.freq_features),  self.voice_activity_detection_features, self.phase_features
 
 
-
+    #@profile
     def predict_on_instance(self, executor, file_path):
         """
-        Given a mixed audio file, it generates three audio files : mix recontructed, source1, source 2
-        #TODO debug!!!
+
         :param executor:
         :param test_file_path:
         :return:
@@ -314,30 +456,18 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             in_data_np = np.expand_dims(in_data_features[sample_i], axis=0)
             in_phase_np = np.expand_dims(phase_features[sample_i], axis=0)
             voice_activity_detection_data_np = np.expand_dims(voice_activity_detection_data_features[sample_i], axis=0)
-            """
-            0*100 to (0+1)*100 = 0   to 100
-            1*100 to (1+1)*100 = 100 to 200
-            2*100 to (2+1)*100 = 200 to 300
-            
-            """
-            embedding_np = np.asarray(embeddings[sample_i*self._hparams.frames_per_sample: (sample_i+1)*self._hparams.frames_per_sample])
-
+            embedding_np = np.asarray(embeddings[sample_i: sample_i+self._hparams.frames_per_sample])
 
             # ----------------------------------------------
 
-            # embedding_ac = []
-            # for i, j in itertools.product(range(self._hparams.frames_per_sample), range(self._hparams.neff)):
-            #     if voice_activity_detection_data_np[0, i, j] == 1:
-            #         embedding_ac.append(embedding_np[i, j, :])
+            embedding_ac = []
+            for i, j in itertools.product(range(self._hparams.frames_per_sample), range(self._hparams.neff)):
+                if voice_activity_detection_data_np[0, i, j] == 1:
+                    embedding_ac.append(embedding_np[i, j, :])
 
-            embedding_ac = [embedding_np[i, j, :]
-                            for i, j in itertools.product(
-                    range(self._hparams.frames_per_sample), range(self._hparams.neff))
-                            if voice_activity_detection_data_np[0, i, j] == 1]
-            print_error(np.array(embedding_ac).shape)
             if embedding_ac == []:
                 break
-            kmean = KMeans(n_clusters=2, random_state=0).fit(embedding_np)
+            kmean = KMeans(n_clusters=2, random_state=0).fit(embedding_ac)
 
             # ----------------------------------------------
 
@@ -347,7 +477,6 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             # print_info("N_assign : {}".format(N_assign))
 
             center = kmean.cluster_centers_
-            center = center * 0.7 + 0.3 * kmean.cluster_centers_
             # two speakers have appeared
             # print_info("Found 2 speakers ...")
             center_new = kmean.cluster_centers_
@@ -361,13 +490,13 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 kmean.labels_ = (kmean.labels_ == 0).astype('int')
 
             kmean.labels_ = (~kmean.labels_).astype('int')
-
+            center = center * 0.7 + 0.3 * kmean.cluster_centers_
 
             # print_info("center : {}".format(center))
             # print_info("kmean.labels_ : {}".format(kmean.labels_))
 
             # ----------------------------------------------
-            # print_error(kmean.labels_)
+
             # transform the clustering result and voice_activity_detection info. into masks
             for i in range(self._hparams.frames_per_sample):
                 for j in range(self._hparams.neff):
@@ -433,7 +562,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return [(source1, self._hparams.sampling_rate), (source2, self._hparams.sampling_rate)]
 
 
-
+    #@profile
     def visulaize(self, executor, file_path):
         """
 

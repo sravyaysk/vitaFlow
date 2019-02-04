@@ -9,8 +9,8 @@ We have provided a [download.sh](download.sh) script that downloads data of size
 
 Please refer below on how to run the experiments.
 
-DeWave repo is sucked into three python classes that resides as [tedlium_dataset.py](tedlium_dataset.py), 
-[tedlium_iterator.py](tedlium_iterator_basic.py) and [deep_clustering.py](deep_clustering.py) respectively.
+DeWave repo is sucked into three python classes that resides as [tedlium_dataset.py](deprecated/tedlium_dataset.py), 
+[tedlium_iterator.py](deprecated/tedlium_iterator_basic.py) and [deep_clustering.py](deep_clustering.py) respectively.
 
 
 ### Experiment
@@ -30,7 +30,7 @@ CUDA_VISIBLE_DEVICES=0 python vitaflow/bin/run_experiments.py --mode=train -conf
 ```
 CUDA_VISIBLE_DEVICES=0 python vitaflow/bin/run_experiments.py \
 --mode=predict_instance \
---test_file_path=mix.wav \
+--test_file_path=mixed.wav \
 -config_python_file=examples/shabda/config.py
 ```
 

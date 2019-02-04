@@ -23,14 +23,14 @@ from examples.shabda.utils import to_clips, _generate_tf_Records
 from vitaflow.core import IPreprocessor, HParams
 from vitaflow.helpers.print_helper import print_error, print_warn, print_info
 
-class TEDLiumDatasetOnCloud(IPreprocessor):
+class TEDLiumDataset(IPreprocessor):
     """
     Download the dataset from https://projets-lium.univ-lemans.fr/wp-content/uploads/corpus/TED-LIUM/TEDLIUM_release1.tar.gz
     And unzip as shown below
 
     .. code-block:: text
 
-        ~/vitaflow/                     #this can be anywhere on your system
+        ~/vitaflow/                     #this can be anywhere on your system or on cloud ()#TODO
             TEDLiumDataset/
                 raw_data/
                     train/
@@ -46,27 +46,39 @@ class TEDLiumDatasetOnCloud(IPreprocessor):
 
                     processed_data/ #created as part of this class output
                         train/
-                           speaker_1/
-                                file_1.wav
-                                file_2.wav ...
-                            speaker_2/
-                                file_1.wav
-                                file_2.wav ...
+                            clips/
+                               speaker_1/
+                                    file_1.wav
+                                    file_2.wav ...
+                                speaker_2/
+                                    file_1.wav
+                                    file_2.wav ...
+                            tfrecords/
+                                0.tfrecord
+                                1.tfrecord ...
+
                         dev/
-                            speaker_1/
-                                file_1.wav ...
-                            speaker_2/
-                                file_1.wav ...
+                            clips/
+                                speaker_1/
+                                    file_1.wav ...
+                                speaker_2/
+                                    file_1.wav ...
+                            tfrecords/
+                                0.tfrecord
+                                1.tfrecord ...
                         test/
-                            speaker_1/
-                                file_1.wav ...
+                            clips/
+                                speaker_1/
+                                    file_1.wav ...
+                            tfrecords/
+                                0.tfrecord
+                                1.tfrecord ...
     """
     def __init__(self, hparams=None):
         IPreprocessor.__init__(self, hparams=hparams)
         self._hparams = HParams(hparams, self.default_hparams())
 
         self._spark_master = self._hparams.spark_master
-        # self._input_sph_dir = self._hparams.input_sph_dir
         self._num_clips = self._hparams.num_clips
         self._duration = self._hparams.duration
         self._clips_output_dir = self._hparams.clips_output_dir
@@ -157,6 +169,7 @@ class TEDLiumDatasetOnCloud(IPreprocessor):
         "test_data_path" : str
             Folder path under `experiment_root_directory` where the test data is stored
 
+        #TODO add doc
 
         :return: A dictionary of hyperparameters with default values
         """
@@ -164,6 +177,7 @@ class TEDLiumDatasetOnCloud(IPreprocessor):
 
         hparams.update({
             "experiment_name": "TEDLiumDataset",
+            "spark_master" : "local[4]",
             "num_clips" : 25,
             "sampling_rate" : 16000,
             "duration": 30,
@@ -176,17 +190,12 @@ class TEDLiumDatasetOnCloud(IPreprocessor):
             "global_mean": 44,
             "global_std": 15.5,
             "frames_per_sample": 100,
-            "prefetch_size": 32,
-            "num_threads" : 8,
             "reinit_file_pair" : False,
-            "spark_master" : "local[4]",
-            "clips_output_dir" : "",
-            "speech_mix_output_dir" : ""
         })
 
         return hparams
 
-    def _get_speaker_files(self, data_dir):
+    def _get_speaker_files(self, data_dir): #TODO S3 support
         """
 
         :param data_dir: dir containing the training data (root_dir + speaker_dir + wavfiles)
