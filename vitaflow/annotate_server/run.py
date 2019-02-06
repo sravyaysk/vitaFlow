@@ -12,16 +12,20 @@ def index():
 
 
 @app.route('/inc/validateTagsAndRegions.php', methods = ['POST', 'GET'])
-def validateTagsAndRegions():
-    pprint(request.__dict__)
+def validate_tags_and_regions():
+    print('-------' * 15)
+    pprint(request.form)
+    print('-------' * 15)
     return jsonify({"url": "/static/data/images/collection_01/part_1/pexels-photo-60091.jpg",
                     "id": "pexels-photo-60091.jpg",
                     "folder": "collection_01/part_1", "annotations": []})
 
 
-@app.route('/inc/getNewImage.php', methods = ['POST', 'GET'])
-def getNewImage():
-    pprint(request.__dict__)
+@app.route('/inc/getNewImage.php', methods=['POST', 'GET'])
+def get_new_image():
+    print('========' * 15)
+    pprint(request.form)
+    print('========' * 15)
 
     return jsonify({"url": "/static/data/images/collection_01/part_1/pexels-photo-60091.jpg",
                     "id": "pexels-photo-60091.jpg",
@@ -37,9 +41,6 @@ def annotate_image(path=''):
 @app.route('/')
 def home_page():
     return render_template('index.html')
-
-
-
 
 
 if __name__ == '__main__':
