@@ -1,6 +1,8 @@
 #!flask/bin/python
 from flask import Flask, render_template, jsonify, send_file, request
-
+import views
+import annotate
+print(__file__)
 from pprint import pprint
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
@@ -17,18 +19,18 @@ sample_data = {"url": "/static/data/images/pexels-photo-60091.jpg",
 @app.route('/inc/validateTagsAndRegions.php', methods=['POST', 'GET'])
 def _rest_validate_tags_and_regions():
     print('-------' * 15)
-    pprint(request.form)
+    form_data = dict(request.form)
+    pprint(form_data)
+    if 'sendInfo' in form_data.keys():
+        annotate.validate_tags_and_regions(request.form)
     print('-------' * 15)
-    return jsonify(sample_data)
+    return _rest_get_new_image()
 
 
 @app.route('/inc/getNewImage.php', methods=['POST', 'GET'])
 def _rest_get_new_image():
-    print('========' * 15)
-    pprint(request.form)
-    print('========' * 15)
-    return jsonify(sample_data)
-
+    views.GetNewImage.refresh()
+    return jsonify(views.GetNewImage.get_new_image())
 #
 # @app.route('/data/<path:path>')
 # def _rest_annotate_image(path=''):

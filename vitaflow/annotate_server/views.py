@@ -1,4 +1,3 @@
-import flask
 import glob
 import os
 import random
@@ -14,35 +13,56 @@ PWD = os.path.dirname(config.__file__)
 class GetNewImage:
     ImageFiles = {}
     XmlFiles = {}
-    PendingImage = []
+    PendingImages = []
+    CompletedImages = []
 
     @staticmethod
     def refresh():
         # with timely invervals - 5 mins update
         GetNewImage.XmlFiles = GetNewImage._get_annotations()
         GetNewImage.ImageFiles = GetNewImage._get_images()
-        GetNewImage.PendingImage = list(set(GetNewImage.ImageFiles)
-                                        - set(GetNewImage.XmlFiles))
+
+        def trim_ext(x):
+            return x.rsplit('.')[-2]
+        xml_files_keys = set(map(trim_ext, GetNewImage.XmlFiles.keys()))
+        image_files_keys = set(map(trim_ext, GetNewImage.ImageFiles.keys()))
+        GetNewImage.PendingImages = list(image_files_keys - xml_files_keys)
+        GetNewImage.CompletedImages = list(image_files_keys.intersection(xml_files_keys))
 
     @staticmethod
     def update_data(data):
         pass
 
     @staticmethod
-    def get_new_image(data):
+    def get_new_image(data=None):
         if data:
             GetNewImage.update_data(data)
-        image_file = random.choice(list(GetNewImage.XmlFiles.keys()))
-        send_info = {
-            'id': image_file,
-            'url': GetNewImage.XmlFiles[image_file]['url'],
-            'folder': '',
-            "annotations": []
-        }
+
+        if GetNewImage.PendingImages:
+            image_file = random.choice(GetNewImage.PendingImages)
+            image_file = [each for each in GetNewImage.ImageFiles.keys() if each.startswith(image_file)][0]
+            send_info = {
+                'id': image_file,
+                'url': GetNewImage.ImageFiles[image_file]['url'],
+                'folder': '',
+                "annotations": []
+            }
+        else:
+            send_info = {"url": "/static/data/images/pexels-photo-60091.jpg",
+                         "id": "pexels-photo-60091.jpg",
+                         "folder": "collection_01/part_1",
+                         "annotations": [
+                             {
+                                 "tag": "Eagle",
+                                 "x": 475, "y": 225,
+                                 "width": 230.555555554,
+                                 "height": 438.888888886}
+                         ]
+                         }
         return send_info
 
     @staticmethod
-    def get_old_image(data):
+    def get_old_image():
         image_file = random.choice(list(GetNewImage.XmlFiles.keys()))
         send_info = {
             'id': image_file,
@@ -98,4 +118,3 @@ class GetNewImage:
                 'fullpath': each
             }
         return xml_dict
-
