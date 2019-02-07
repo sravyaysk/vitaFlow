@@ -1,63 +1,27 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <annotation>
-  <folder>collection_01/part_2</folder>
-  <filename>pexels-photo-151048.jpg</filename>
-  <path/>
-  <source>
-    <database>Unknown</database>
-  </source>
-  <size_part>
-    <width>1075</width>
-    <height>750</height>
-    <depth>3</depth>
-  </size_part>
-  <segmented>0</segmented>
-  <object>
-    <name>Long Beak Bird</name>
-    <pose>Unspecified</pose>
-    <truncated>0</truncated>
-    <difficult>0</difficult>
-    <bndbox>
-      <xmin>62.550744248985</xmin>
-      <ymin>154.06976744186</ymin>
-      <xmax>491.67794316644</xmax>
-      <ymax>485.46511627907</ymax>
-    </bndbox>
-  </object>
-  <object>
-    <name>Long Beak Bird</name>
-    <pose>Unspecified</pose>
-    <truncated>0</truncated>
-    <difficult>0</difficult>
-    <bndbox>
-      <xmin>206.56292286874</xmin>
-      <ymin>292.1511627907</ymin>
-      <xmax>363.66711772666</xmax>
-      <ymax>565.40697674419</ymax>
-    </bndbox>
-  </object>
-  <object>
-    <name>Long Beak Bird</name>
-    <pose>Unspecified</pose>
-    <truncated>0</truncated>
-    <difficult>0</difficult>
-    <bndbox>
-      <xmin>350.5751014885</xmin>
-      <ymin>109.01162790698</ymin>
-      <xmax>746.2449255751</xmax>
-      <ymax>305.23255813953</ymax>
-    </bndbox>
-  </object>
-  <object>
-    <name>Long Beak Bird</name>
-    <pose>Unspecified</pose>
-    <truncated>0</truncated>
-    <difficult>0</difficult>
-    <bndbox>
-      <xmin>624.05277401894</xmin>
-      <ymin>254.36046511628</ymin>
-      <xmax>1022.6319350474</xmax>
-      <ymax>563.95348837209</ymax>
-    </bndbox>
-  </object>
+	<folder/>
+	<filename>pexels-photo-151048.jpg</filename>
+	<path>static/data/images/pexels-photo-151048.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size_part>
+		<width>1075</width>
+		<height>750</height>
+		<depth>3</depth>
+	</size_part>
+	<segmented>0</segmented>
+	<object>
+		<name>Long Beak Bird</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>404.16666666666663</xmin>
+			<ymin>59.72222222222222</ymin>
+			<xmax>762.5</xmax>
+			<ymax>456.94444444444446</ymax>
+		</bndbox>
+	</object>
 </annotation>

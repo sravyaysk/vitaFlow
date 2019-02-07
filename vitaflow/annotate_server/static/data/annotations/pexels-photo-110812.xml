@@ -1,39 +1,27 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <annotation>
-  <folder>collection_01/part_2</folder>
-  <filename>pexels-photo-110812.jpg</filename>
-  <path/>
-  <source>
-    <database>Unknown</database>
-  </source>
-  <size_part>
-    <width>1135</width>
-    <height>750</height>
-    <depth>3</depth>
-  </size_part>
-  <segmented>0</segmented>
-  <object>
-    <name>Baby Bird</name>
-    <pose>Unspecified</pose>
-    <truncated>0</truncated>
-    <difficult>0</difficult>
-    <bndbox>
-      <xmin>419.07692307692</xmin>
-      <ymin>180.23255813953</ymin>
-      <xmax>686.82051282051</xmax>
-      <ymax>601.74418604651</ymax>
-    </bndbox>
-  </object>
-  <object>
-    <name>Baby Bird</name>
-    <pose>Unspecified</pose>
-    <truncated>0</truncated>
-    <difficult>0</difficult>
-    <bndbox>
-      <xmin>727.5641025641</xmin>
-      <ymin>212.20930232558</ymin>
-      <xmax>1052.0576923077</xmax>
-      <ymax>658.43023255814</ymax>
-    </bndbox>
-  </object>
+	<folder/>
+	<filename>pexels-photo-110812.jpg</filename>
+	<path>static/data/images/pexels-photo-110812.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size_part>
+		<width>1135</width>
+		<height>750</height>
+		<depth>3</depth>
+	</size_part>
+	<segmented>0</segmented>
+	<object>
+		<name>Eagle</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>419.547123623011</xmin>
+			<ymin>168.05555555555554</ymin>
+			<xmax>718.2313341493268</xmax>
+			<ymax>584.7222222222222</ymax>
+		</bndbox>
+	</object>
 </annotation>
