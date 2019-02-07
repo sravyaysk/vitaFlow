@@ -14,10 +14,14 @@
 """
 Main file that puts different pieces together for the issue #14
 """
-import os
-import tensorflow as tf
-from memory_profiler import profile
+# from memory_profiler import profile
 import importlib
+import os
+import sys
+
+import tensorflow as tf
+
+sys.path.append(os.path.abspath('.'))
 
 from examples.receipt_ocr.image_cropping import ImageCropping
 from examples.receipt_ocr.image_segmentation import image_annotations
@@ -42,7 +46,10 @@ def main():
 
     for each in annotated_data:
         t = ImageCropping(each['image_loc'], each['dest'])
-        t.multiple_crop_and_save(each['coords'], each['tags'])
+        try:
+            t.multiple_crop_and_save(each['coords'], each['tags'])
+        except:
+            print('Issues with parsing - {}'.format(each['image_loc']))
 
     ocr = TesseractOCR(image_dir=config.images_dest,
                        text_out_dir=config.text_out_dir)
