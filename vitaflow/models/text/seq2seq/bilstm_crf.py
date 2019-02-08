@@ -23,8 +23,8 @@ from tensorflow.contrib.learn import ModeKeys
 from tensorflow.contrib import lookup
 
 from vitaflow.core.hyperparams import HParams
-from vitaflow.data.text.iterators.csv_seq_to_seq_iterator import CSVSeqToSeqIterator
-from vitaflow.data.text.vocabulary import SpecialTokens
+from vitaflow.iterators.text.csv_seq_to_seq_iterator import CSVSeqToSeqIterator
+from vitaflow.iterators.text.vocabulary import SpecialTokens
 from vitaflow.core.models.model_base import ModelBase
 from vitaflow.core.features.feature_types import ITextFeature
 from vitaflow.helpers.tf_data_helper import get_sequence_length
