@@ -120,6 +120,7 @@ venv.bak/
 # Ignore test images & annotated data
 vitaflow/annotate_server/static/data/annotations/*
 vitaflow/annotate_server/static/data/images/*
+vitaflow/annotate_server/static/data/annotations/*.*
 
 # Ignore annotation - tags
 vitaflow/annotate_server/resources/list_of_tags.json
