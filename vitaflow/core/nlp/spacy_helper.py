@@ -21,7 +21,7 @@ from tqdm import tqdm
 from tensorflow.python.platform import gfile
 
 from vitaflow.helpers.print_helper import print_warn
-from vitaflow.data.text.vocabulary import SpecialTokens
+from vitaflow.iterators.text.vocabulary import SpecialTokens
 
 
 def naive_vocab_creater(out_file_name, lines, use_nlp):
