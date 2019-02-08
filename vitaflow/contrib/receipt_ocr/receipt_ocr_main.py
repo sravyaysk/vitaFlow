@@ -14,12 +14,20 @@
 """
 Main file that puts different pieces together for the issue #14
 """
-import tensorflow as tf
-import importlib
 
-from vitaflow.contrib.receipt_ocr import ImageCropping
-from vitaflow.contrib.receipt_ocr import image_annotations
-from vitaflow.contrib.receipt_ocr import TextPostProcessor
+# from memory_profiler import profile
+import importlib
+import os
+import sys
+
+import tensorflow as tf
+
+sys.path.append(os.path.abspath('.'))
+
+
+from vitaflow.contrib.receipt_ocr.image_cropping import ImageCropping
+from vitaflow.contrib.receipt_ocr.image_segmentation import image_annotations
+from vitaflow.contrib.receipt_ocr.text_post_processing import TextPostProcessor
 from vitaflow.utils.ocr.tesseract import TesseractOCR
 
 flags = tf.flags
@@ -40,7 +48,10 @@ def main():
 
     for each in annotated_data:
         t = ImageCropping(each['image_loc'], each['dest'])
-        t.multiple_crop_and_save(each['coords'], each['tags'])
+        try:
+            t.multiple_crop_and_save(each['coords'], each['tags'])
+        except:
+            print('Issues with parsing - {}'.format(each['image_loc']))
 
     ocr = TesseractOCR(image_dir=config.images_dest,
                        text_out_dir=config.text_out_dir)
