@@ -6,7 +6,11 @@ import json
 import os
 import xml.dom.minidom
 import xmltodict
-import config
+
+try:
+    from . import config
+except:
+    import config
 
 
 def single_annotated_box_to_xml(annotation):
@@ -33,6 +37,7 @@ def annotated_boxes_to_xml(annotations):
 def validate_tags_and_regions(form_data):
     sent_info = json.loads(form_data['sendInfo'])
     # sent_info.keys() => dict_keys(['url', 'folder', 'id', 'width', 'height', 'annotations'])
+    print('Generating XML file for {}'.format(sent_info['id']))
     default_xml_format = {
         'annotation': {
             'folder': sent_info['folder'],
@@ -52,10 +57,10 @@ def validate_tags_and_regions(form_data):
     xml_string = xmltodict.unparse(default_xml_format)
     xml_string = xml.dom.minidom.parseString(xml_string)
     pretty_xml_as_string = xml_string.toprettyxml()
-    print(pretty_xml_as_string)
+    # print(pretty_xml_as_string)
     file_name = os.path.join(config.ANNOTATIONS_DIR, sent_info['id'].rsplit('.')[-2] + '.xml')
     open(file_name, 'w').write(pretty_xml_as_string)
-    print('wrting xml data to file {}'.format(file_name))
+    print('Wrote xml data to file {}'.format(file_name))
 
 
 def xml_to_single_annotated_box(xml_annotation):

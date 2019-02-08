@@ -18,12 +18,10 @@ sample_data = {"url": "/static/data/images/pexels-photo-60091.jpg",
 
 @app.route('/inc/validateTagsAndRegions.php', methods=['POST', 'GET'])
 def _rest_validate_tags_and_regions():
-    print('-------' * 15)
     form_data = dict(request.form)
-    pprint(form_data)
+    # pprint(form_data)
     if 'sendInfo' in form_data.keys():
         annotate.validate_tags_and_regions(request.form)
-    print('-------' * 15)
     return _rest_get_new_image()
 
 
@@ -50,8 +48,13 @@ def annotate_image():
 def review_annotation():
     return render_template('index.html')
 
+@app.route('/show_completed_images')
 def show_completed_images():
-    pass
+    # Get data & show
+    # show data nicely
+    views.GetNewImage.refresh()
+    # print(views.GetNewImage.PendingImages)
+    return jsonify(views.GetNewImage.CompletedImages)
 
 
 def show_pending_images():
