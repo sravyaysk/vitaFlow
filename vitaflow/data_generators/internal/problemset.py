@@ -11,12 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-vitaFlow module utilities
-"""
 
-<<<<<<< HEAD
-from vitaflow.utils.misc_utils import *
-=======
-from vitaflow.utils.utils import *
->>>>>>> merge conflict fix
+import os
+import tensorflow as tf
+
+class ProblemSet(object):
+    """" """
+    def __init__(self):
+        pass
+
+    def generate_data(self, data_dir, temp_dir):
+        """
+        Generates data for given problem set
+        Args:
+            data_dir: Directory where the final processed data will be placed
+            temp_dir: All temperory data store path
+
+        Returns:
+
+        """
+        pass

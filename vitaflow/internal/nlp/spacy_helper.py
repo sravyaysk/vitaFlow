@@ -21,6 +21,7 @@ from tqdm import tqdm
 from tensorflow.python.platform import gfile
 
 from vitaflow.utils.print_helper import print_warn
+# from vitaflow.helpers.print_helper import print_warn
 from vitaflow.iterators.text.vocabulary import SpecialTokens
 
 

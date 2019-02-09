@@ -30,6 +30,14 @@ from vitaflow.internal.features.feature_types import ITextFeature
 from vitaflow.utils.tf_data_helper import get_sequence_length
 from vitaflow.utils.print_helper import *
 
+# from vitaflow.core.hyperparams import HParams
+# from vitaflow.iterators.text.csv_seq_to_seq_iterator import CSVSeqToSeqIterator
+# from vitaflow.iterators.text.vocabulary import SpecialTokens
+# from vitaflow.core.models.model_base import ModelBase
+# from vitaflow.core.features.feature_types import ITextFeature
+# from vitaflow.helpers.tf_data_helper import get_sequence_length
+# from vitaflow.helpers.print_helper import *
+
 
 class BiLSTMCrf(ModelBase, ITextFeature):
     """

@@ -14,20 +14,20 @@
 """
 Main file that puts different pieces together for the issue #14
 """
+
 # from memory_profiler import profile
 import importlib
 import os
 import sys
-
 import tensorflow as tf
-
+import tensorflow as tf
 sys.path.append(os.path.abspath('.'))
 import tensorflow as tf
 import importlib
 
-from vitaflow.contrib.receipt_ocr import ImageCropping
-from vitaflow.contrib.receipt_ocr import image_annotations
-from vitaflow.contrib.receipt_ocr import TextPostProcessor
+from vitaflow.contrib.receipt_ocr.image_cropping import ImageCropping
+from vitaflow.contrib.receipt_ocr.image_segmentation import image_annotations
+from vitaflow.contrib.receipt_ocr.text_post_processing import TextPostProcessor
 from vitaflow.utils.ocr.tesseract import TesseractOCR
 
 flags = tf.flags
