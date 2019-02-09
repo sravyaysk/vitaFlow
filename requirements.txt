@@ -1,7 +1,7 @@
 # TODO add version number
 #DL libraries
-tensorflow >= 1.7.0
-tensorflow-gpu >= 1.7.0
+tensorflow >= 1.11.0
+tensorflow-gpu >= 1.11.0
 tensorflow-probability >= 0.3.0
 tensorflow-probability-gpu >= 0.3.0
 # Standard Framework
@@ -12,6 +12,9 @@ numpy
 sklearn
 tqdm
 overrides
+flask
+#misc
+xmltodict
 # image libraries
 wand
 pillow

@@ -23,11 +23,11 @@ from tqdm import tqdm
 import tensorflow as tf
 from tensorflow import TensorShape, Dimension
 
-from vitaflow.core import HParams
-from vitaflow.core import IPreprocessor
-from vitaflow.core import IIteratorBase
-from vitaflow.core.features import GANFeature
-from vitaflow.helpers.os_helper import check_n_makedirs, print_info, print_error
+from vitaflow.internal import HParams
+from vitaflow.internal import IPreprocessor
+from vitaflow.internal import IIteratorBase
+from vitaflow.internal.features import GANFeature
+from vitaflow.utils.os_helper import check_n_makedirs, print_info
 
 
 class Cifar10GanIterator(IIteratorBase, GANFeature):

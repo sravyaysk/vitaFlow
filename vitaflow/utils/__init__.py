@@ -15,4 +15,4 @@
 vitaFlow module utilities
 """
 
-from vitaflow.utils.utils import *
+from vitaflow.utils.misc_utils import *

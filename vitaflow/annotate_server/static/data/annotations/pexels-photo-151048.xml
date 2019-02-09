@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<annotation>
+	<folder/>
+	<filename>pexels-photo-151048.jpg</filename>
+	<path>static/data/images/pexels-photo-151048.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size_part>
+		<width>1075</width>
+		<height>750</height>
+		<depth>3</depth>
+	</size_part>
+	<segmented>0</segmented>
+	<object>
+		<name>Long Beak Bird</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>611.5013357137342</xmin>
+			<ymin>158.80503144654088</ymin>
+			<xmax>1008.1338393740564</xmax>
+			<ymax>528.3018867924528</ymax>
+		</bndbox>
+	</object>
+</annotation>

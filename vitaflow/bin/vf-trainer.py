@@ -21,8 +21,8 @@ import sys
 
 import tensorflow as tf
 
-from vitaflow.core import registry
-from vitaflow.core import hyperparams_lib
+from vitaflow.utils import registry
+from vitaflow.internal import hyperparams_lib
 
 flags = tf.flags
 FLAGS = flags.FLAGS

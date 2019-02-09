@@ -4,8 +4,8 @@ import librosa
 import numpy as np
 
 from tqdm import tqdm
-from vitaflow.core import IPreprocessor, HParams
-from vitaflow.helpers.print_helper import print_error, print_warn, print_info
+from vitaflow.internal import IPreprocessor, HParams
+
 
 class TEDLiumDataset(IPreprocessor):
     """

@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from glob import glob
 
-from vitaflow.helpers.print_helper import print_info
+from vitaflow.utils.print_helper import print_info
 from tqdm import tqdm
 
 from vitaflow.helpers.print_helper import print_info

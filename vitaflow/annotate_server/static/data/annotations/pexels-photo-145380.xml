@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<annotation>
+	<folder/>
+	<filename>pexels-photo-145380.jpg</filename>
+	<path>static/data/images/pexels-photo-145380.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size_part>
+		<width>1034</width>
+		<height>750</height>
+		<depth>3</depth>
+	</size_part>
+	<segmented>0</segmented>
+	<object>
+		<name>Baby Bird</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>503.12415177854774</xmin>
+			<ymin>103.77358490566039</ymin>
+			<xmax>920.1865566491717</xmax>
+			<ymax>498.4276729559749</ymax>
+		</bndbox>
+	</object>
+</annotation>
