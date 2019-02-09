@@ -24,14 +24,14 @@ import tensorflow as tf
 from overrides import overrides
 from tqdm import tqdm
 
-from vitaflow.core import HParams
-from vitaflow.core import IIteratorBase
-from vitaflow.core import IPreprocessor
-from vitaflow.core.features import ITextFeature
-from vitaflow.core.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, vocab_to_tsv
+from vitaflow.internal import HParams
+from vitaflow.internal import IIteratorBase
+from vitaflow.internal import IPreprocessor
+from vitaflow.internal.features import ITextFeature
+from vitaflow.internal.nlp.spacy_helper import naive_vocab_creater, get_char_vocab, vocab_to_tsv
 from vitaflow.iterators.text.vocabulary import SpecialTokens
-from vitaflow.helpers.os_helper import check_n_makedirs
-from vitaflow.helpers.print_helper import print_info
+from vitaflow.utils.os_helper import check_n_makedirs
+from vitaflow.utils.print_helper import print_info
 from vitaflow.engines import Executor
 
 

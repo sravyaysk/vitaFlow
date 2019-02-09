@@ -11,8 +11,8 @@ from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
 
 from vitaflow.contrib.shabda.core import ShabdaWavPairFeature
-from vitaflow.core import HParams, IIteratorBase
-from vitaflow.helpers.print_helper import print_info
+from vitaflow.internal import HParams, IIteratorBase
+from vitaflow.utils.print_helper import print_info
 
 
 def stft(sig, frameSize, overlapFac=0.75, window=np.hanning):

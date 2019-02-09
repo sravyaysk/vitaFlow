@@ -23,7 +23,7 @@ import tensorflow as tf
 from numpy.lib import stride_tricks
 from scipy.io import wavfile
 
-from vitaflow.helpers.print_helper import print_error, print_warn, print_info
+from vitaflow.utils.print_helper import print_error
 
 
 def to_clips(file_path, data, num_clips=128, duration=20, output_dir="/tmp/"):

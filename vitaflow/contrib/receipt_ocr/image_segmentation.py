@@ -5,7 +5,7 @@ import tensorflow as tf
 
 from glob import glob
 
-from vitaflow.helpers.print_helper import print_info
+from vitaflow.utils.print_helper import print_info
 from tqdm import tqdm
 
 def image_annotations(path_to_tensorflow_model, category_index, images_src, images_dest):

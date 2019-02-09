@@ -23,9 +23,9 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA
 
 from vitaflow.contrib.shabda.core import ShabdaWavPairFeature
-from vitaflow.core import HParams, IIteratorBase
-from vitaflow.helpers.print_helper import print_info
-from vitaflow.helpers.print_helper import print_error
+from vitaflow.internal import HParams, IIteratorBase
+from vitaflow.utils.print_helper import print_info
+from vitaflow.utils.print_helper import print_error
 
 
 class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):

@@ -25,12 +25,12 @@ import tensorflow as tf
 from tensorflow import TensorShape, Dimension
 
 
-from vitaflow.core import HParams
-from vitaflow.core.features import ImageFeature
-from vitaflow.core import IPreprocessor
-from vitaflow.core import IIteratorBase
-from vitaflow.core.models import ClassifierBase
-from vitaflow.helpers.os_helper import check_n_makedirs, print_info, print_error, print_warn
+from vitaflow.internal import HParams
+from vitaflow.internal.features import ImageFeature
+from vitaflow.internal import IPreprocessor
+from vitaflow.internal import IIteratorBase
+from vitaflow.internal.models import ClassifierBase
+from vitaflow.utils.os_helper import check_n_makedirs, print_info, print_error
 from vitaflow.engines import Executor
 
 

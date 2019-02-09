@@ -21,12 +21,12 @@ import tensorflow as tf
 from tensorflow.python.training import training_util
 from tensorflow.contrib.learn import ModeKeys
 
-from vitaflow.core import HParams
-from vitaflow.core.features import GANFeature
-from vitaflow.core.hooks.image_grid_hook import ImageGridHook
-from vitaflow.helpers.print_helper import print_info, print_error
-from vitaflow.core.models import ModelBase
-from vitaflow.core.hooks.run_train_ops_hook import GANTrainSteps, RunTrainOpsHook
+from vitaflow.internal import HParams
+from vitaflow.internal.features import GANFeature
+from vitaflow.internal.hooks.image_grid_hook import ImageGridHook
+from vitaflow.utils.print_helper import print_info, print_error
+from vitaflow.internal.models import ModelBase
+from vitaflow.internal.hooks.run_train_ops_hook import GANTrainSteps, RunTrainOpsHook
 
 
 class CGAN(ModelBase, GANFeature):

@@ -7,8 +7,7 @@ sys.path.append(os.path.abspath('.'))
 
 # from config.global_constants import UNKNOWN_WORD
 # from data_iterators.data_iterators_factory import DataIteratorsFactory
-from vitaflow.engines.factory.data_iterator import DataIteratorFactory
-from vitaflow.helpers.print_helper import *
+from vitaflow.utils.print_helper import *
 # from commands.tagger import load_estimator
 
 

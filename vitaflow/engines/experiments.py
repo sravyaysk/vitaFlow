@@ -19,13 +19,12 @@ import os
 import shutil
 import time
 from importlib import import_module
-from memory_profiler import profile
 
 import tensorflow as tf
 from tqdm import tqdm
 
-from vitaflow.core.hyperparams import HParams
-from vitaflow.helpers.print_helper import *
+from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.print_helper import *
 from vitaflow.engines.executor import Executor
 
 # get TF logger
