@@ -16,6 +16,9 @@
 ## Build Tool
 - [Gradle](https://gradle.org/)
 
+## Debugging
+- [memory-profiler](https://pypi.org/project/memory-profiler/)
+
 ## Continuous Integration
 - [GIT Travis](https://travis-ci.org/)
 
