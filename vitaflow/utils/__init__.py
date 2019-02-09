@@ -15,8 +15,6 @@
 vitaFlow module utilities
 """
 
-<<<<<<< HEAD
 from vitaflow.utils.misc_utils import *
-=======
 from vitaflow.utils.utils import *
->>>>>>> merge conflict fix
+from vitaflow.utils.misc_utils import *

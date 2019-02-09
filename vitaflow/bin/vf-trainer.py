@@ -21,13 +21,12 @@ import sys
 
 import tensorflow as tf
 
-<<<<<<< HEAD
 from vitaflow.utils import registry
 from vitaflow.internal import hyperparams_lib
-=======
-from vitaflow.core import registry
-from vitaflow.core import hyperparams_lib
->>>>>>> merge conflict fix
+# from vitaflow.core import registry
+# from vitaflow.core import hyperparams_lib
+from vitaflow.utils import registry
+from vitaflow.internal import hyperparams_lib
 
 flags = tf.flags
 FLAGS = flags.FLAGS
