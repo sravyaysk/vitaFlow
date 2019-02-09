@@ -22,10 +22,10 @@ __author__ = 'Gaurish Thakkar'
 import os
 import shutil
 
-from vitaflow.core.dataset_types.dataset_types import ICLIENTXType1
-from vitaflow.core.hyperparams import HParams
-from vitaflow.core.ipreprocessor import IPreprocessor
-from vitaflow.helpers.print_helper import *
+from vitaflow.internal import ICLIENTXType1
+from vitaflow.internal.hyperparams import HParams
+from vitaflow.internal.ipreprocessor import IPreprocessor
+from vitaflow.utils.print_helper import *
 
 
 class CLIENTXDataset(IPreprocessor, ICLIENTXType1):

@@ -20,12 +20,9 @@ import shutil
 
 import numpy as np
 
-from vitaflow.core import HParams
-from vitaflow.core import IPreprocessor
-from vitaflow.core.features import ImageFeature
-from vitaflow.core.models import ClassifierBase
-from vitaflow.helpers.print_helper import print_info
-from vitaflow.engines import Executor
+from vitaflow.internal import HParams
+from vitaflow.internal import IPreprocessor
+from vitaflow.utils.print_helper import print_info
 from vitaflow.utils.data_io import maybe_download
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelBinarizer

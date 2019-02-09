@@ -28,7 +28,7 @@ from PIL import Image as PI
 from tqdm import tqdm
 from wand.image import Image
 
-from vitaflow.helpers.print_helper import print_info, print_error
+from vitaflow.utils.print_helper import print_info, print_error
 
 
 class TesseractOCR:

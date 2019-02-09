@@ -23,7 +23,7 @@ import tensorflow as tf
 from tensorflow import gfile
 import numpy as np
 
-from vitaflow.utils.utils import dict_lookup
+from vitaflow.utils.misc_utils import dict_lookup
 
 # pylint: disable=too-few-public-methods, invalid-name
 # pylint: disable=too-many-instance-attributes, too-many-arguments
