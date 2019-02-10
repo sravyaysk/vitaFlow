@@ -32,6 +32,7 @@ import time
 import numpy as np
 import six
 from six.moves import range  # pylint: disable=redefined-builtin
+from vitaflow.internal.data_generators import tokenizer
 
 import tensorflow as tf
 

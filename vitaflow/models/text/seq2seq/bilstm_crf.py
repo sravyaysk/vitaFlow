@@ -22,7 +22,7 @@ import tensorflow as tf
 from tensorflow.contrib.learn import ModeKeys
 from tensorflow.contrib import lookup
 
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 from vitaflow.iterators.text.csv_seq_to_seq_iterator import CSVSeqToSeqIterator
 from vitaflow.iterators.text.vocabulary import SpecialTokens
 from vitaflow.internal.models.model_base import ModelBase

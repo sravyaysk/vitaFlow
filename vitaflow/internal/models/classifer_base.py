@@ -18,7 +18,7 @@ A class that sets up default Tensorflow operations for classifying audio
 import tensorflow as tf
 from overrides import overrides
 
-from vitaflow.internal import HParams
+from vitaflow.utils.hyperparams import HParams
 from vitaflow.internal.models.model_base import ModelBase
 
 

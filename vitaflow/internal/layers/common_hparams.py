@@ -18,7 +18,7 @@
 
 from six.moves import zip  # pylint: disable=redefined-builtin
 from vitaflow.utils import registry
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 
 import tensorflow as tf
 

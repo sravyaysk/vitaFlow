@@ -19,7 +19,7 @@ from overrides import overrides
 import tensorflow as tf
 
 from vitaflow.contrib.shabda.core import ShabdaWavPairFeature
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 from vitaflow.internal.models.model_base import ModelBase
 from vitaflow.utils.print_helper import print_error
 # from vitaflow.core.hyperparams import HParams

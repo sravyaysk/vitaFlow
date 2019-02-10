@@ -23,7 +23,7 @@ import os
 import shutil
 
 from vitaflow.internal import ICLIENTXType1
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 from vitaflow.internal.ipreprocessor import IPreprocessor
 from vitaflow.utils.print_helper import *
 

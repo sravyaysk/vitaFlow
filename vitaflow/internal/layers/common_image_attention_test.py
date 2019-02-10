@@ -19,7 +19,7 @@
 from absl.testing import parameterized
 from vitaflow.internal.layers import common_hparams
 from vitaflow.internal.layers import common_image_attention
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 
 import tensorflow as tf
 

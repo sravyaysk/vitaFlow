@@ -32,6 +32,11 @@ import six
 # where <rhs> is either a single token or [] enclosed list of tokens.
 # For example:  "var[1] = a" or "x = [1,2,3]"
 from vitaflow.utils.dtypes import is_callable
+from vitaflow.utils.print_helper import print_info, print_error
+
+
+def _type_name(value):
+    return type(value).__name__
 
 PARAM_RE = re.compile(r"""
   (?P<name>[a-zA-Z][\w\.]*)      # variable name: "var" or "x"
@@ -422,13 +427,13 @@ class HParams(object):
 
     def __init__(self, hparams=None, default_hparams=None, allow_new_hparam=False, **kwargs):
 
-        _hparams_type = {}
+        _hparam_types = {}
         parsed_hparams = {}
 
         if hparams is None and default_hparams is None:
             for name, value in six.iteritems(kwargs):
                 parsed_hparams[name] = value
-            _hparams_type = self.add_hparam_type(parsed_hparams)
+            _hparam_types = self.add_hparam_type(parsed_hparams)
         else:
             if isinstance(hparams, HParams):
                 hparams = hparams.todict()
@@ -436,10 +441,10 @@ class HParams(object):
                 parsed_hparams = self._parse(hparams, default_hparams, allow_new_hparam)
             else:
                 parsed_hparams = self._parse(hparams, hparams)
-            _hparams_type = self.add_hparam_type(parsed_hparams)
+            _hparam_types = self.add_hparam_type(parsed_hparams)
 
         super(HParams, self).__setattr__('_hparams', parsed_hparams)
-        super(HParams, self).__setattr__('_hparams_type', _hparams_type)
+        super(HParams, self).__setattr__('_hparam_types', _hparam_types)
 
 
     def __getattr__(self, name):
@@ -447,17 +452,22 @@ class HParams(object):
         """
         if name == '_hparams':
             return super(HParams, self).__getattribute__('_hparams')
-        if name == '_hparams_type':
-            return super(HParams, self).__getattribute__('_hparams_type')
+        if name == '_hparam_types':
+            return super(HParams, self).__getattribute__('_hparam_types')
         if name not in self._hparams:
             # Raise AttributeError to allow copy.deepcopy, etc
             raise AttributeError("Unknown hyperparameter: %s" % name)
-        return self._hparams[name]
+
+        value = self._hparams[name]
+        return value
 
     def __getitem__(self, name):
         """Retrieves the value of the hyperparameter.
         """
         return self.__getattr__(name)
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
 
     def __setattr__(self, name, value):
         """Set the value of an existing hyperparameter.
@@ -478,12 +488,8 @@ class HParams(object):
                 "Unknown hyperparameter: %s. Only the `kwargs` "
                 "hyperparameters can contain new entries undefined "
                 "in default hyperparameters." % name) #TODO in texar this is an Error
-        self._hparams[name] = self._parse_value(value, name)
-
-    def keys(self):
-        """Returns the list of hyperparam names
-        """
-        return self._hparams.keys()
+        parsed_value = self._parse_value(value, name)
+        self._hparams[name] = parsed_value
 
     def __iter__(self):
         for name, value in self._hparams.items():
@@ -495,20 +501,38 @@ class HParams(object):
     def __contains__(self, name):
         return name in self._hparams
 
-    def as_json(self):
-        """Return a string of the hparams.
-        """
-        hparams_dict = self.todict()
-        return json.dumps(hparams_dict, sort_keys=True, indent=2)
-
     def __str__(self):
-        return str(sorted(self.values().items()))
+        return str(self.values())
+        #return str(sorted(self.values().items()))
 
-    def items(self):
+    def keys(self):
+        """Returns the list of hyperparam names
+        """
+        return self._hparams.keys()
+
+    def values(self):
+        """Return the hyperparameter values as a Python dictionary.
+
+        Returns:
+          A dictionary with hyperparameter names as keys.  The values are the
+          hyperparameter values.
+        """
+        return self.todict()
+
+    def items(self): #TODO add test case
         """Returns the list of hyperparam `(name, value)` pairs
         """
-        return iter(self)
-    
+        return list(self._hparams.items())#iter(self)
+
+    def todict(self):
+        """Returns a copy of hyperparameters as a dictionary.
+        """
+        dict_ = copy.deepcopy(self._hparams)
+        for name, value in self._hparams.items():
+            if isinstance(value, HParams):
+                dict_[name] = value.todict()
+        return dict_
+
     def add_hparam_type(self, parsed_hparams):
         """Adds {name, value} pair value type.
 
@@ -523,7 +547,7 @@ class HParams(object):
         # Keys in kwargs are unique, but 'name' could the name of a pre-existing
         # attribute of this object.  In that case we refuse to use it as a
         # hyperparameter name.
-        _hparams_type = {}
+        _hparam_types = {}
         for name, value in six.iteritems(parsed_hparams):
             if getattr(self, name, None) is not None:
                 raise ValueError('Hyperparameter name is reserved: %s' % name)
@@ -531,10 +555,208 @@ class HParams(object):
                 if not value:
                     raise ValueError(
                         'Multi-valued hyperparameters cannot be empty: %s' % name)
-                _hparams_type[name] = (type(value[0]), True)
+                _hparam_types[name] = (type(value[0]), True)
             else:
-                _hparams_type[name] = (type(value), False)
-        return _hparams_type
+                _hparam_types[name] = (type(value), False)
+        return _hparam_types
+
+
+    def _parse_value(self, value, name=None):
+        """
+        Note: Since we encode all values as HParams,
+        there is a need for explicit dict conversion to use with `six`
+        eg: six.itervalues(self.hparams.some_dict_option_key.todict())
+        Args:
+            value:
+            name:
+
+        Returns:
+
+        """
+        if isinstance(value, dict) and (name is None or name != "kwargs"):
+            value = HParams(value, None)
+            return value
+        else:
+            return value
+
+    def parse(self, values):
+        """Override existing hyperparameter values, parsing new values from a string.
+
+        See parse_values for more detail on the allowed format for values.
+
+        Args:
+          values: String.  Comma separated list of `name=value` pairs where 'value'
+            must follow the syntax described above.
+
+        Returns:
+          The `HParams` instance.
+
+        Raises:
+          ValueError: If `values` cannot be parsed or a hyperparameter in `values`
+          doesn't exist.
+        """
+        type_map = dict()
+        for name, t in self._hparam_types.items():
+            param_type, _ = t
+            type_map[name] = param_type
+        values_map = parse_values(values, type_map)
+        return self.override_from_dict(values_map)
+
+    def override_from_dict(self, values_dict):
+        """Override existing hyperparameter values, parsing new values from a dictionary.
+
+        Args:
+          values_dict: Dictionary of name:value pairs.
+
+        Returns:
+          The `HParams` instance.
+
+        Raises:
+          KeyError: If a hyperparameter in `values_dict` doesn't exist.
+          ValueError: If `values_dict` cannot be parsed.
+        """
+        for name, value in values_dict.items():
+            self.set_hparam(name, value)
+        return self
+
+    def get(self, name, default=None):
+        """Returns the hyperparameter value for the given name. If name is not
+        available then returns :attr:`default`.
+
+        Args:
+            name (str): the name of hyperparameter.
+            default: the value to be returned in case name does not exist.
+        """
+        if name in self._hparam_types:
+            # Ensure that default is compatible with the parameter type.
+            if default is not None:
+                param_type, is_param_list = self._hparam_types[name]
+                type_str = 'list<%s>' % param_type if is_param_list else str(param_type)
+                fail_msg = ("Hparam '%s' of type '%s' is incompatible with "
+                            'default=%s' % (name, type_str, default))
+
+                is_default_list = isinstance(default, list)
+                if is_param_list != is_default_list:
+                    raise ValueError(fail_msg)
+
+                try:
+                    if is_default_list:
+                        for value in default:
+                            _cast_to_type_if_compatible(name, param_type, value)
+                    else:
+                        _cast_to_type_if_compatible(name, param_type, default)
+                except ValueError as e:
+                    raise ValueError('%s. %s' % (fail_msg, e))
+
+            return self.__getattr__(name)
+
+        return default
+
+    def add_hparam(self, name, value):
+        """Adds a new hyperparameter.
+        """
+        # if (name in self._hparams) or hasattr(self, name):
+        #     raise ValueError("Hyperparameter name already exists: %s" % name)
+        if getattr(self, name, None) is not None:
+            raise ValueError('Hyperparameter name is reserved: %s' % name)
+        self._hparams[name] = self._parse_value(value, name)
+
+        if isinstance(value, (list, tuple)):
+            if not value:
+                raise ValueError(
+                    'Multi-valued hyperparameters cannot be empty: %s' % name)
+            self._hparam_types[name] = (type(value[0]), True)
+        else:
+            self._hparam_types[name] = (type(value), False)
+
+
+
+    def set_hparam(self, name, value):
+        """Set the value of an existing hyperparameter.
+
+        This function verifies that the type of the value matches the type of the
+        existing hyperparameter.
+
+        Args:
+          name: Name of the hyperparameter.
+          value: New value of the hyperparameter.
+
+        Raises:
+          KeyError: If the hyperparameter doesn't exist.
+          ValueError: If there is a type mismatch.
+        """
+        param_type, is_list = self._hparam_types[name]
+        if isinstance(value, list):
+            if not is_list:
+                raise ValueError(
+                    'Must not pass a list for single-valued parameter: %s' % name)
+            # setattr(self, name, [
+            #     _cast_to_type_if_compatible(name, param_type, v) for v in value])
+            self._hparams[name] = [_cast_to_type_if_compatible(name, param_type, v) for v in value]
+        else:
+            if is_list:
+                raise ValueError(
+                    'Must pass a list for multi-valued parameter: %s.' % name)
+            # setattr(self, name, _cast_to_type_if_compatible(name, param_type, value))
+            self._hparams[name] = _cast_to_type_if_compatible(name, param_type, value)
+
+    def del_hparam(self, name):
+        """Removes the hyperparameter with key 'name'.
+
+        Does nothing if it isn't present.
+
+        Args:
+          name: Name of the hyperparameter.
+        """
+        if self._hparams[name]:
+            del self._hparam_types[name]
+            del self._hparams[name]
+
+    def as_json(self):
+        """Return a string of the hparams.
+        """
+        hparams_dict = self.todict()
+        return json.dumps(hparams_dict, sort_keys=True, indent=2)
+
+    def to_json(self, indent=None, separators=None, sort_keys=False):
+        """Serializes the hyperparameters into JSON.
+
+        Args:
+          indent: If a non-negative integer, JSON array elements and object members
+            will be pretty-printed with that indent level. An indent level of 0, or
+            negative, will only insert newlines. `None` (the default) selects the
+            most compact representation.
+          separators: Optional `(item_separator, key_separator)` tuple. Default is
+            `(', ', ': ')`.
+          sort_keys: If `True`, the output dictionaries will be sorted by key.
+
+        Returns:
+          A JSON string.
+        """
+        values = {}
+        for key, value in self.items():
+            values[key] = str(value)
+        return json.dumps(
+            values,
+            indent=indent,
+            separators=separators,
+            sort_keys=sort_keys)
+
+    def parse_json(self, values_json):
+        """Override existing hyperparameter values, parsing new values from a json object.
+
+        Args:
+          values_json: String containing a json object of name:value pairs.
+
+        Returns:
+          The `HParams` instance.
+
+        Raises:
+          KeyError: If a hyperparameter in `values_json` doesn't exist.
+          ValueError: If `values_json` cannot be parsed.
+        """
+        values_map = json.loads(values_json)
+        return self.override_from_dict(values_map)
 
 
     # @staticmethod
@@ -659,195 +881,3 @@ class HParams(object):
                         (name, _type_name(default_value), _type_name(value)))
 
         return parsed_hparams
-
-    def _parse_value(self, value, name=None):
-        if isinstance(value, dict) and (name is None or name != "kwargs"):
-            return HParams(value, None)
-        else:
-            return value
-
-    def parse(self, values):
-        """Override existing hyperparameter values, parsing new values from a string.
-
-        See parse_values for more detail on the allowed format for values.
-
-        Args:
-          values: String.  Comma separated list of `name=value` pairs where 'value'
-            must follow the syntax described above.
-
-        Returns:
-          The `HParams` instance.
-
-        Raises:
-          ValueError: If `values` cannot be parsed or a hyperparameter in `values`
-          doesn't exist.
-        """
-        type_map = dict()
-        for name, t in self._hparams_type.items():
-            param_type, _ = t
-            type_map[name] = param_type
-        values_map = parse_values(values, type_map)
-        return self.override_from_dict(values_map)
-
-    def override_from_dict(self, values_dict):
-        """Override existing hyperparameter values, parsing new values from a dictionary.
-
-        Args:
-          values_dict: Dictionary of name:value pairs.
-
-        Returns:
-          The `HParams` instance.
-
-        Raises:
-          KeyError: If a hyperparameter in `values_dict` doesn't exist.
-          ValueError: If `values_dict` cannot be parsed.
-        """
-        for name, value in values_dict.items():
-            self.set_hparam(name, value)
-        return self
-
-    def values(self):
-        """Return the hyperparameter values as a Python dictionary.
-    
-        Returns:
-          A dictionary with hyperparameter names as keys.  The values are the
-          hyperparameter values.
-        """
-        return self._hparams
-
-    def get(self, name, default=None):
-        """Returns the hyperparameter value for the given name. If name is not
-        available then returns :attr:`default`.
-
-        Args:
-            name (str): the name of hyperparameter.
-            default: the value to be returned in case name does not exist.
-        """
-        if name in self._hparams_type:
-            # Ensure that default is compatible with the parameter type.
-            if default is not None:
-                param_type, is_param_list = self._hparams_type[name]
-                type_str = 'list<%s>' % param_type if is_param_list else str(param_type)
-                fail_msg = ("Hparam '%s' of type '%s' is incompatible with "
-                            'default=%s' % (name, type_str, default))
-
-                is_default_list = isinstance(default, list)
-                if is_param_list != is_default_list:
-                    raise ValueError(fail_msg)
-
-                try:
-                    if is_default_list:
-                        for value in default:
-                            _cast_to_type_if_compatible(name, param_type, value)
-                    else:
-                        _cast_to_type_if_compatible(name, param_type, default)
-                except ValueError as e:
-                    raise ValueError('%s. %s' % (fail_msg, e))
-
-            return self.__getattr__(name)
-
-        return default
-
-    def add_hparam(self, name, value):
-        """Adds a new hyperparameter.
-        """
-        if (name in self._hparams) or hasattr(self, name):
-            raise ValueError("Hyperparameter name already exists: %s" % name)
-        self._hparams[name] = self._parse_value(value, name)
-
-        if isinstance(value, (list, tuple)):
-            if not value:
-                raise ValueError(
-                    'Multi-valued hyperparameters cannot be empty: %s' % name)
-            self._hparams_type[name] = (type(value[0]), True)
-        else:
-            self._hparams_type[name] = (type(value), False)
-
-
-
-    def set_hparam(self, name, value):
-        """Set the value of an existing hyperparameter.
-
-        This function verifies that the type of the value matches the type of the
-        existing hyperparameter.
-
-        Args:
-          name: Name of the hyperparameter.
-          value: New value of the hyperparameter.
-
-        Raises:
-          KeyError: If the hyperparameter doesn't exist.
-          ValueError: If there is a type mismatch.
-        """
-        param_type, is_list = self._hparams_type[name]
-        if isinstance(value, list):
-            if not is_list:
-                raise ValueError(
-                    'Must not pass a list for single-valued parameter: %s' % name)
-            # setattr(self, name, [
-            #     _cast_to_type_if_compatible(name, param_type, v) for v in value])
-            self._hparams[name] = [_cast_to_type_if_compatible(name, param_type, v) for v in value]
-        else:
-            if is_list:
-                raise ValueError(
-                    'Must pass a list for multi-valued parameter: %s.' % name)
-            # setattr(self, name, _cast_to_type_if_compatible(name, param_type, value))
-            self._hparams[name] = _cast_to_type_if_compatible(name, param_type, value)
-
-    def del_hparam(self, name):
-        """Removes the hyperparameter with key 'name'.
-
-        Does nothing if it isn't present.
-
-        Args:
-          name: Name of the hyperparameter.
-        """
-        if self._hparams[name]:
-            del self._hparams_type[name]
-            del self._hparams[name]
-
-    def todict(self):
-        """Returns a copy of hyperparameters as a dictionary.
-        """
-        dict_ = copy.deepcopy(self._hparams)
-        for name, value in self._hparams.items():
-            if isinstance(value, HParams):
-                dict_[name] = value.todict()
-        return dict_
-
-    def to_json(self, indent=None, separators=None, sort_keys=False):
-        """Serializes the hyperparameters into JSON.
-
-        Args:
-          indent: If a non-negative integer, JSON array elements and object members
-            will be pretty-printed with that indent level. An indent level of 0, or
-            negative, will only insert newlines. `None` (the default) selects the
-            most compact representation.
-          separators: Optional `(item_separator, key_separator)` tuple. Default is
-            `(', ', ': ')`.
-          sort_keys: If `True`, the output dictionaries will be sorted by key.
-
-        Returns:
-          A JSON string.
-        """
-        return json.dumps(
-            self.todict(),
-            indent=indent,
-            separators=separators,
-            sort_keys=sort_keys)
-
-    def parse_json(self, values_json):
-        """Override existing hyperparameter values, parsing new values from a json object.
-
-        Args:
-          values_json: String containing a json object of name:value pairs.
-
-        Returns:
-          The `HParams` instance.
-
-        Raises:
-          KeyError: If a hyperparameter in `values_json` doesn't exist.
-          ValueError: If `values_json` cannot be parsed.
-        """
-        values_map = json.loads(values_json)
-        return self.override_from_dict(values_map)

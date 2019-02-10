@@ -28,7 +28,7 @@ equivalents.
 Forked from : https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/utils/registry.py
 ```
 @Registries.models.register
-class MyModel(T2TModel):
+class MyModel(VfModel):
   ...
 
 'my_model' in Registries.models  # True
@@ -39,16 +39,16 @@ model = Registries.models['my_model'](constructor_arg)
 
 #### Legacy Support
 
-Define a new model by subclassing T2TModel and register it:
+Define a new model by subclassing VfModel and register it:
 
 ```
 @register_model
-class MyModel(T2TModel):
+class MyModel(VfModel):
   ...
 ```
 
 Access by snake-cased name: `model("my_model")`. If you're using
-`t2t_trainer.py`, you can pass on the command-line: `--model=my_model`.
+`vf_trainer.py`, you can pass on the command-line: `--model=my_model`.
 
 See all the models registered: `list_models()`.
 
@@ -56,13 +56,13 @@ For hyperparameter sets:
   * Register: `register_hparams`
   * List: `list_hparams`
   * Retrieve by name: `hparams`
-  * Command-line flag in `t2t_trainer.py`: `--hparams_set=name`
+  * Command-line flag in `vf_trainer.py`: `--hparams_set=name`
 
 For hyperparameter ranges:
   * Register: `register_ranged_hparams`
   * List: `list_ranged_hparams`
   * Retrieve by name: `ranged_hparams`
-  * Command-line flag in `t2t_trainer.py`: `--hparams_range=name`
+  * Command-line flag in `vf_trainer.py`: `--hparams_range=name`
 """
 
 import collections

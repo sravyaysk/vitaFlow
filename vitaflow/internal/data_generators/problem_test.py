@@ -18,8 +18,7 @@
 from absl.testing import parameterized  # for assertLen
 import numpy as np
 
-from vitaflow.internal.data_generators import algorithmic
-from vitaflow.internal.problem import problem as problem_module
+from vitaflow.internal.data_generators import algorithmic, problem as problem_module
 from vitaflow.internal.data_generators import problem_hparams
 from vitaflow.internal.layers import modalities
 

@@ -21,9 +21,10 @@ import numpy as np
 import json
 
 import tensorflow as tf
+from vitaflow.internal.data_generators import problem as problem_lib
 
 from vitaflow.utils import registry
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 
 
 def dict_patch(tgt_dict, src_dict):

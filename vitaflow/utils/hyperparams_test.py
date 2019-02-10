@@ -19,13 +19,17 @@ import copy
 import pickle
 
 import tempfile
+
+import six
 import tensorflow as tf
 
-import vitaflow.internal.hyperparams as hparam
-from vitaflow.internal.hyperparams import HParams
+import vitaflow.utils.hyperparams as hparam
+from vitaflow.utils.hyperparams import HParams
 
 
 # pylint: disable=no-member
+from vitaflow.utils.print_helper import print_error, print_info
+
 
 class HParamsTest(tf.test.TestCase):
     """Tests hyperparameter related operations.
@@ -199,8 +203,10 @@ class HParamsTest2(tf.test.TestCase):
         self.assertDictEqual(
             {'aaa': 1, 'b': 2.0, 'c_c': 'relu6', 'd': '/a/b=c/d'},
             hparams.values())
-        expected_str = ('[(\'aaa\', 1), (\'b\', 2.0), (\'c_c\', \'relu6\'), '
-                        '(\'d\', \'/a/b=c/d\')]')
+        # expected_str = ('[(\'aaa\', 1), (\'b\', 2.0), (\'c_c\', \'relu6\'), '
+        #                 '(\'d\', \'/a/b=c/d\')]')
+        expected_str = ('{\'aaa\': 1, \'b\': 2.0, \'c_c\': \'relu6\', '
+                        '\'d\': \'/a/b=c/d\'}')
         self.assertEqual(expected_str, str(hparams.__str__()))
         self.assertEqual(expected_str, str(hparams))
         self.assertEqual(1, hparams.aaa)
@@ -658,6 +664,21 @@ class HParamsTest2(tf.test.TestCase):
 
         hparams.set_hparam('aaa', 'still works')
         self.assertEqual('still works', hparams.get('aaa'))
+
+    def testInnerDictValues(self):
+        class Input:
+            def __init__(self):
+                self._hparams = HParams()
+        class Output:
+            def __init__(self):
+                self._hparams = HParams()
+
+        hparams = HParams(outer_name='outer_value')
+        hparams.a_dict_called_modality = {"input" : Input, "output" : Output}
+        values = list(six.itervalues(hparams.a_dict_called_modality.todict()))
+        # for feature_name, modality_cls in six.iteritems(hparams.a_dict_called_modality):
+        #     print(feature_name, modality_cls)
+        self.assertEqual(values, [Input, Output])
 
 if __name__ == "__main__":
     tf.test.main()
