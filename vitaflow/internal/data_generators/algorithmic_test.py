@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import print_function
 from six.moves import range  # pylint: disable=redefined-builtin
 
-from tensor2tensor.data_generators import algorithmic
+from vitaflow.internal.data_generators import algorithmic
 
 import tensorflow as tf
 

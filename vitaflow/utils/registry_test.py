@@ -17,7 +17,7 @@
 """Tests for vitaflow.registry."""
 
 from vitaflow.utils import registry
-# from tensor2tensor.utils import t2t_model
+from vitaflow.internal.models import vf_model
 
 import tensorflow as tf
 
@@ -116,66 +116,66 @@ class EnvProblemRegistryTest(tf.test.TestCase):
     # assert on the type.
     self.assertTrue(isinstance(ep, EnvProb))
 
-#
-# class ModelRegistryTest(tf.test.TestCase):
-#
-#   def setUp(self):
-#     registry.Registries.models._clear()
-#
-#   def testT2TModelRegistration(self):
-#
-#     @registry.register_model
-#     class MyModel1(t2t_model.T2TModel):
-#       pass
-#
-#     model = registry.model("my_model1")
-#     self.assertTrue(model is MyModel1)
-#
-#   def testNamedRegistration(self):
-#
-#     @registry.register_model("model2")
-#     class MyModel1(t2t_model.T2TModel):
-#       pass
-#
-#     model = registry.model("model2")
-#     self.assertTrue(model is MyModel1)
-#
-#   def testNonT2TModelRegistration(self):
-#
-#     @registry.register_model
-#     def model_fn():
-#       pass
-#
-#     model = registry.model("model_fn")
-#     self.assertTrue(model is model_fn)
-#
-#   def testUnknownModel(self):
-#     with self.assertRaisesRegexp(KeyError, "never registered"):
-#       registry.model("not_registered")
-#
-#   def testDuplicateRegistration(self):
-#
-#     @registry.register_model
-#     def m1():
-#       pass
-#
-#     with self.assertRaisesRegexp(KeyError, "already registered"):
-#
-#       @registry.register_model("m1")
-#       def m2():
-#         pass
-#
-#   def testListModels(self):
-#
-#     @registry.register_model
-#     def m1():
-#       pass
-#
-#     @registry.register_model
-#     def m2():
-#       pass
-#
-#     self.assertSetEqual(set(["m1", "m2"]), set(registry.list_models()))
+
+class ModelRegistryTest(tf.test.TestCase):
+
+  def setUp(self):
+    registry.Registries.models._clear()
+
+  def testT2TModelRegistration(self):
+
+    @registry.register_model
+    class MyModel1(vf_model.VfModel):
+      pass
+
+    model = registry.model("my_model1")
+    self.assertTrue(model is MyModel1)
+
+  def testNamedRegistration(self):
+
+    @registry.register_model("model2")
+    class MyModel1(vf_model.VfModel):
+      pass
+
+    model = registry.model("model2")
+    self.assertTrue(model is MyModel1)
+
+  def testNonT2TModelRegistration(self):
+
+    @registry.register_model
+    def model_fn():
+      pass
+
+    model = registry.model("model_fn")
+    self.assertTrue(model is model_fn)
+
+  def testUnknownModel(self):
+    with self.assertRaisesRegexp(KeyError, "never registered"):
+      registry.model("not_registered")
+
+  def testDuplicateRegistration(self):
+
+    @registry.register_model
+    def m1():
+      pass
+
+    with self.assertRaisesRegexp(KeyError, "already registered"):
+
+      @registry.register_model("m1")
+      def m2():
+        pass
+
+  def testListModels(self):
+
+    @registry.register_model
+    def m1():
+      pass
+
+    @registry.register_model
+    def m2():
+      pass
+
+    self.assertSetEqual(set(["m1", "m2"]), set(registry.list_models()))
 
 
 class HParamRegistryTest(tf.test.TestCase):

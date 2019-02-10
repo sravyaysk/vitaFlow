@@ -21,8 +21,7 @@ import tempfile
 import numpy as np
 from six.moves import range  # pylint: disable=redefined-builtin
 
-from vitaflow.internal.data_generators import generator_utils
-from vitaflow.internal.problem import problem as problem_mod
+from vitaflow.internal.data_generators import generator_utils, problem as problem_mod
 from vitaflow.internal.layers import modalities
 from vitaflow.utils import data_reader, registry
 

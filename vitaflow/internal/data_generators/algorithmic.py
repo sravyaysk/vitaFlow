@@ -20,8 +20,7 @@ import os
 import shutil
 import numpy as np
 from six.moves import range  # pylint: disable=redefined-builtin
-from vitaflow.internal.data_generators import generator_utils as utils
-from vitaflow.internal.problem import problem
+from vitaflow.internal.data_generators import generator_utils as utils, problem
 from vitaflow.internal.data_generators import text_encoder
 from vitaflow.internal.layers import modalities
 from vitaflow.utils import metrics

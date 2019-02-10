@@ -20,18 +20,15 @@ import random
 import six
 
 from vitaflow.internal.data_generators import generator_utils
-from vitaflow.internal.data_generators import text_encoder
 from vitaflow.internal.layers import modalities
 from vitaflow.utils import data_reader
 from vitaflow.utils import metrics
 from vitaflow.utils import mlperf_log
-from vitaflow.internal.hyperparams import HParams
-
 
 import tensorflow as tf
 from tensorflow.contrib.tpu.python.tpu import tpu_config
 
-from vitaflow.internal import HParams
+from vitaflow.utils.hyperparams import HParams
 from vitaflow.internal.data_generators import text_encoder
 
 

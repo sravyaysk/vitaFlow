@@ -20,7 +20,7 @@ from abc import ABC
 import os
 import pickle
 
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 from vitaflow.internal import IPreprocessor
 from vitaflow.utils.print_helper import print_info
 from vitaflow.engines import Executor

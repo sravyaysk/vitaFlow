@@ -23,7 +23,7 @@ from importlib import import_module
 import tensorflow as tf
 from tqdm import tqdm
 
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 from vitaflow.utils.print_helper import *
 from vitaflow.engines.executor import Executor
 

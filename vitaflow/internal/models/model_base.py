@@ -16,7 +16,7 @@ Base class for models.
 """
 import os
 
-from vitaflow.internal.hyperparams import HParams
+from vitaflow.utils.hyperparams import HParams
 
 # pylint: disable=too-many-arguments
 

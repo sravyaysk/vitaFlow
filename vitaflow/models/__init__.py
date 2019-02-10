@@ -1,4 +1,4 @@
-# Copyright 2019 The vitaFlow Authors. All Rights Reserved.
+# Copyright 2018 The vitFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,3 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""Models defined in vitaFlow. Imports here force registration."""
+
+import six
+
+# pylint: disable=unused-import
+
+from vitaflow.models.text import lstm
+from vitaflow.models.text import transformer
+
+from tensor2tensor.utils import registry
+
+# pylint: enable=unused-import
+
+
+def model(name):
+    return registry.model(name)

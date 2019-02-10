@@ -21,8 +21,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-from vitaflow.internal.problem import problem
-from vitaflow.internal.data_generators import text_encoder
+from vitaflow.internal.data_generators import text_encoder, problem
 from vitaflow.internal.layers import modalities
 from vitaflow.utils import registry
 
