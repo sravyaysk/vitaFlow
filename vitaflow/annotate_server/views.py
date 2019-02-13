@@ -22,7 +22,7 @@ class GetNewImage:
     CompletedImages = []
     _last_refresh_ = 0
     # TODO: put below param in config.py
-    _refresh_interval_ = 5 * 60
+    _refresh_interval_ = 2 * 60
 
     @staticmethod
     def refresh(image=None):
@@ -55,7 +55,7 @@ class GetNewImage:
     def get_new_image():
         if GetNewImage.PendingImages:
             image_file = random.choice(GetNewImage.PendingImages)
-            image_file = [each for each in GetNewImage.ImageFiles.keys() if each.startswith(image_file)][0]
+            # image_file = [each for each in GetNewImage.ImageFiles.keys() if each.startswith(image_file)][0]
             send_info = {
                 'id': GetNewImage.ImageFiles[image_file]['file'],
                 'url': GetNewImage.ImageFiles[image_file]['url'],
