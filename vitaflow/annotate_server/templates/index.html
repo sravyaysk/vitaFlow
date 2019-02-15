@@ -8,15 +8,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=EDGE"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/ae_base.css') }}">
+    <!--TODO Convert Following to `url_for` -->
+    <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/ae_base.css') }}">-->
 
+    <link rel="stylesheet" href="/static/css/ae_base.css" type="text/css"/>
     <link rel="stylesheet" href="/static/autocomplete/easy-autocomplete.css" type="text/css"/>
     <link rel="stylesheet" href="/static/autocomplete/easy-autocomplete.themes.css" type="text/css"/>
     <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <link href="static/css/jquery.selectareas.css" rel="stylesheet">
 
-    <script src="{{ url_for('static', filename='js/jquery-3.2.1.js') }}"></script>
+    <script src="static/js/jquery-3.2.1.js" type="text/javascript"></script>
     <script src="static/js/jquery.selectareas.js" type="text/javascript"></script>
     <script src="static/autocomplete/jquery.easy-autocomplete.js" type="text/javascript"></script>
 

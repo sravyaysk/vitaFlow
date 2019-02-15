@@ -207,12 +207,15 @@ window.onload = function () {
             $('#getCroppedCanvasModal').modal().find('.modal-body').html(result);
 
             if (!download.disabled) {
-//              alert('asdf');
+              // alert('asdf');
               download.download = uploadedImageName;
+              // TODO: Network Traffic Efficient way is to send only image & cropping details
+              //        instead of sending whole image.
               download.href = result.toDataURL(uploadedImageType);
 
               var formData = new FormData();
               formData.append("fileToUpload", result.toDataURL(uploadedImageType));
+              formData.append("fileName", image.src.split('/').pop());
 
             $.ajax({
                url: "upload.php",

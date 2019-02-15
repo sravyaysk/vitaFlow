@@ -3,18 +3,26 @@ import os
 import random
 import time
 
-try:
-    from . import config
-except:
-    import config
+import config
 
 PWD = os.path.dirname(config.__file__)
+
 
 def trim_ext(x):
     return x.rsplit('.')[-2]
 
 
-class GetNewImage:
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class GetNewImage(metaclass=Singleton):
+    # TODO: Convert GetNewImage is a Singleton Class
     # TODO: Naming Convention to changes to lower case.
     ImageFiles = {}
     XmlFiles = {}
@@ -23,6 +31,22 @@ class GetNewImage:
     _last_refresh_ = 0
     # TODO: put below param in config.py
     _refresh_interval_ = 2 * 60
+
+    @staticmethod
+    def get_default_request_response():
+        # TODO: Update default Image details
+        send_info = {"url": "/static/data/images/pexels-photo-60091.jpg",
+                     "id": "pexels-photo-60091.jpg",
+                     "folder": "collection_01/part_1",
+                     "annotations": [
+                         {
+                             "tag": "Eagle",
+                             "x": 475, "y": 225,
+                             "width": 230.555555554,
+                             "height": 438.888888886}
+                     ]
+                     }
+        return send_info
 
     @staticmethod
     def refresh(image=None):
@@ -63,20 +87,21 @@ class GetNewImage:
                 "annotations": []
             }
         else:
-            # TODO: Add a default Image for display in case no images are pending.
-            send_info = {"url": "/static/data/images/pexels-photo-60091.jpg",
-                         "id": "pexels-photo-60091.jpg",
-                         "folder": "collection_01/part_1",
-                         "annotations": [
-                             {
-                                 "tag": "Eagle",
-                                 "x": 475, "y": 225,
-                                 "width": 230.555555554,
-                                 "height": 438.888888886}
-                         ]
-                         }
+            send_info = GetNewImage.get_default_request_response()
         print('GetNewImage returned {}'.format(send_info['id']))
         return send_info
+
+    @staticmethod
+    def get_specific_image(image_name):
+        image_file = trim_ext(image_name)
+        send_info = {
+            'id': GetNewImage.ImageFiles[image_file]['file'],
+            'url': GetNewImage.ImageFiles[image_file]['url'],
+            'folder': '',
+            "annotations": []
+        }
+        return send_info
+
 
     @staticmethod
     def get_old_image():
@@ -90,17 +115,7 @@ class GetNewImage:
             }
         else:
             # TODO: Add a default Image for display in case no images are annotated.
-            send_info = {"url": "/static/data/images/pexels-photo-60091.jpg",
-                         "id": "pexels-photo-60091.jpg",
-                         "folder": "collection_01/part_1",
-                         "annotations": [
-                             {
-                                 "tag": "Eagle",
-                                 "x": 475, "y": 225,
-                                 "width": 230.555555554,
-                                 "height": 438.888888886}
-                         ]
-                         }
+            send_info = send_info = GetNewImage.get_default_request_response()
         return send_info
 
     @staticmethod

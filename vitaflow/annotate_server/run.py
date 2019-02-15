@@ -1,13 +1,17 @@
 #!flask/bin/python
-
-
 from flask import Flask, render_template, jsonify, send_file, request
-import views
-import annotate
-print(__file__)
+
+
+import os
 import base64
 from pprint import pprint
 import pickle
+
+import config
+import views
+import annotate
+import cropper
+
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
@@ -40,17 +44,27 @@ def _rest_get_new_image():
 #     return send_file('')
 
 
-@app.route('/')
+
 @app.route('/annotate_image')
-# @app.route('/annotate_image/<image:image>')
 def annotate_image():
     return render_template('index.html')
+
+
+@app.route('/')
+@app.route('/<image>')
+def annotate_image2(image=None):
+    if image:
+        print('--'* 54)
+        print(image)
+    return render_template('index.html')
+
 
 
 @app.route('/review_annotation')
 # @app.route('/review_annotation/<image:image>')
 def review_annotation():
     return render_template('index.html')
+
 
 @app.route('/show_completed_images')
 def show_completed_images():
@@ -76,36 +90,18 @@ def show_summary():
 def login_logout():
     pass
 
-@app.route("/cropper")
-def cropper():
-    return render_template("Cropper_js.html")
+
+@app.route("/cropper/<image_name>")
+def page_cropper(image_name=None):
+    data = {'image_name': "/" + os.path.join(config.IMAGE_ROOT_DIR, image_name)}
+    return render_template("Cropper_js.html", data=data)
 
 
+@app.route("/cropper/upload.php", methods=['POST'])
 @app.route("/upload.php", methods=['POST'])
 def cropper_upload():
     data = dict(request.form)
-    key = 'fileToUpload'
-    if key in data:
-        print('Saving file !!')
-        stringToRGB(data[key])
-    else:
-        print('Not '
-              'Saving file !!')
-    return 'ok'
-
-
-def stringToRGB(base64_string):
-    # print(str(base64_string)[:100])
-    # verify @ https://codebeautify.org/base64-to-image-converter#
-    try:
-        image_name = os.path.join('/Users/sampathm/Desktop', 'download122.jpg')
-        print('Saving file to Image {}'.format(image_name))
-        data = base64_string.split(',')[-1]
-        open(image_name, 'bw').write(base64.b64decode(data))
-    except:
-        filehandler = open('sam.pk', 'bw')
-        print('used pickle !!')
-        pickle.dump(str(base64_string), filehandler)
+    return cropper.cropper_upload(data)
 
 
 if __name__ == '__main__':
