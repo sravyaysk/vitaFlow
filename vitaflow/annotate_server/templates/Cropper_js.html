@@ -10,20 +10,21 @@
 	<title>Cropper.js</title>
 	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
-	<link href="./static/Cropper_js_files/cropper.css" rel="stylesheet">
-	<link href="./static/Cropper_js_files/main.css" rel="stylesheet">
-	<script src="./static/Cropper_js_files/js">
+	<link href="/static/Cropper_js_files/cropper.css" rel="stylesheet">
+	<link href="/static/Cropper_js_files/main.css" rel="stylesheet">
+	<script src="/static/Cropper_js_files/js">
 	</script>
 </head>
 <body data-gr-c-s-loaded="true">
 	<!-- Jumbotron -->
 	<!-- Content -->
+    <h2>Cropper '{{data.image_name}}'</h2>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-9">
 				<!-- <h3>Demo:</h3> -->
 				<div class="img-container">
-					<img alt="Picture" class="cropper-hidden" src="./static/Cropper_js_files/picture.jpg" id="image_to_process">
+					<img alt="Picture" class="cropper-hidden" src="{{data.image_name}}" id="image_to_process">
 				</div>
 			</div>
 			<div class="col-md-3">
@@ -142,9 +143,9 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js">
 	</script>
-	<script src="./static/Cropper_js_files/cropper.js">
+	<script src="/static/Cropper_js_files/cropper.js">
 	</script>
-	<script src="./static/Cropper_js_files/main.js">
+	<script src="/static/Cropper_js_files/main.js">
 	</script>
 </body>
 </html>
