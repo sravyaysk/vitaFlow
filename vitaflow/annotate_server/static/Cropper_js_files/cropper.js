@@ -2933,8 +2933,7 @@
      */
     getCroppedCanvas: function getCroppedCanvas() {
 
-      alert('asdf');
-      debugger;
+//      debugger;
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       if (!this.ready || !window.HTMLCanvasElement) {

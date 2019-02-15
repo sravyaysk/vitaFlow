@@ -1,9 +1,13 @@
 #!flask/bin/python
+
+
 from flask import Flask, render_template, jsonify, send_file, request
 import views
 import annotate
 print(__file__)
+import base64
 from pprint import pprint
+import pickle
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
@@ -72,7 +76,36 @@ def show_summary():
 def login_logout():
     pass
 
+@app.route("/cropper")
+def cropper():
+    return render_template("Cropper_js.html")
 
+
+@app.route("/upload.php", methods=['POST'])
+def cropper_upload():
+    data = dict(request.form)
+    key = 'fileToUpload'
+    if key in data:
+        print('Saving file !!')
+        stringToRGB(data[key])
+    else:
+        print('Not '
+              'Saving file !!')
+    return 'ok'
+
+
+def stringToRGB(base64_string):
+    # print(str(base64_string)[:100])
+    # verify @ https://codebeautify.org/base64-to-image-converter#
+    try:
+        image_name = os.path.join('/Users/sampathm/Desktop', 'download122.jpg')
+        print('Saving file to Image {}'.format(image_name))
+        data = base64_string.split(',')[-1]
+        open(image_name, 'bw').write(base64.b64decode(data))
+    except:
+        filehandler = open('sam.pk', 'bw')
+        print('used pickle !!')
+        pickle.dump(str(base64_string), filehandler)
 
 
 if __name__ == '__main__':

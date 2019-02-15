@@ -207,8 +207,30 @@ window.onload = function () {
             $('#getCroppedCanvasModal').modal().find('.modal-body').html(result);
 
             if (!download.disabled) {
+//              alert('asdf');
               download.download = uploadedImageName;
               download.href = result.toDataURL(uploadedImageType);
+
+              var formData = new FormData();
+              formData.append("fileToUpload", result.toDataURL(uploadedImageType));
+
+            $.ajax({
+               url: "upload.php",
+               type: "POST",
+               data: formData,
+               processData: false,
+               contentType: false,
+               success: function(response) {
+                   console.log('Uploaded Image!!');
+               },
+               error: function(jqXHR, textStatus, errorMessage) {
+                   console.log('Failed to uploaded image!!');
+                   console.log(errorMessage); // Optional
+               }
+            });
+
+//            debugger;
+
             }
           }
 
