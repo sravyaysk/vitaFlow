@@ -10,13 +10,11 @@
 1. [Introduction](#introduction)
 2. [Problem Statement](#problem-statement)
 3. [Proposed Solution](#proposed-solution)
-    1. VitaFlow Features <!--what has been done/Available Features -->
-    2. Current Implementation <!--what is being prepared -->
-    3. Future Implementations Plans <!--what is next -->
-4. [Architecture](#architecture)
-5. [VitaFlow in Action](#vitaflow-in-action)
-6. [License](#license)
-7. [Contributions](#contributions) 
+4. [Development](#development)
+5. [Architecture](#architecture)
+6. [VitaFlow in Action](#vitaflow-in-action)
+7. [License](#license)
+8. [Contributions](#contributions) 
  
 # Introduction
 
@@ -28,17 +26,17 @@ We are incubating an ideation to solve this typical software design problem for 
 
 To come up with a framework that enables a fast prototyping of Deep Learning models that handles Video/Image/Text/Audio and provide an seamless way of serving them in different end points.
 
-- **A Navie Developer**: Can I get an experimentation play ground, with some set of open datasets, data iterators and models? to learn by doing?
-- **A Data Scientist**: Can I build a model with an available open dataset and later switch to production dataset when the Data Engineering team bring in the production data?
-- **A Data Engineer**: Can I use any available model and run through my data during my data preparation cycle?
-- **An Online competitioner**: Can I reuse the models and pieces of modules that I have developed for my last competition in my current competition? 
-- **Business Deadlines** : We had spend few months of effort while addressing a clients proposals and build a prototype.Can we showcase the prototype developed to upcoming project proposals as quick as possible? 
+- __A Navie Developer__: Can I get an experimentation play ground, with some set of open datasets, data iterators and models? to learn by doing?
+- __A Data Scientist__: Can I build a model with an available open dataset and later switch to production dataset when the Data Engineering team bring in the production data?
+- __A Data Engineer__: Can I use any available model and run through my data during my data preparation cycle?
+- __An Online Competitor__: Can I reuse the models and pieces of modules that I have developed for my last competition in my current competition? 
+- __Business Deadlines__ : We had spend few months of effort while addressing a clients proposals and build a prototype.Can we showcase the prototype developed to upcoming project proposals as quick as possible? 
 
 In our Deep Learning exploration/projects we wanted to build a framework that is modular as much as possible, plug ang play architecture for main modules and reuse our experience (hours of development and testing) from one project to another, while improving on existing capabilities without breaking it.  
 
 # Proposed Solution
 
-> **Data Science wisdom comes only through failed experimentation - Damian Mingle**
+> __Data Science wisdom comes only through failed experimentation - Damian Mingle__
 
 The thought process is to come up with following modular components which then can be then glued through
 configuration:
@@ -51,6 +49,23 @@ configuration:
  - Tensorflow model serving using [TFLite](https://www.tensorflow.org/lite/)
     - Web app
     - Mobile
+
+# Development
+
+VitaFlow is continuously extended by solving some real work problem. To check some of these solved work please check [examples](https://github.com/Imaginea/vitaFlow/tree/master/examples) folder in repo.
+
+_TODO: Update VitaFlow Features here_
+<!--
+    1. VitaFlow Features - what has been done/Available Features
+    2. Current Implementation - what is being prepared 
+    3. Future Implementations Plans - what is next 
+-->
+
+### Receipt OCR
+
+Receipt OCR is related to [Information Extraction](https://en.wikipedia.org/wiki/Information_extraction) Domain. Using a open source Receipts dataset, we working on building a simple pipeline for valuable information extration.
+
+For more updates on development & progress, please check [Receipt OCR - Readme](https://github.com/Imaginea/vitaFlow/tree/master/examples/receipt_ocr)
 
 # Architecture
 
