@@ -2,16 +2,29 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/imaginea/vitaflow/blob/master/LICENSE)
  
 
-# vitaFlow - VideoImageTextAudioFlow
+# VitaFlow - VideoImageTextAudioFlow
  ![](vitaflow-icon.png)
+
+# Table of content
+
+1. [Introduction](#introduction)
+2. [Problem Statement](#problem-statement)
+3. [Proposed Solution](#proposed-solution)
+    1. VitaFlow Features <!--what has been done/Available Features -->
+    2. Current Implementation <!--what is being prepared -->
+    3. Future Implementations Plans <!--what is next -->
+4. [Architecture](#architecture)
+5. [VitaFlow in Action](#vitaflow-in-action)
+6. [License](#license)
+7. [Contributions](#contributions) 
  
-## Introduction
+# Introduction
 
 Deep Learning projects are increasing exponentially in recent times and the complexity of handling such projects alike across the domains. Be it business environment or in any online competitions, the main challenge is how we can reuse the code base what we have developed for one requirement/problem statement and use it to a slightly different new requirement/problem statement. 
 
 We are incubating an ideation to solve this typical software design problem for Deep Learning projects, which would simplify the whole process of data preparation, modelling and serving in a easy configurable plug and play framework.
 
-## Problem Statement
+# Problem Statement
 
 To come up with a framework that enables a fast prototyping of Deep Learning models that handles Video/Image/Text/Audio and provide an seamless way of serving them in different end points.
 
@@ -23,7 +36,7 @@ To come up with a framework that enables a fast prototyping of Deep Learning mod
 
 In our Deep Learning exploration/projects we wanted to build a framework that is modular as much as possible, plug ang play architecture for main modules and reuse our experience (hours of development and testing) from one project to another, while improving on existing capabilities without breaking it.  
 
-## Proposed Solution
+# Proposed Solution
 
 > **Data Science wisdom comes only through failed experimentation - Damian Mingle**
 
@@ -39,11 +52,11 @@ configuration:
     - Web app
     - Mobile
 
-## Architecture
+# Architecture
 
 ![](docs/images/vitaflow_stack.png)
 
-## vitaFlow in Action
+# VitaFlow in Action
 
 CoNLL 2003 data set is considered since the data size small and easy to test:
 
@@ -67,3 +80,15 @@ you are good to go with new model with old tested dataset and data iterator modu
 
 This level of configuration and project design will allows us to iterate the Deep Learning ideas as fast as possible to 
 meet the business demands.
+
+
+
+# License
+
+The VitaFlow is licensed under the terms of the Apache License - Version 2.0.
+
+# Contributions
+
+* For readme - please follow
+    * http://tom.preston-werner.com/2010/08/23/readme-driven-development.html
+    * https://changelog.com/posts/top-ten-reasons-why-i-wont-use-your-open-source-project
