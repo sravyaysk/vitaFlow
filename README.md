@@ -16,13 +16,13 @@ We are incubating an ideation to solve this typical software design problem for 
 To come up with a framework that enables a fast prototyping of Deep Learning models that handles Video/Image/Text/Audio and provide an seamless way of serving them in different end points.
 
 - **A Navie Developer**: Can I get an experimentation play ground, with some set of open datasets, data iterators and models? to learn by doing?
-- **A Data Scientist**: Can I build a model with an avaiable open dataset and later switch to production dataset when the Data Engineering team bring in the production data?
+- **A Data Scientist**: Can I build a model with an available open dataset and later switch to production dataset when the Data Engineering team bring in the production data?
 - **A Data Engineer**: Can I use any available model and run through my data during my data preparation cycle?
 - **An Online competitioner**: Can I reuse the models and pieces of modules that I have developed for my last competition in my current competition? 
 - **Business Deadlines** : We had spend few months of effort while addressing a clients proposals and build a prototype.Can we showcase the prototype developed to upcoming project proposals as quick as possible? 
 
 In our Deep Learning exploration/projects we wanted to build a framework that is modular as much as possible, plug ang play architecture for main modules and reuse our experience (hours of development and testing) from one project to another, while improving on existing capabilities without breaking it.  
- 
+
 ## Proposed Solution
 
 > **Data Science wisdom comes only through failed experimentation - Damian Mingle**
