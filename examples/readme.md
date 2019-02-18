@@ -1,19 +1,18 @@
 # Cifar10
 
- _#TODO: update_
+Cifar10 is a image dataset from Toronto dataset, used for training vitaflow image classification models & predict.
 
 # Conll2003
 
- _#TODO: update_
-
+CONLL 2003 datase for training vitaflow sequence to sequence model training and predictions.
 
 # Shabda
 
- _#TODO: update_
+Using Tedlium data, do voice separation of individual speakers in an audio or video file.
 
 # ClientX
 
- _#TODO: update_
+WIP
 
 # Receipt OCR
  
