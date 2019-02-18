@@ -112,6 +112,7 @@ The above diagram depicts the various
  
 # Development Progress
 
+Please check the current progress at [Project Page](https://github.com/Imaginea/vitaFlow/projects/10) and [OCR Project](https://github.com/Imaginea/vitaFlow/projects/8).
 
 ## Dataset
 
