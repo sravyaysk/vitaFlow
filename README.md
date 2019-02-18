@@ -52,7 +52,7 @@ configuration:
 
 # Development
 
-VitaFlow is continuously extended by solving some real work problem. To check some of these solved work please check [examples](https://github.com/Imaginea/vitaFlow/tree/master/examples) folder in repo.
+We are continuously extending VitaFlow, by solving some real world problems. To check some of these solved works, please check [examples](https://github.com/Imaginea/vitaFlow/tree/master/examples) folder in repo.
 
 _TODO: Update VitaFlow Features here_
 <!--
@@ -100,7 +100,7 @@ meet the business demands.
 
 # License
 
-The VitaFlow is licensed under the terms of the Apache License - Version 2.0.
+Apache License - Version 2.0.
 
 # Contributions
 
