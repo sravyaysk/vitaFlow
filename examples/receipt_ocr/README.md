@@ -172,3 +172,7 @@ using
 - https://uu.diva-portal.org/smash/get/diva2:967971/FULLTEXT01.pdf
 - https://eng.infoscout.co/receipt_store_detection/
 - https://ryubidragonfire.github.io/blogs/2017/06/06/Automating-Receipt-Processing.html
+
+**Annotation Tool**
+- https://github.com/frederictost/images_annotation_programme
+- https://github.com/fengyuanchen/cropper
