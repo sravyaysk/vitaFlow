@@ -16,5 +16,5 @@
  _#TODO: update_
 
 # Receipt OCR
-
- _#TODO: update_
+ 
+ To extract information from Receipts that one find in their eveday life.

@@ -1,5 +1,33 @@
 # Receipt OCR
 
+Given a receipt, the aim is to extract the domain specific fields by using deep-learning techinques.
+
+__General Receipt Tags__
+
+- merchant
+- date
+- line_item
+- total
+- tax
+
+# Table of content
+
+1. [Introduction](#introduction)
+2. [Goal](#goal)
+3. [Development Plan](#development-plan)
+4. [Development Progress](#development-progress)
+    1. [Dataset](dataset)
+    2. [Object Detection Model](object_detection_model)
+    3. [Image Annotation Tool](image_annotation_tool)
+    4. [Text Extraction](text_extraction)
+5. [Explorations](explorations)
+
+
+
+# Introduction
+	In this example, we show solution for extracting information from the given documents.
+	
+
 ```
 Scanned PDFs/Images  --> Image Preprocessing 
                         ---> Resizing
@@ -22,27 +50,30 @@ Scanned PDFs/Images  --> Image Preprocessing
                         ---> Word combiners
 ```
 
-## Receipt OCR
 
-### Introduction
-	In this example, we show solution for extracting information from the given documents.
-### Aim
-	Given a receipt, the aim is to extract the domain specific fields by using deep-learning techinques.
-### Steps
+<!-- _# AIM : Given a receipt, the aim is to extract the domain specific fields by using deep-learning techinques. -->
+
+# Goal
+- Provide a end-to-end solution for information extraction from images.
+- Achieve decent accuracy with very few annotated images.
+
+
+# Development Plan
 ![](./docs/images/block-diagram.jpg)
 
 The above diagram depicts the various 
-- Dataset
+
+- __Dataset__:
     - We use the dataset present on the [website](http://expressexpense.com/view-receipts.php).
     These are the receipts collected from various sources and are of various types.
     
-- Data Preparation
-    - Web scrabbing : scrapy 
+- __Data Preparation__:
+    - Web scrapping: scrapy 
     - We use the python library called scrapy in order to crawl and download all the images
     - we have around ~2k receipt images.
     ![](./docs/images/ReceiptSwiss.jpg)
     
-- Data Annotation
+- __Data Annotation__:
     - We annotate around 125 images using image annotation [tool](https://github.com/frederictost/images_annotation_programme). 
     - The information we are interested from the receipts are 
         - Merchant - name of the store
@@ -54,10 +85,10 @@ The above diagram depicts the various
         - Mode of payment - card/cash
     ![](./docs/images/image-anno.png)
     
-- Object Detection
+- __Object Detection__:
     - We leverage the existing pre-trained models for the detecting the above points of interest by using [Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
 
-- Image Segmentation and Cropping
+- __Image Segmentation and Cropping__:
     - Following folder structure is adopted to output the images by croping the receipt image for predicted co-ordinates and labels
         ```
         image_name_1\
@@ -66,23 +97,54 @@ The above diagram depicts the various
             label_3.jpg
          ...
         ```
-- OCR : Tesseract. Converts the cropped images to text
+- __OCR__: Tesseract. Converts the cropped images to text
 
         image_name_1\
             label_1.txt
             label_2.txt
             label_3.txt
         ...  
-- Text Postprocessing : Domain specific 
+- __Text Postprocessing__: Domain specific 
 
         image_name_1.csv
         ...
 
-### Experiment Goal
-- Provide a end-to-end solution for information extraction from images.
-- Achieve decent accuracy with very few annotated images. 
+ 
+# Development Progress
 
-## Explorations
+
+## Dataset
+
+- [x] Annotated 100-150 Receipt Images with Tags(merchant, date, line_items, total, tax,..)
+- [x] Image Synthesizer for generation of dummy receipt images
+- [ ] Annotated 500-600 Receipt Images
+
+## Object Detection Model 
+
+
+using
+- [ ] mask_rcnn_inception_v2_coco_2018_01_28 for detecting receipts(instance localization) with in images.
+- [x] faster_rcnn for identifying specific text objects within Receipt Image
+
+
+## Image Annotation Tool
+ 
+ A Flask Application for image processing, tagging and predition of receipts images.
+
+- [x] Page - Text Tagging & Generation of Annotated XML
+- [x] Page - Cropping & Rotation
+- [ ] Page - Binarization 
+- [ ] Page - Summary of Annotated Images
+- [ ] Page - Training data with models(drop-down list) and automatically annoating data
+- [ ] Support for tagging images sources(Amazon bucket or Google Drive)
+
+## Text Extraction
+
+- [x] OCR with Tessaract (with parallel processing feature)
+- [ ] OCR with ocropus
+ 
+
+# Explorations
 
 **Python Libs:**
 - https://pypi.org/project/pytesseract/
