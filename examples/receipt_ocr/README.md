@@ -21,7 +21,7 @@ __General Receipt Tags__
     3. [Image Annotation Tool](image_annotation_tool)
     4. [Text Extraction](text_extraction)
 5. [Explorations](explorations)
-
+6. [Acknowledgments](acknowledgments)
 
 
 # Introduction
@@ -174,6 +174,10 @@ using
 - https://eng.infoscout.co/receipt_store_detection/
 - https://ryubidragonfire.github.io/blogs/2017/06/06/Automating-Receipt-Processing.html
 
+
+# Acknowledgments
+
 **Annotation Tool**
+
 - https://github.com/frederictost/images_annotation_programme
 - https://github.com/fengyuanchen/cropper
