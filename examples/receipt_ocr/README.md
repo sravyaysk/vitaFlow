@@ -71,7 +71,7 @@ The above diagram depicts the various
     - Web scrapping: scrapy 
     - We use the python library called scrapy in order to crawl and download all the images
     - we have around ~2k receipt images.
-    ![](./docs/images/ReceiptSwiss.jpg =250x)
+    ![](./docs/images/ReceiptSwiss.jpg=250x)
     
 - __Data Annotation__:
     - We annotate around 125 images using image annotation [tool](https://github.com/frederictost/images_annotation_programme). 
