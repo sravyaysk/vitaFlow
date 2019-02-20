@@ -35,8 +35,8 @@ class GetNewImage(metaclass=Singleton):
     @staticmethod
     def get_default_request_response():
         # TODO: Update default Image details
-        send_info = {"url": "/static/data/images/pexels-photo-60091.jpg",
-                     "id": "pexels-photo-60091.jpg",
+        send_info = {"url": "/static/images/NoImage.png",
+                     "id": "NoImage.jpg",
                      "folder": "collection_01/part_1",
                      "annotations": [
                          {

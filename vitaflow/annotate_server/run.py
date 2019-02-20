@@ -1,22 +1,16 @@
 #!flask/bin/python
-from flask import Flask, render_template, jsonify, send_file, request
-
-
 import os
-import base64
-from pprint import pprint
-import pickle
 
-import config
-import views
 import annotate
+import config
 import cropper
-
+import views
+from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
-sample_data = {"url": "/static/data/images/pexels-photo-60091.jpg",
-               "id": "pexels-photo-60091.jpg",
+sample_data = {"url": "static/images/NoImage.png",
+               "id": "NoImage.png",
                "folder": "collection_01/part_1",
                "annotations": [
                    {"tag": "Eagle", "x": 475, "y": 225, "width": 230.555555554, "height": 438.888888886}
@@ -80,7 +74,7 @@ def show_pending_images():
 
 
 def show_all_images():
-    pass
+    return 'Hello World'
 
 
 def show_summary():

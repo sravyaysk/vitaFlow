@@ -1,14 +1,22 @@
 [
 	{
-      "name": "Long Beak Bird" , "icon": ""
+      "name": "Merchant",
+      "icon": ""
+    },
+  {
+    "name": "Date",
+    "icon": ""
     },
 	{
-      "name": "Eagle" , "icon": ""
+      "name": "Line_Item",
+      "icon": ""
     },
 	{
-      "name": "Parrot" , "icon": ""
+      "name": "Total",
+      "icon": ""
     },
 	{
-      "name": "Baby Bird", "icon": ""
+      "name": "Tax",
+      "icon": ""
     }
 ]
