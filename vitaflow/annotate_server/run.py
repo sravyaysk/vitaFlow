@@ -1,11 +1,12 @@
 #!flask/bin/python
 import os
 
+from flask import Flask, render_template, jsonify, request
+
 import annotate
 import config
 import cropper
 import views
-from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
@@ -18,7 +19,7 @@ sample_data = {"url": "static/images/NoImage.png",
                }
 
 
-@app.route('/inc/validateTagsAndRegions.php', methods=['POST', 'GET'])
+@app.route('/inc/validateTagsAndRegions', methods=['POST', 'GET'])
 def _rest_validate_tags_and_regions():
     form_data = dict(request.form)
     # pprint(form_data)
@@ -27,8 +28,18 @@ def _rest_validate_tags_and_regions():
     return _rest_get_new_image()
 
 
-@app.route('/inc/getNewImage.php', methods=['POST', 'GET'])
-def _rest_get_new_image():
+@app.route('/inc/getNewImage', methods=['POST', 'GET'])
+@app.route('/inc/getNewImage/<image>', methods=['POST', 'GET'])
+def _rest_get_new_image(image=None):
+    if image:
+        print('\n' + '=' * 54 + image + '\n' + '=' * 54)
+        try:
+            return jsonify(views.GetNewImage.get_specific_image(image))
+        except Exception as err:
+            print("==" * 15)
+            print(err)
+            print(image)
+            print(locals())
     views.GetNewImage.refresh()
     return jsonify(views.GetNewImage.get_new_image())
 #
@@ -36,7 +47,6 @@ def _rest_get_new_image():
 # def _rest_annotate_image(path=''):
 #     print('Path is {}'.format(path))
 #     return send_file('')
-
 
 
 @app.route('/annotate_image')
@@ -48,10 +58,8 @@ def annotate_image():
 @app.route('/<image>')
 def annotate_image2(image=None):
     if image:
-        print('--'* 54)
-        print(image)
+        print('\n' + '-' * 54 + image + '\n' + '-' * 54)
     return render_template('index.html')
-
 
 
 @app.route('/review_annotation')
@@ -66,7 +74,7 @@ def show_completed_images():
     # show data nicely
     views.GetNewImage.refresh()
     # print(views.GetNewImage.PendingImages)
-    return jsonify(views.GetNewImage.CompletedImages)
+    return jsonify(views.GetNewImage.completed_images)
 
 
 def show_pending_images():
@@ -91,8 +99,8 @@ def page_cropper(image_name=None):
     return render_template("Cropper_js.html", data=data)
 
 
-@app.route("/cropper/upload.php", methods=['POST'])
-@app.route("/upload.php", methods=['POST'])
+@app.route("/cropper/upload", methods=['POST'])
+@app.route("/upload", methods=['POST'])
 def cropper_upload():
     data = dict(request.form)
     return cropper.cropper_upload(data)
