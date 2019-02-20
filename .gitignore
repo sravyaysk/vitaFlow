@@ -118,9 +118,7 @@ venv.bak/
 .DS_Store
 
 # Ignore test images & annotated data
-vitaflow/annotate_server/static/data/annotations/*
-vitaflow/annotate_server/static/data/images/*
-vitaflow/annotate_server/static/data/annotations/*.*
+vitaflow/annotate_server/static/data/*
 
 # Ignore annotation - tags
 vitaflow/annotate_server/resources/list_of_tags.json
