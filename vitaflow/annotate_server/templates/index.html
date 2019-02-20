@@ -788,9 +788,9 @@ function isTagInAuthorizedList()
 						$('#image_id').text(image_id);
 						$('#image_to_process').attr("src", image_info.url);
 						// debugger;
-						document.getElementById("cropper_btn").href = './cropper/' + image_info.url.split('/').pop();
-						console.log('Update the log')
-						console.log('./cropper/' + image_info.url.split('/').pop());
+						// document.getElementById("cropper_btn").href = './cropper/' + image_info.url.split('/').pop();
+						// console.log('Update the log')
+						// console.log('./cropper/' + image_info.url.split('/').pop());
 
 						/*$('#image_to_process').selectAreas(
 						{
@@ -810,20 +810,20 @@ function isTagInAuthorizedList()
 
   function reLoadImage()
   {
-	  console.log("INFO: " + "reLoadImage() from php");
+	  console.log("INFO: reLoadImage");
+	  // document.getElementById("image_to_process").src =  "/static/images/wait.gif";
 	  var standard_image_url = document.getElementById("image_to_process").src.split("/").pop();
 
 	  // TODO : Request is supposed to a ajax call.
-	  document.getElementById("image_to_process").src =  "./cropper/" + standard_image_url;
+	  document.getElementById("image_to_process").src =  "/static/data/cropper/" + standard_image_url;
 	}
 
 
   function openCropper()
   {
-  	  console.log("INFO: " + "reLoadImage() from php");
+  	  console.log("INFO: openCropper");
 	  var standard_image_url = document.getElementById("image_to_process").src.split("/").pop();
-
-	  window.open("./cropper/" + standard_image_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+	  window.open("/cropper/" + standard_image_url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
 	}
 
 /*document.onkeyup = function(e) {
@@ -886,21 +886,16 @@ function isTagInAuthorizedList()
                         <h1><span class="ae_small_90">Image: </span>
 
                         <span class="ae_small_90" id="image_id">NoImage.jpg</span></h1>
-                        <button>
-                            <span class="tooltiptext light_violet">To Rotate & Crop this image?</span>
 
-                        </button>
-                    <button id="cropper_id" class="tooltip ae_button_level_1">
-                        <a href="/cropper/" class="btn btn-info" role="button" id="cropper_btn" >Cropper Link</a>
-                        <span style="padding-left:4px;">
-								<img src="./static/images/ic_add_black_48dp.png" style="vertical-align: bottom;" alt=""
-                                     width="18" height="18">
-                        </span>
+
+                        <button id="cropper_id" class="tooltip ae_button_level_1" onclick="openCropper()">
+                            <!--<a href="/cropper/" class="btn btn-info" role="button" id="cropper_btn" >Cropper Link</a>-->
+                            Open Cropper
                         <span class="tooltiptext light_green">Rotate or crop image</span>
                     </button>
 
                         <button class="tooltip ae_button_level_1" onclick="reLoadImage()">
-                            Cropper Image
+                            Load Cropper Image
                             <span class="tooltiptext light_violet">To Load Cropped Image</span>
                         </button>
                     </div>
