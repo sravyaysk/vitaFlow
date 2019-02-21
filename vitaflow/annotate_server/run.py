@@ -6,7 +6,9 @@ from flask import Flask, render_template, jsonify, request
 import annotate
 import config
 import cropper
-import views
+import image_manager
+
+image_manager.GetNewImage.refresh()
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
@@ -34,14 +36,14 @@ def _rest_get_new_image(image=None):
     if image:
         print('\n' + '=' * 54 + image + '\n' + '=' * 54)
         try:
-            return jsonify(views.GetNewImage.get_specific_image(image))
+            return jsonify(image_manager.GetNewImage.get_specific_image(image))
         except Exception as err:
             print("==" * 15)
             print(err)
             print(image)
             print(locals())
-    views.GetNewImage.refresh()
-    return jsonify(views.GetNewImage.get_new_image())
+    image_manager.GetNewImage.refresh()
+    return jsonify(image_manager.GetNewImage.get_new_image())
 #
 # @app.route('/data/<path:path>')
 # def _rest_annotate_image(path=''):
@@ -72,21 +74,33 @@ def review_annotation():
 def show_completed_images():
     # Get data & show
     # show data nicely
-    views.GetNewImage.refresh()
-    # print(views.GetNewImage.PendingImages)
-    return jsonify(views.GetNewImage.completed_images)
+    image_manager.GetNewImage.refresh()
+    # print(image_manager.GetNewImage.PendingImages)
+    return jsonify(image_manager.GetNewImage.completed_images)
 
 
 def show_pending_images():
     pass
 
 
+@app.route('/show_all_images')
 def show_all_images():
-    return 'Hello World'
+    return jsonify(image_manager.GetNewImage.completed_images)
 
 
+@app.route('/summary')
 def show_summary():
-    pass
+    # data = jsonify({'completed': image_manager.GetNewImage.completed_images,
+    #                 'pending': image_manager.GetNewImage.pending_images,
+    #                 'inputs': list(image_manager.GetNewImage.receipt_images.keys()),
+    #                 'xml': list(image_manager.GetNewImage.annotated_files.keys())})
+    data = list(image_manager.GetNewImage.annotated_files.keys())
+    return render_template('summary.html', data=data)
+
+
+@app.route('/summary/<id>')
+def rest_show_summary(id):
+    return jsonify({'receipt_images': image_manager.GetNewImage.receipt_images})
 
 
 def login_logout():
