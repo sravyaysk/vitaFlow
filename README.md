@@ -110,5 +110,5 @@ Apache License - Version 2.0.
     * https://changelog.com/posts/top-ten-reasons-why-i-wont-use-your-open-source-project
     
 # Examples
-[Receipt OCR](https://github.com/Imaginea/vitaFlow/tree/master/examples/receipt_ocr)
-[CONLL dataset NER task](https://github.com/Imaginea/vitaFlow/tree/master/examples/conll2003)
+- [Receipt OCR](https://github.com/Imaginea/vitaFlow/tree/master/examples/receipt_ocr)
+- [CONLL dataset NER task](https://github.com/Imaginea/vitaFlow/tree/master/examples/conll2003)
