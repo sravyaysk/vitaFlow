@@ -146,6 +146,7 @@ using
 - [x] Page - Text Tagging & Generation of Annotated XML
 - [x] Page - Cropping & Rotation
 - [ ] Page - Binarization 
+- [ ] Page - Re-size all image to a standard size(free from prixalation & image loss)(Check https://yahooeng.tumblr.com/post/151148689421/open-sourcing-a-deep-learning-solution-for)
 - [ ] Page - Summary of Annotated Images
 - [ ] Page - Training data with models(drop-down list) and automatically annoating data
 - [ ] Support for tagging images sources(Amazon bucket or Google Drive)
