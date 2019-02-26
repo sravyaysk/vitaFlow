@@ -1,12 +1,19 @@
 
 function format_row(obj){
 
+// cropper - is optional feature
+var cropper_url = obj.hasOwnProperty('cropper_url')? obj.cropper_url : "/static/images/NoImage.png";
+
+//if ()
+
 html = `<tr>` +
     `<td><p> Input File:` + obj.file + `</p>` +
-    `<img src=` + obj.url + ` alt="/static/images/NoImage.png" style="width:300px;height:300px;">` +
+    `<img src=` + obj.url + ` alt="/static/images/NoImage.png" style="height:300px;">` +
     `</td>` +
-    `<td><p> Cropper File:</p>` +  + `<td>`
-    `</tr>`
+    `<td><p> Cropper File:</p>` +
+    `<img src=` + cropper_url + ` alt="/static/images/NoImage.png" style="height:300px;">` +
+    `<td>` +
+    `</tr>`;
 
 return html;
 }
@@ -40,4 +47,4 @@ $.ajax({
 // end of function
 }
 
-test()
+//test()

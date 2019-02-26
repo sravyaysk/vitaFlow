@@ -100,7 +100,10 @@ def show_summary():
 
 @app.route('/summary/<id>')
 def rest_show_summary(id):
-    return jsonify({'receipt_images': image_manager.GetNewImage.receipt_images})
+    id = 0
+    receipt_images = image_manager.GetNewImage.receipt_images
+    data_dict = dict([(key, receipt_images[key]) for key in image_manager.GetNewImage.pending_images[id:id + 10]])
+    return jsonify({'receipt_images': data_dict})
 
 
 def login_logout():

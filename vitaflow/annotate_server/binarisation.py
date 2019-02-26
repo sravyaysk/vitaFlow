@@ -16,7 +16,7 @@ def binarisation(image_loc, dest_image_loc):
                            '-T',
                            '-p',
                            '10',
-                           image_loc, dest_image_lo])
+                           image_loc, dest_image_loc])
 
 
 def blur(image_loc, dest_image_loc):

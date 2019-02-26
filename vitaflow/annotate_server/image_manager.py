@@ -7,6 +7,21 @@ from bin.datatypes import Singleton
 from bin.utils import get_folder_config
 from bin.utils import trim_file_ext
 
+preference_list = [
+    'binarisation_url',
+    'cropper_url',
+    'url'
+]
+
+
+def get_image_url(image_dict):
+    for key in preference_list:
+        url = image_dict.get(key)
+        print(key + '\n')
+        if url:
+            return url
+    raise Exception('No Preference List\'s URL is in {}'.format(str(image_dict)))
+
 
 # config.IMAGE_ROOT_DIR = os.path.dirname(config.__file__)
 
@@ -106,3 +121,24 @@ class GetNewImage(metaclass=Singleton):
         image_files_keys = set(GetNewImage.receipt_images.keys())
         GetNewImage.pending_images = list(image_files_keys - xml_files_keys)
         GetNewImage.completed_images = list(image_files_keys.intersection(xml_files_keys))
+
+        # feature
+        GetNewImage._get_cropper_data()
+
+    @staticmethod
+    def _get_cropper_data():
+        # fetch cropper data
+        cropper_images = \
+            get_folder_config('static/data/cropper/',
+                              file_exts=config.IMAGE_EXTS,
+                              trim_path_prefix='/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server')
+
+        receipt_images = GetNewImage.receipt_images
+        # update cropper data
+        for key, key_value in cropper_images.items():
+            receipt_images[key]['cropper_url'] = key_value['url']
+
+    @staticmethod
+    def _update_cropper_data(image_file):
+        image_id = trim_file_ext(image_file)
+        GetNewImage.receipt_images[image_id]['cropper_url'] = os.path.join(config.COLLECTION_NAME, image_file)
