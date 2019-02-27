@@ -3,7 +3,7 @@
  
 
 # VitaFlow - VideoImageTextAudioFlow
- ![](vitaflow-icon.png)
+ ![](vitaflow-logo.png)
 
 # Table of content
 
