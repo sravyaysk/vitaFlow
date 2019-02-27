@@ -2,16 +2,20 @@
 function format_row(obj){
 
 // cropper - is optional feature
-var cropper_url = obj.hasOwnProperty('cropper_url')? obj.cropper_url : "/static/images/NoImage.png";
+var cropper_url = obj.hasOwnProperty('cropper_url')? obj.cropper_url : "/static/images/NoImage.svg";
+var binarisation_url = obj.hasOwnProperty('binarisation_url')? obj.binarisation_url : "/static/images/NoImage.svg";
 
 //if ()
 
 html = `<tr>` +
-    `<td><p> Input File:` + obj.file + `</p>` +
-    `<img src=` + obj.url + ` alt="/static/images/NoImage.png" style="height:300px;">` +
+    `<td><p> Input File: <\p><p><a href=` + obj.file + `>link text` + obj.file + `</a></p>` +
+    `<img src=` + obj.url + ` alt="/static/images/NoImage.svg" style="height:300px;">` +
     `</td>` +
     `<td><p> Cropper File:</p>` +
-    `<img src=` + cropper_url + ` alt="/static/images/NoImage.png" style="height:300px;">` +
+    `<img src=` + cropper_url + ` alt="/static/images/NoImage.svg" style="height:300px;">` +
+    `<td>` +
+    `<td><p> Binarisation File:</p>` +
+    `<img src=` + binarisation_url + ` alt="/static/images/NoImage.svg" style="height:300px;">` +
     `<td>` +
     `</tr>`;
 
@@ -38,7 +42,7 @@ $.ajax({
           }
        }
     // receipt_images - output
-    document.getElementById("show_image_data22").innerHTML = html_data;
+    document.getElementById("show_image_data").innerHTML = html_data;
         }
 
     })

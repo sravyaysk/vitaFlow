@@ -14,7 +14,7 @@ IMAGE_ROOT_DIR = "static/data/images"
 CROPPER_ROOT_DIR = "static/data/cropper"
 
 # To store cropped images - original images
-BINERIZE_ROOT_DIR = "static/data/binerisation"
+BINARIZE_ROOT_DIR = "static/data/binarisation"
 
 # To store annotation xml files
 ANNOTATIONS_DIR = "static/data/annotations"
@@ -34,7 +34,7 @@ OS_FILE_REFRESH_TIME_INVTERVAL = 2 * 60  # Shift to inotify
 # create missing dir
 for each_dir in [IMAGE_ROOT_DIR,
                  CROPPER_ROOT_DIR,
-                 BINERIZE_ROOT_DIR,
+                 BINARIZE_ROOT_DIR,
                  ANNOTATIONS_DIR]:
     each_dir = os.path.join(ROOT_DIR, each_dir)
     check_n_create(each_dir)

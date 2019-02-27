@@ -218,7 +218,7 @@ window.onload = function () {
               formData.append("fileName", image.src.split('/').pop());
 
             $.ajax({
-               url: "upload.php",
+               url: "upload",
                type: "POST",
                data: formData,
                processData: false,

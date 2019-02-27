@@ -1,7 +1,9 @@
 import os
 import random
 import time
+from pprint import pprint
 
+import binarisation
 import config
 from bin.datatypes import Singleton
 from bin.utils import get_folder_config
@@ -14,16 +16,37 @@ preference_list = [
 ]
 
 
-def get_image_url(image_dict):
-    for key in preference_list:
+def get_image_url(image_dict, pref_list=preference_list):
+    for key in pref_list:
         url = image_dict.get(key)
-        print(key + '\n')
         if url:
             return url
     raise Exception('No Preference List\'s URL is in {}'.format(str(image_dict)))
 
 
-# config.IMAGE_ROOT_DIR = os.path.dirname(config.__file__)
+def _generate_binarisation_paths(image_id):
+    receipt_images = GetNewImage.receipt_images
+    image_path = os.path.join(config.ROOT_DIR, receipt_images[image_id]['url'])
+    binarisation_path = os.path.join(config.ROOT_DIR, config.BINARIZE_ROOT_DIR, receipt_images[image_id]['file'])
+    binarisation_image_root_path = os.path.join(config.BINARIZE_ROOT_DIR, receipt_images[image_id]['file'])
+    return image_path, binarisation_path, binarisation_image_root_path
+
+
+def _generate_binarisation_images(image_id):
+    (image_path, binarisation_path, binarisation_image_root_path) = _generate_binarisation_paths(image_id)
+    if not os.path.isfile(binarisation_path):
+        binarisation.binarisation(image_path, binarisation_path)
+        print('Binarisation done for: {}'.format(image_id))
+    else:
+        print('Binarisation found for: {}'.format(image_id))
+    return binarisation_image_root_path
+
+
+
+
+
+
+
 
 # noinspection PyCompatibility
 class GetNewImage(metaclass=Singleton):
@@ -124,14 +147,18 @@ class GetNewImage(metaclass=Singleton):
 
         # feature
         GetNewImage._get_cropper_data()
+        GetNewImage._get_binarisation_data()
+
+        # pprint
+        pprint(GetNewImage.receipt_images)
 
     @staticmethod
     def _get_cropper_data():
         # fetch cropper data
         cropper_images = \
-            get_folder_config('static/data/cropper/',
+            get_folder_config(config.CROPPER_ROOT_DIR,
                               file_exts=config.IMAGE_EXTS,
-                              trim_path_prefix='/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server')
+                              trim_path_prefix=config.ROOT_DIR)
 
         receipt_images = GetNewImage.receipt_images
         # update cropper data
@@ -139,6 +166,25 @@ class GetNewImage(metaclass=Singleton):
             receipt_images[key]['cropper_url'] = key_value['url']
 
     @staticmethod
+    def _get_binarisation_data():
+        # fetch cropper data
+        binarisation_images = \
+            get_folder_config(config.BINARIZE_ROOT_DIR,
+                              file_exts=config.IMAGE_EXTS,
+                              trim_path_prefix=config.ROOT_DIR)
+
+        receipt_images = GetNewImage.receipt_images
+        # update cropper data
+        for key, key_value in binarisation_images.items():
+            receipt_images[key]['binarisation_url'] = key_value['url']
+
+    @staticmethod
     def _update_cropper_data(image_file):
         image_id = trim_file_ext(image_file)
         GetNewImage.receipt_images[image_id]['cropper_url'] = os.path.join(config.COLLECTION_NAME, image_file)
+
+    @staticmethod
+    def binarisation_all_images():
+        all_receipt_images = list(GetNewImage.receipt_images.keys())
+        for image_id in all_receipt_images:
+            GetNewImage.receipt_images['binarisation_url'] = _generate_binarisation_images(image_id)
