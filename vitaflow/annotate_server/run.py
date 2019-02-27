@@ -1,12 +1,13 @@
 #!flask/bin/python
 import os
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, Markup
 
 import annotate
 import config
 import cropper
 import image_manager
+import stats
 
 image_manager.GetNewImage.refresh()
 
@@ -90,16 +91,14 @@ def show_all_images():
 
 @app.route('/summary')
 def show_summary():
-    # data = jsonify({'completed': image_manager.GetNewImage.completed_images,
-    #                 'pending': image_manager.GetNewImage.pending_images,
-    #                 'inputs': list(image_manager.GetNewImage.receipt_images.keys()),
-    #                 'xml': list(image_manager.GetNewImage.annotated_files.keys())})
     data = list(image_manager.GetNewImage.annotated_files.keys())
     return render_template('summary.html', data=data)
 
 
 @app.route('/summary/<id>')
+@app.route('/summary/<start>/<end>')
 def rest_show_summary(id):
+    # TODO: setup - pagination using start and end
     id = 0
     from random import shuffle
     receipt_images = image_manager.GetNewImage.receipt_images
@@ -107,10 +106,6 @@ def rest_show_summary(id):
     shuffle(data_list)
     data_dict = dict(data_list)
     return jsonify({'receipt_images': data_dict})
-
-
-def login_logout():
-    pass
 
 
 @app.route("/cropper/<image_name>")
@@ -124,6 +119,13 @@ def page_cropper(image_name=None):
 def cropper_upload():
     data = dict(request.form)
     return cropper.cropper_upload(data)
+
+
+@app.route("/stats")
+def stats_page(image_name=None):
+    data = stats.get_stats()
+    print(data)
+    return render_template("stats.html", html_data=Markup(data))
 
 
 if __name__ == '__main__':

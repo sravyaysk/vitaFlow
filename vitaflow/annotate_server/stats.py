@@ -3,8 +3,9 @@
 import xml.etree.ElementTree
 from glob import glob
 
-import config
 import pandas as pd
+
+import config
 
 bag = [
     # (filename, tag)
@@ -21,7 +22,7 @@ def get_stats():
     df = pd.DataFrame(bag, columns=['filename', 'tag'])
     print('Loc: {}'.format(config.ANNOTATIONS_DIR))
     print('Total Number of files processed: {}'.format(len(df.filename.unique())))
-    return df.tag.value_counts()
+    return df.tag.value_counts().to_frame().to_html(classes='table table-striped')
 
 
 if __name__ == '__main__':
