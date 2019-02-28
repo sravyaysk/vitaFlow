@@ -251,6 +251,7 @@ Consists of 2k scrapped images images. We have the following statistics about th
 
 - Also thinking of using networks trained on tesseract features for extracting text/character from images.
 
-  ```
-  	
-  ```
+## Receipt Image - Limitations
+
+- Recept size width is atleast 350.
+- Expected the images size are having no corner trademarks or Crop Image while annotation
