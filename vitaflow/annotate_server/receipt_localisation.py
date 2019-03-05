@@ -1,3 +1,7 @@
+'''
+Given EAST - Text File & Image - we can corner the image.
+'''
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -126,7 +130,7 @@ def four_point_transform(image, pts):
     return warped
 
 
-def trim_outliars1(raw_data):
+def trim_outliers1(raw_data):
     new_plot_points = []
     stats = []
     plot_points = []
@@ -153,11 +157,7 @@ def trim_outliars1(raw_data):
     return new_plot_points
 
 
-img_filename = '2CB8715100000578-3247898-image-m-17_1443121861464.jpg_predict.jpg'
-text_filename = '2CB8715100000578-3247898-image-m-17_1443121861464.txt'
-
-
-def main():
+def main(img_filename, text_filename):
     image = plt.imread(img_filename)
     raw_data, bag = read_data(text_filename)
 
@@ -165,12 +165,12 @@ def main():
     # plot_points = get_plot_points(raw_data)
 
     #  exception
-    # new_plot_points = trim_outliars1(raw_data)
+    # new_plot_points = trim_outliers1(raw_data)
     #  exception - delete 1 corner region
     # plt.imshow(image)
     # plt.plot(*zip(*new_plot_points), 'b')
     # plt.plot(*zip(*new_plot_points[:-5]), 'g')
-    new_plot_points = trim_outliars1(raw_data)[:-5]
+    new_plot_points = trim_outliers1(raw_data)[:-5]
 
     cnt = np.array(new_plot_points)
     # re-read image
@@ -186,4 +186,7 @@ def main():
     plt.imshow(warped)
 
 
-main()
+img_filename = '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.jpg'
+text_filename = '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.txt'
+
+main(img_filename, text_filename)
