@@ -22,15 +22,20 @@ html = `<tr>` +
 return html;
 }
 
+var start = 0;
+var number_of_images_to_load = 5;
 
-function test(){
+
+function load_prev_page_item(){
 
 var json_data = {};
 var html_data = "";
 
+start = Math.max(0, start - number_of_images_to_load);
+
 $.ajax({
     type: 'GET',
-    url: '/summary/0',
+    url: '/summary/' + start + '/' + start + number_of_images_to_load,
     success: function (json_data) {
     // On success code
     var receipt_images = json_data.receipt_images;
@@ -43,6 +48,51 @@ $.ajax({
        }
     // receipt_images - output
     document.getElementById("show_image_data").innerHTML = html_data;
+    console.log("Loading images from " + start + ' till ' + (start + number_of_images_to_load) );
+
+        }
+
+    })
+
+
+// end of function
+}
+
+
+function load_next_page_item(){
+
+start = start + number_of_images_to_load;
+
+images_ajax_call(start, start + number_of_images_to_load);
+// end of function
+}
+
+
+
+function images_ajax_call(start, end){
+
+console.log('start is ' + start)
+console.log('end is ' + end)
+
+var json_data = {};
+var html_data = "";
+
+$.ajax({
+    type: 'GET',
+    url: '/summary/' + start + '/' + end,
+    success: function (json_data) {
+    // On success code
+    var receipt_images = json_data.receipt_images;
+    // receipt_images
+    for (var key in receipt_images) {
+       if (receipt_images.hasOwnProperty(key)) {
+          var obj = receipt_images[key];
+             html_data = html_data + format_row(obj);
+          }
+       }
+    // receipt_images - output
+    document.getElementById("show_image_data").innerHTML = html_data;
+    console.log("Loading images from " + start + ' till ' + end);
         }
 
     })

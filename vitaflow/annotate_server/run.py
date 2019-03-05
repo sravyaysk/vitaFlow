@@ -90,20 +90,23 @@ def show_all_images():
 
 
 @app.route('/summary')
-def show_summary():
+@app.route('/summary/<id>')
+def show_summary(id=None):
     data = list(image_manager.GetNewImage.annotated_files.keys())
+    print('Request to display {} Records'.format(len(data)))
     return render_template('summary.html', data=data)
 
 
-@app.route('/summary/<id>')
 @app.route('/summary/<start>/<end>')
-def rest_show_summary(id):
+def rest_show_summary(start, end):
     # TODO: setup - pagination using start and end
-    id = 0
-    from random import shuffle
+    start = int(start) if start.isdigit() else 0
+    end = int(end) if end.isdigit() else 10
+    # from random import shuffle
     receipt_images = image_manager.GetNewImage.receipt_images
-    data_list = [(key, receipt_images[key]) for key in image_manager.GetNewImage.pending_images[id:id + 100]]
-    shuffle(data_list)
+    data_list = [(key, receipt_images[key]) for key in image_manager.GetNewImage.pending_images]
+    data_list = sorted(data_list)[start: end]
+    # shuffle(data_list)
     data_dict = dict(data_list)
     return jsonify({'receipt_images': data_dict})
 
