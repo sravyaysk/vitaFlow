@@ -14,29 +14,28 @@ Annotation Tools:
     2.
 """
 
-import os
-import sys
 import base64
+import os
 import pickle
+from shutil import copyfile
 
 import config
-import views
-
-from shutil import copyfile
 
 
 def cropper_upload(data):
     # input data is dict with key - image_name, image_base64_data
-    image_name = data['fileName']
-    image_base64_data = data['fileToUpload']
+    image_name = data['fileName'][0]
+    image_base64_data = data['fileToUpload'][0]
     print('Cropper Upload {}'.format(image_name))
-    save_image(image_name, image_base64_data)
+    if image_name:
+        save_image(image_name, image_base64_data)
     return 'ok'
 
 
 def save_image(image_name, image_base64_data):
     # print(str(image_base64_data)[:100])
     # verify @ https://codebeautify.org/base64-to-image-converter#
+    print(locals())
     original_file = os.path.join(config.ROOT_DIR, config.IMAGE_ROOT_DIR, image_name)
     image_name = os.path.join(config.ROOT_DIR, config.CROPPER_ROOT_DIR, image_name)
     if not os.path.isfile(original_file):
