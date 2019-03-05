@@ -147,8 +147,8 @@ using
 - [x] Page - Cropping & Rotation
 - [x] Page - Binarization 
 - [ ] Page - Re-size all image to a standard size(free from prixalation & image loss)(Check https://yahooeng.tumblr.com/post/151148689421/open-sourcing-a-deep-learning-solution-for)
-- [ ] Page - Summary of Annotated Images
-- [ ] Page - Training data with models(drop-down list) and automatically annoating data
+- [x] Page - Summary of Annotated Images(with Pagination)
+- [ ] Page - Training data with models(drop-down list) and automatically annotating data
 - [ ] Support for tagging images sources(Amazon bucket or Google Drive)
 
 ## Text Extraction

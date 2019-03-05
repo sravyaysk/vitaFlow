@@ -1,17 +1,14 @@
-from matplotlib import pyplot as plt
+from glob import glob
 
 import numpy as np
 import tensorflow as tf
-from examples.receipt_ocr.image_cropping import ImageCropping
-
-from glob import glob
-
-from vitaflow.helpers.print_helper import print_info
+from matplotlib import pyplot as plt
 from tqdm import tqdm
 
+from vitaflow.helpers.print_helper import print_info
+
+
 def image_annotations(path_to_tensorflow_model, category_index, images_src, images_dest):
-
-
     def get_box_dims(box, image_shape):
         ymin, xmin, ymax, xmax = box
         im_width, im_height, im_depth = image_shape
