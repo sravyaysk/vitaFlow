@@ -4,6 +4,9 @@ tensorflow >= 1.11.0
 tensorflow-gpu >= 1.11.0
 tensorflow-probability >= 0.3.0
 tensorflow-probability-gpu >= 0.3.0
+tensorflow-serving-api
+tensorflow-hub
+tensorflow-model-server
 # Standard Framework
 # prefer do manually
 # cython3 --install-option="--no-cython-compile"

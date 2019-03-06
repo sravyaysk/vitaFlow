@@ -28,8 +28,8 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA
 
-from vitaflow.contrib.shabda.core import ShabdaWavPairFeature
-from vitaflow.contrib.shabda.utils import _stft
+from vitaflow.playground.shabda.core import ShabdaWavPairFeature
+from vitaflow.playground.shabda.utils import _stft
 from vitaflow.internal import HParams, IIteratorBase
 from vitaflow.utils.print_helper import print_info
 from vitaflow.utils.print_helper import print_error

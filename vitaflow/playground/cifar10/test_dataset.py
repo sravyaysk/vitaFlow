@@ -1,6 +1,6 @@
 import os
 import tensorflow as tf
-from vitaflow.contrib.cifar10.cifar10_dataset import Cifar10Dataset
+from vitaflow.playground.cifar10.cifar10_dataset import Cifar10Dataset
 
 
 class TestCifiar10Dataset(tf.test.TestCase):

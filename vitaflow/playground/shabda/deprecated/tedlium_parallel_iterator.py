@@ -1,5 +1,10 @@
 import os
 import random
+import traceback
+from contextlib import closing
+import datetime
+from scipy.io import wavfile
+
 import itertools
 
 import numpy as np
@@ -7,18 +12,20 @@ import tensorflow as tf
 from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
 import librosa
+from numpy.lib import stride_tricks
+from multiprocessing import Pool
+from memory_profiler import profile
+
 
 from sklearn.cluster import KMeans
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA
 
-from vitaflow.contrib.shabda.core import ShabdaWavPairFeature
+from vitaflow.playground.shabda.core import ShabdaWavPairFeature
 from vitaflow.internal import HParams, IIteratorBase
 from vitaflow.utils.print_helper import print_info
 from vitaflow.utils.print_helper import print_error
-
-
 
 
 class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
@@ -78,6 +85,8 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
                 self.TEST_WAV_PAIR = self._generate_match_dict(self.TEST_SPEAKER_WAV_FILES_DICT)
                 self.store_as_pickle(self.TEST_WAV_PAIR, "test_wav_pair.p")
 
+
+
     @property
     def num_labels(self):
         """
@@ -120,7 +129,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         )
         return params
 
-    #@profile
+    @profile
     def _get_speaker_files(self, data_dir):
         """
 
@@ -157,7 +166,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         st = os.stat(wav_file)
         return st.st_size
 
-    #@profile
+    @profile
     def _generate_match_dict(self, speaker_wav_files_dict):
         """
         Generates pair of files from given dict of speakers and their speeches
@@ -190,53 +199,296 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return wav_file_pair
 
 
+    @profile
+    def _get_speech_data(self, wav_file, sampling_rate):
+        """
+
+        :param wav_file:
+        :param sampling_rate:
+        :return:
+        """
+        # speech, _ = librosa.core.load(wav_file, sr=sampling_rate)
+        sr, speech = wavfile.read(wav_file)
+        # amplication factor between -3 (dB) to 3 (dB)
+        fac = np.random.rand(1)[0] * 6 - 3
+        # randomly choose the amplification factor and applyt he factor to get gan or loss of the speech
+        # why so? randomly we are increasing/decreasing or amplification/damping the magnitude of the signals
+        # dB = 20 * log_10(p2/p1)
+        # fac / 20 = log_10(p2/p1)
+        # 10 ^ (fac/20) = p2/p1
+        #convert the `fac` to decibel and applyt it to the signal
+        #fac_db = 10. ^ (fac / 20)
+        speech = 10. ** (fac / 20) * speech
+        return speech
+
+    @profile
+    def _stft(self, sig, frameSize, overlapFac=0.75, window=np.hanning):
+        """
+        Short time fourier transform of audio signal
+        computing STFTs is to divide a longer time signal into shorter segments of equal length and then compute
+        the Fourier transform separately on each shorter segment.
+        This reveals the Fourier spectrum on each shorter segment.
+
+        Reference:
+        - https://en.wikipedia.org/wiki/Hann_function
+
+        :param sig: 10 seconds 8000 SR wav file. 30 seconds 8000 SR wav file.
+        :param frameSize: 256 default
+        :param overlapFac:
+        :param window:
+        :return:
+        """
+
+        #Eg :  30 seconds 8000 SR wav file.
+
+        win = window(frameSize)
+
+        # 256  - (0.75 * 256) = 64
+        hopSize = int(frameSize - np.floor(overlapFac * frameSize)) # number of slides
+        samples = np.array(sig, dtype='float64') # 240000
+
+        # cols for windowing
+        cols = int(np.ceil((len(samples) - frameSize) / float(hopSize)) + 1) # 3747
+        # zeros at end (thus samples can be fully covered by frames)
+        samples = np.append(samples, np.zeros(frameSize)) # 240256
+
+        frames = stride_tricks.as_strided(
+            samples,
+            shape=(cols, frameSize),
+            strides=(samples.strides[0] * hopSize, samples.strides[0])).copy()
+        frames *= win # (3747, 256)
+        #discrete Fourier Transform
+        return np.fft.rfft(frames)
+
+    @profile
+    def replaceZeroes(self, data):
+        min_nonzero = np.min(data[np.nonzero(data)])
+        data[data == 0] = min_nonzero
+        return data
+
+    @profile
+    def _get_log_spectrum_features(self, speech, frame_size, neff, amp_fac, min_amp):
+        """
+        find short time fourier transform for the mixture and trim it to given NEFF
+            -  https://www.cds.caltech.edu/~murray/wiki/Why_is_dB_defined_as_20log_10%3F
+            -  http://www.sengpielaudio.com/calculator-FactorRatioLevelDecibel.htm
+        :param speech:
+        :param frame_size:
+        :param neff:
+        :param amp_fac:
+        :param min_amp:
+        :return:
+        """
+        speech_features = np.abs(self._stft(speech, frame_size)[:, :neff])
+        # say if we have 1256 max of speech signal array and min_amp as follows
+        # 1256/1000 = maximum(speech, 1.256)
+        # 1256/50 = maximum(speech, 25.12)
+        # 1256/10 = maximum(speech, 125.6)
+        # 1256/5  = maximum(speech, 251.2)
+        # 1256/1  = maximum(speech, 1256)
+        # np.max : array wise
+        # np.maximum : element wise
+        # scaling the speech features with respect to min_amp and its max value
+        speech_features = np.maximum(speech_features, np.max(speech_features) / min_amp)
+        speech_features = self.replaceZeroes(speech_features)
+        speech_features = 20. * np.log10(speech_features * amp_fac)
+        return speech_features
+
+    @profile
+    def _get_speech_samples(self,
+                            speech_1_features,
+                            speech_2_features,
+                            frames_per_sample,
+                            number_frames,
+                            speech_mix_features,
+                            speech_voice_activity_detection):
+        """
+        Processes one audio pair
+        :param speech_1_features: Spectral audio features
+        :param speech_2_features: Spectral audio features
+        :param frames_per_sample:
+        :param len_spec: Total number of frames (to say?) in the given signal
+        :param speech_mix_features:
+        :param speech_voice_activity_detection:
+        :return: Returns an array of shape ((self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff),(self._hparams.frames_per_sample, self._hparams.neff, 2))
+        """
+        #
+
+        current_frame = 0
+        bag = []
+
+        while current_frame + frames_per_sample < number_frames: # we make sure we have enough data for slicing
+            #simple array slicing on the first dimension (time/freq axis)
+            sample_1 = speech_1_features[current_frame:current_frame + frames_per_sample, :]
+            sample_2 = speech_2_features[current_frame:current_frame + frames_per_sample, :]
+            sample_mix = speech_mix_features[current_frame:current_frame + frames_per_sample, :]
+            voice_activity_detection = speech_voice_activity_detection[current_frame:current_frame + frames_per_sample, :]
+            # phase = speech_phase[k: k + frames_per_sample, :]
+
+            # Y: indicator of the belongings of the TF bin
+            # 1st speaker or second speaker
+            Y = np.array([sample_1 > sample_2, sample_1 < sample_2])
+            # Y now will have 2-axis one for each signal comparision with other
+            # returned Y will be [2, x, y], hence the transpose [x, y, 2]
+            Y = np.transpose(Y, [1, 2, 0])
+            bag.append((sample_mix, voice_activity_detection, Y))
+            current_frame = current_frame + frames_per_sample
+
+            del sample_1, sample_2, sample_mix, voice_activity_detection, Y
+        return bag
+
+    @profile
+    def _get_speech_features(self, args):
+        """
+
+
+        :param args:
+        :return:
+        """
+        (wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+         threshold, global_mean, global_std, frames_per_sample) = args
+
+        try:
+            # TODO: experimental though - is multi-processing required here? to reduce IO
+            # print_info("{} {}".format(wav_file_1, wav_file_2))
+            def _get_data():
+                speech_1 = self._get_speech_data(wav_file_1, sampling_rate)
+                speech_2 = self._get_speech_data(wav_file_2, sampling_rate)
+
+                # print(wav_file_1, wav_file_2)
+
+                # find the minimum length of two speeches
+                length = min(len(speech_1), len(speech_2))
+                #trim both the speeches to the minimum length
+                speech_1 = speech_1[:length]
+                speech_2 = speech_2[:length]
+                # mix the signals
+                speech_mix = speech_1 + speech_2
+
+                #get the spectral features in dB
+                speech_1_features = self._get_log_spectrum_features(speech_1, frame_size, neff, amp_fac, min_amp)
+                speech_2_features = self._get_log_spectrum_features(speech_2, frame_size, neff, amp_fac, min_amp)
+                speech_mix_features = self._get_log_spectrum_features(speech_mix, frame_size, neff, amp_fac, min_amp)
+
+                max_mag = np.max(speech_mix_features)
+                # apply threshold to the feature signal, to find the silent portion of the signal and
+                # construct a boolean array as a feature
+                # https://en.wikipedia.org/wiki/Voice_activity_detection
+                speech_voice_activity_detection = (speech_mix_features > (max_mag - threshold))
+                # normalize the signal values with given global mean and std
+                speech_mix_features_final = (speech_mix_features - global_mean) / global_std
+
+                number_frames = speech_1_features.shape[0]
+
+                new_data = self._get_speech_samples(speech_1_features,
+                                               speech_2_features,
+                                               frames_per_sample,
+                                               number_frames,
+                                                speech_mix_features_final,
+                                               speech_voice_activity_detection)
+                # print_error("deleting speech_1_features, speech_2_features, speech_voice_activity_detection, speech_mix_features")
+                del speech_1_features, speech_2_features, speech_voice_activity_detection, speech_mix_features, speech_mix_features_final
+                return new_data
+
+            new_data = _get_data()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except Exception as err:
+            print_error(traceback.print_exc())
+            new_data = []
+
+        return new_data
+
+
+    @profile
+    def _yield_samples_multicore(self,
+                                 speaker_file_match,
+                                 sampling_rate,
+                                 frame_size,
+                                 amp_fac,
+                                 neff,
+                                 min_amp,
+                                 threshold,
+                                 global_mean,
+                                 global_std,
+                                 frames_per_sample,
+                                 num_threads,
+                                 tqdm_desc):
+        """
+
+        :param speaker_file_match: Pair of audio files thats needs to be mixed
+        :param sampling_rate:
+        :param frame_size:
+        :param self._hparams.amp_fac:
+        :param neff:
+        :param min_amp:
+        :param threshold:
+        :param global_mean:
+        :param global_std:
+        :param frames_per_sample:
+        :param num_threads:
+        :param tqdm_desc:
+        :return:
+        """
+
+        # for each file pair, generate their mixture and reference samples
+
+        input_params = [(wav_file_1, wav_file_2, sampling_rate, frame_size, neff, amp_fac, min_amp,
+                         threshold, global_mean, global_std, frames_per_sample) for (wav_file_1, wav_file_2) in
+                        speaker_file_match.items()]
+        prev = datetime.datetime.now()
+
+
+        with closing( Pool(num_threads, maxtasksperchild=100000) ) as pool:
+            with tqdm(total=len(speaker_file_match.items()), desc=tqdm_desc) as pbar:
+                for i, res in enumerate(pool.imap_unordered(self._get_speech_features, input_params)):
+                    pbar.update()
+                    for data in res:
+                        yield data
+            # pool.join()
+
+    @profile
+    def _yield_samples(self, speaker_file_match, tqdm_desc):
+        '''Init the training data using the wav files'''
+        sampling_rate = self._hparams.sampling_rate
+        frame_size = self._hparams.frame_size
+        amp_fac = self._hparams.amp_fac
+        neff = self._hparams.neff
+        min_amp = self._hparams.min_amp
+        threshold = self._hparams.threshold
+        global_mean = self._hparams.global_mean
+        global_std = self._hparams.global_std
+        frames_per_sample = self._hparams.frames_per_sample
+
+        for (sample_mix, voice_activity_detection, Y) in self._yield_samples_multicore(speaker_file_match,
+                                                             sampling_rate,
+                                                             frame_size,
+                                                             amp_fac,
+                                                             neff,
+                                                             min_amp,
+                                                             threshold,
+                                                             global_mean,
+                                                             global_std,
+                                                             frames_per_sample,
+                                                             num_threads=self._hparams.num_threads,
+                                                             tqdm_desc=tqdm_desc):
+            # print_info((sample_mix, voice_activity_detection, Y))
+            yield sample_mix, voice_activity_detection, Y
+
     # To make easy integration with TF Data generator APIs, following methods are added
-    #@profile
+    @profile
     def _yield_train_samples(self):
-        return _yield_samples(self.TRAIN_WAV_PAIR,
-                              tqdm_desc="Train: ",
-                              num_threads=self._hparams.num_threads,
-                              sampling_rate = self._hparams.sampling_rate,
-                              frame_size = self._hparams.frame_size,
-                              amp_fac = self._hparams.amp_fac,
-                              neff = self._hparams.neff,
-                              min_amp = self._hparams.min_amp,
-                              threshold = self._hparams.threshold,
-                              global_mean = self._hparams.global_mean,
-                              global_std = self._hparams.global_std,
-                              frames_per_sample = self._hparams.frames_per_sample)
+        return self._yield_samples(self.TRAIN_WAV_PAIR, tqdm_desc="Train: ")
 
-    #@profile
+    @profile
     def _yield_val_samples(self):
-        return _yield_samples(self.VAL_WAV_PAIR,
-                              tqdm_desc="Val: ",
-                              num_threads=self._hparams.num_threads,
-                              sampling_rate = self._hparams.sampling_rate,
-                              frame_size = self._hparams.frame_size,
-                              amp_fac = self._hparams.amp_fac,
-                              neff = self._hparams.neff,
-                              min_amp = self._hparams.min_amp,
-                              threshold = self._hparams.threshold,
-                              global_mean = self._hparams.global_mean,
-                              global_std = self._hparams.global_std,
-                              frames_per_sample = self._hparams.frames_per_sample)
+        return self._yield_samples(self.VAL_WAV_PAIR, tqdm_desc="Val: ")
 
-    #@profile
+    @profile
     def _yield_test_samples(self):
-        return _yield_samples(self.TEST_WAV_PAIR,
-                              tqdm_desc="Test: ",
-                              num_threads=self._hparams.num_threads,
-                              sampling_rate = self._hparams.sampling_rate,
-                              frame_size = self._hparams.frame_size,
-                              amp_fac = self._hparams.amp_fac,
-                              neff = self._hparams.neff,
-                              min_amp = self._hparams.min_amp,
-                              threshold = self._hparams.threshold,
-                              global_mean = self._hparams.global_mean,
-                              global_std = self._hparams.global_std,
-                              frames_per_sample = self._hparams.frames_per_sample)
+        return self._yield_samples(self.TEST_WAV_PAIR, tqdm_desc="Test: ")
 
-    #@profile
+    @profile
     def _get_train_input_fn(self):
         """
         Inheriting class must implement this
@@ -261,7 +513,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info(dataset.output_shapes)
         return dataset
 
-    #@profile
+    @profile
     def _get_val_input_fn(self):
         """
         Inheriting class must implement this
@@ -285,7 +537,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info(dataset.output_shapes)
         return dataset
 
-    #@profile
+    @profile
     def _get_test_input_function(self):
         """
         Inheriting class must implement this
@@ -308,7 +560,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         print_info(dataset.output_shapes)
         return dataset
 
-    #@profile
+    @profile
     def _get_predict_samples(self, file_path):
         """
 
@@ -317,13 +569,13 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         """
         speech_mix, _ = librosa.load(file_path, self._hparams.sampling_rate) # 10 seconds * 8000 SR = 80000
         print_info("speech_mix original shape: {} for a length of {} seconds with Sampling rate {}".format(speech_mix.shape,
-                                                                                                           librosa.get_duration(y=speech_mix, sr=self._hparams.sampling_rate),
-                                                                                                           self._hparams.sampling_rate))
+                                                                                                   librosa.get_duration(y=speech_mix, sr=self._hparams.sampling_rate),
+                                                                                                   self._hparams.sampling_rate))
         # replicate the speech signal thrice,1: original audio,  2:speaker one, 3: speaker two
         speech_mix = np.concatenate((speech_mix, speech_mix, speech_mix), axis=0)
         print_info("speech_mix original shape: {} for a length of {} seconds with Sampling rate {}".format(speech_mix.shape,
-                                                                                                           librosa.get_duration(y=speech_mix, sr=self._hparams.sampling_rate),
-                                                                                                           self._hparams.sampling_rate))
+                                                                                                   librosa.get_duration(y=speech_mix, sr=self._hparams.sampling_rate),
+                                                                                                   self._hparams.sampling_rate))
         # feature enginerring like before
         speech_mix_spec0 = self._stft(speech_mix, self._hparams.frame_size)[:, :self._hparams.neff]
         speech_mix_spec = np.abs(speech_mix_spec0)
@@ -372,7 +624,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return np.asarray(self.freq_features),  self.voice_activity_detection_features, self.phase_features
 
 
-    #@profile
+    @profile
     def predict_on_instance(self, executor, file_path):
         """
 
@@ -551,7 +803,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
         return [(source1, self._hparams.sampling_rate), (source2, self._hparams.sampling_rate)]
 
 
-    #@profile
+    @profile
     def visulaize(self, executor, file_path):
         """
 

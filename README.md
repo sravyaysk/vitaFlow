@@ -47,7 +47,7 @@ configuration:
 
 CoNLL 2003 data set is considered since the data size small and easy to test:
 
-Run a experiment pointing to this [config](vitaflow/contrib/conll2003/config.py),
+Run a experiment pointing to this [config](vitaflow/playground/conll2003/config.py),
 which uses this [dataset](https://imaginea.github.io/vitaFlow/build/html/api/data/text/conll/conll_2003_dataset.html),
 and this [data iterator](https://imaginea.github.io/vitaFlow/build/html/api/data/text/iterators/conll_csv_in_memory.html),
 and this [model](https://imaginea.github.io/vitaFlow/build/html/api/models/text/seq2seq/bilstm_crf.html).
