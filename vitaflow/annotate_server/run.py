@@ -45,6 +45,8 @@ def _rest_get_new_image(image=None):
             print(locals())
     image_manager.GetNewImage.refresh()
     return jsonify(image_manager.GetNewImage.get_new_image())
+
+
 #
 # @app.route('/data/<path:path>')
 # def _rest_annotate_image(path=''):
@@ -86,12 +88,16 @@ def show_pending_images():
 
 @app.route('/show_all_images')
 def show_all_images():
-    return jsonify(image_manager.GetNewImage.completed_images)
+    return jsonify([
+        ('receipt_images', list(image_manager.GetNewImage.receipt_images.keys())),
+        ('pending_images', list(image_manager.GetNewImage.pending_images)),
+        ('completed_images', list(image_manager.GetNewImage.completed_images)),
+    ])
 
 
 @app.route('/summary')
-@app.route('/summary/<id>')
-def show_summary(id=None):
+@app.route('/summary/')
+def show_summary():
     data = list(image_manager.GetNewImage.annotated_files.keys())
     print('Request to display {} Records'.format(len(data)))
     return render_template('summary.html', data=data)
@@ -121,13 +127,14 @@ def page_cropper(image_name=None):
 @app.route("/upload", methods=['POST'])
 def cropper_upload():
     data = dict(request.form)
-    return cropper.cropper_upload(data)
+    print('Cropper - File upload status: {}'.format(cropper.cropper_upload(data)))
+    return 'ok'
 
 
 @app.route("/stats")
-def stats_page(image_name=None):
+def stats_page():
     data = stats.get_stats()
-    print(data)
+    # print(data)
     return render_template("stats.html", html_data=Markup(data))
 
 

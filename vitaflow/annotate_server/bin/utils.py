@@ -18,7 +18,7 @@ def check_n_create(full_path):
 
 
 def parser_folder(search_folder, exts=None):
-    "Return (base_filename, full_path_filename)"
+    '''Return (base_filename, full_path_filename)'''
     bag = []
     for filename in glob.iglob(search_folder + '/*', recursive=True):
         file = os.path.basename(filename)

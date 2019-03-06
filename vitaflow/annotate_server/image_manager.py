@@ -1,13 +1,16 @@
 import os
 import random
 import time
-from pprint import pprint
+
+import tqdm
 
 import binarisation
 import config
 from bin.datatypes import Singleton
 from bin.utils import get_folder_config
 from bin.utils import trim_file_ext
+
+# from pprint import pprint
 
 preference_list = [
     'binarisation_url',
@@ -16,8 +19,8 @@ preference_list = [
 ]
 
 
-def get_image_url(image_dict, pref_list=preference_list):
-    for key in pref_list:
+def get_image_url(image_dict):  # , pref_list=preference_list):
+    for key in preference_list:
         url = image_dict.get(key)
         if url:
             return url
@@ -36,16 +39,27 @@ def _generate_binarisation_images(image_id):
     (image_path, binarisation_path, binarisation_image_root_path) = _generate_binarisation_paths(image_id)
     if not os.path.isfile(binarisation_path):
         binarisation.binarisation(image_path, binarisation_path)
-        print('Binarisation done for: {}'.format(image_id))
+        # print('Binarisation done for: {}'.format(image_id))
     else:
         print('Binarisation found for: {}'.format(image_id))
     return binarisation_image_root_path
 
 
+def _regenerate_binarisation_images(image_id):
+    (image_path, binarisation_path, binarisation_image_root_path) = _generate_binarisation_paths(image_id)
+    if not os.path.isfile(binarisation_path):
+        binarisation.binarisation(image_path, binarisation_path)
+        print('Binarisation done for: {}'.format(image_id))
+    else:
+        binarisation.binarisation(image_path, binarisation_path)
+        print('Binarisation redone for: {}'.format(image_id))
+    return binarisation_image_root_path
 
 
-
-
+def gen_cropper_binarisation(image_name):
+    image_id = trim_file_ext(image_name)
+    _regenerate_binarisation_images(image_id)
+    return 'ok - _generate_binarisation_images'
 
 
 # noinspection PyCompatibility
@@ -76,9 +90,11 @@ class GetNewImage(metaclass=Singleton):
     @staticmethod
     def get_specific_image(image_file):
         image_name = trim_file_ext(image_file)
+
         send_info = {
             'id': GetNewImage.receipt_images[image_name]['file'],
-            'url': GetNewImage.receipt_images[image_name]['url'],
+            # 'url': GetNewImage.receipt_images[image_name]['url'],
+            'url': get_image_url(GetNewImage.receipt_images[image_name]),
             'folder': '',
             "annotations": []
         }
@@ -146,11 +162,12 @@ class GetNewImage(metaclass=Singleton):
         GetNewImage.completed_images = list(image_files_keys.intersection(xml_files_keys))
 
         # feature
+        GetNewImage.gen_binarisation_images()
         GetNewImage._get_cropper_data()
         GetNewImage._get_binarisation_data()
 
         # pprint
-        pprint(GetNewImage.receipt_images)
+        # pprint(GetNewImage.receipt_images)
 
     @staticmethod
     def _get_cropper_data():
@@ -175,16 +192,21 @@ class GetNewImage(metaclass=Singleton):
 
         receipt_images = GetNewImage.receipt_images
         # update cropper data
-        for key, key_value in binarisation_images.items():
+        for key, key_value in tqdm.tqdm(binarisation_images.items(), desc='Binarise images Url Tagging'):
             receipt_images[key]['binarisation_url'] = key_value['url']
 
     @staticmethod
-    def _update_cropper_data(image_file):
+    def update_binarisation_data(image_file):
+        image_id = trim_file_ext(image_file)
+        GetNewImage.receipt_images[image_id]['binarisation_url'] = os.path.join(config.BINARIZE_ROOT_DIR, image_file)
+
+    @staticmethod
+    def update_cropper_data(image_file):
         image_id = trim_file_ext(image_file)
         GetNewImage.receipt_images[image_id]['cropper_url'] = os.path.join(config.COLLECTION_NAME, image_file)
 
     @staticmethod
-    def binarisation_all_images():
+    def gen_binarisation_images():
         all_receipt_images = list(GetNewImage.receipt_images.keys())
-        for image_id in all_receipt_images:
-            GetNewImage.receipt_images['binarisation_url'] = _generate_binarisation_images(image_id)
+        for image_id in tqdm.tqdm(all_receipt_images, desc='Gen Binarise images'):
+            GetNewImage.receipt_images[image_id]['binarisation_url'] = _generate_binarisation_images(image_id)

@@ -5,11 +5,12 @@ Module for working with xml files(reading & wri.
 import json
 import os
 import xml.dom.minidom
+
 import xmltodict
 
 try:
     from . import config
-except:
+except ImportError:
     import config
 
 

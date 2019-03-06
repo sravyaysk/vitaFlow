@@ -20,6 +20,7 @@ import pickle
 from shutil import copyfile
 
 import config
+import image_manager
 
 
 def cropper_upload(data):
@@ -28,11 +29,16 @@ def cropper_upload(data):
     image_base64_data = data['fileToUpload'][0]
     print('Cropper Upload {}'.format(image_name))
     if image_name:
-        save_image(image_name, image_base64_data)
+        # Generate cropper & binarisation image
+        gen_cropper_file(image_name, image_base64_data)
+        image_manager.gen_cropper_binarisation(image_name)
+        # update image manager
+        image_manager.GetNewImage.update_cropper_data(image_name)
+        image_manager.GetNewImage.update_binarisation_data(image_name)
     return 'ok'
 
 
-def save_image(image_name, image_base64_data):
+def gen_cropper_file(image_name, image_base64_data):
     # print(str(image_base64_data)[:100])
     # verify @ https://codebeautify.org/base64-to-image-converter#
     print(locals())
@@ -59,5 +65,6 @@ def save_image(image_name, image_base64_data):
 def get_new_image():
     pass
 
+
 def show_cropped_images():
-    list_of_image = []
+    pass

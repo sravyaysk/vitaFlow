@@ -1,6 +1,6 @@
-'''
+"""
 Given EAST - Text File & Image - we can corner the image.
-'''
+"""
 
 import cv2
 import matplotlib.pyplot as plt

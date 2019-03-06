@@ -37,6 +37,7 @@ config = FLAGS.config_python_file.replace("/", ".")
 config = config.replace(".py", "")
 config = importlib.import_module(config)
 
+
 def main():
 
     annotated_data = image_annotations(path_to_tensorflow_model=config.path_to_tensorflow_model,
@@ -58,6 +59,7 @@ def main():
 
     text_post_processing = TextPostProcessor(text_out_dir=config.text_out_dir, receipt_text_dir=config.receipt_text_dir)
     text_post_processing.process()
+
 
 if __name__ =="__main__":
     main()

@@ -19,5 +19,6 @@ def binarisation(image_loc, dest_image_loc):
                            image_loc, dest_image_loc])
 
 
+# noinspection PyUnusedLocal
 def blur(image_loc, dest_image_loc):
     pass
