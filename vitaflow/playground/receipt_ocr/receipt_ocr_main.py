@@ -25,9 +25,9 @@ sys.path.append(os.path.abspath('.'))
 import tensorflow as tf
 import importlib
 
-from vitaflow.contrib.receipt_ocr.image_cropping import ImageCropping
-from vitaflow.contrib.receipt_ocr.image_segmentation import image_annotations
-from vitaflow.contrib.receipt_ocr.text_post_processing import TextPostProcessor
+from vitaflow.playground.receipt_ocr.image_cropping import ImageCropping
+from vitaflow.playground.receipt_ocr.image_segmentation import image_annotations
+from vitaflow.playground.receipt_ocr.text_post_processing import TextPostProcessor
 from vitaflow.utils.ocr.tesseract import TesseractOCR
 
 flags = tf.flags

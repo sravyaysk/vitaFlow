@@ -14,7 +14,7 @@ import tensorflow as tf
 from tensorflow import TensorShape, Dimension
 from tqdm import tqdm
 
-from vitaflow.contrib.shabda.core import ShabdaWavPairFeature
+from vitaflow.playground.shabda.core import ShabdaWavPairFeature
 from vitaflow.internal import HParams, IIteratorBase
 from vitaflow.utils.print_helper import print_error, print_info, print_warn
 # from vitaflow.core import HParams, IIteratorBase
