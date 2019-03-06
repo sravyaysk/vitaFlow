@@ -2,6 +2,7 @@ import subprocess
 
 
 def binarisation(image_loc, dest_image_loc):
+    print('binarisation src {} dest {} '.format(image_loc, dest_image_loc))
     subprocess.check_call(['./textcleaner',
                            '-g',
                            '-e',

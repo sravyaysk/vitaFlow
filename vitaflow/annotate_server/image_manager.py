@@ -40,19 +40,25 @@ def _generate_binarisation_images(image_id):
     if not os.path.isfile(binarisation_path):
         binarisation.binarisation(image_path, binarisation_path)
         # print('Binarisation done for: {}'.format(image_id))
-    else:
-        print('Binarisation found for: {}'.format(image_id))
+    # else:
+    # print('Binarisation found for: {}'.format(image_id))
     return binarisation_image_root_path
 
 
 def _regenerate_binarisation_images(image_id):
     (image_path, binarisation_path, binarisation_image_root_path) = _generate_binarisation_paths(image_id)
-    if not os.path.isfile(binarisation_path):
-        binarisation.binarisation(image_path, binarisation_path)
-        print('Binarisation done for: {}'.format(image_id))
-    else:
-        binarisation.binarisation(image_path, binarisation_path)
-        print('Binarisation redone for: {}'.format(image_id))
+    # regeneration is due to Cropper
+    image_path = os.path.join(config.ROOT_DIR, GetNewImage.receipt_images[image_id]['cropper_url'])
+
+    print('os- remove- files {} - {}'.format(binarisation_path, os.remove(binarisation_path)))
+    # if not os.path.isfile(binarisation_path):
+    #     binarisation.binarisation(image_path, binarisation_path)
+    #     print('Binarisation done for: {}'.format(image_id))
+    # else:
+    print('\n' * 5)
+    print((image_path, binarisation_path))
+    binarisation.binarisation(image_path, binarisation_path)
+    print('Binarisation redone for: {}'.format(image_id))
     return binarisation_image_root_path
 
 
@@ -203,7 +209,7 @@ class GetNewImage(metaclass=Singleton):
     @staticmethod
     def update_cropper_data(image_file):
         image_id = trim_file_ext(image_file)
-        GetNewImage.receipt_images[image_id]['cropper_url'] = os.path.join(config.COLLECTION_NAME, image_file)
+        GetNewImage.receipt_images[image_id]['cropper_url'] = os.path.join(config.CROPPER_ROOT_DIR, image_file)
 
     @staticmethod
     def gen_binarisation_images():

@@ -31,9 +31,8 @@ def cropper_upload(data):
     if image_name:
         # Generate cropper & binarisation image
         gen_cropper_file(image_name, image_base64_data)
-        image_manager.gen_cropper_binarisation(image_name)
-        # update image manager
         image_manager.GetNewImage.update_cropper_data(image_name)
+        image_manager.gen_cropper_binarisation(image_name)
         image_manager.GetNewImage.update_binarisation_data(image_name)
     return 'ok'
 

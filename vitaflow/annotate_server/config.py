@@ -20,7 +20,7 @@ BINARIZE_ROOT_DIR = "static/data/binarisation"
 ANNOTATIONS_DIR = "static/data/annotations"
 
 # Collection name
-COLLECTION_NAME = "collection_01"
+# COLLECTION_NAME = "collection_01"
 
 # Not annotated image 80% to be presented to user
 ratio_new_old = 80
