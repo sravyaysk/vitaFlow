@@ -14,20 +14,18 @@
 """
 Main file that puts different pieces together for the issue #14
 """
-
 # from memory_profiler import profile
 import importlib
 import os
 import sys
-import tensorflow as tf
-import tensorflow as tf
-sys.path.append(os.path.abspath('.'))
-import tensorflow as tf
-import importlib
 
-from vitaflow.playground.receipt_ocr.image_cropping import ImageCropping
-from vitaflow.playground.receipt_ocr.image_segmentation import image_annotations
-from vitaflow.playground.receipt_ocr.text_post_processing import TextPostProcessor
+import tensorflow as tf
+
+sys.path.append(os.path.abspath('.'))
+
+from examples.receipt_ocr.image_cropping import ImageCropping
+from examples.receipt_ocr.image_segmentation import image_annotations
+from examples.receipt_ocr.text_post_processing import TextPostProcessor
 from vitaflow.utils.ocr.tesseract import TesseractOCR
 
 flags = tf.flags
@@ -38,7 +36,6 @@ FLAGS = flags.FLAGS
 config = FLAGS.config_python_file.replace("/", ".")
 config = config.replace(".py", "")
 config = importlib.import_module(config)
-
 
 def main():
 
@@ -61,7 +58,6 @@ def main():
 
     text_post_processing = TextPostProcessor(text_out_dir=config.text_out_dir, receipt_text_dir=config.receipt_text_dir)
     text_post_processing.process()
-
 
 if __name__ =="__main__":
     main()
