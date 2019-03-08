@@ -196,7 +196,7 @@ using
 
 - https://github.com/frederictost/images_annotation_programme
 
-- # https://github.com/fengyuanchen/cropper
+- https://github.com/fengyuanchen/cropper
 
 # Round Two
 
