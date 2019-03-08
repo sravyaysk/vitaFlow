@@ -27,7 +27,7 @@ import os
 import sys
 
 import tensorflow as tf
-from memory_profiler import profile
+# from memory_profiler import profile
 
 # Appending vitaFlow main Path
 sys.path.append(os.path.abspath('.'))

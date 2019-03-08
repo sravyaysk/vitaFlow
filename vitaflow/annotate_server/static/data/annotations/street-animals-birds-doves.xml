@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<annotation>
+	<folder/>
+	<filename>street-animals-birds-doves.jpg</filename>
+	<path>static/data/images/street-animals-birds-doves.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size_part>
+		<width>1125</width>
+		<height>750</height>
+		<depth>3</depth>
+	</size_part>
+	<segmented>0</segmented>
+	<object>
+		<name>Baby Bird</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>585.6648654472536</xmin>
+			<ymin>254.2194092827004</ymin>
+			<xmax>890.6601750157339</xmax>
+			<ymax>526.3713080168776</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Baby Bird</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>403.0898185429385</xmin>
+			<ymin>145.56962025316454</ymin>
+			<xmax>563.502576516672</xmax>
+			<ymax>341.77215189873414</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Baby Bird</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>709.1404752033512</xmin>
+			<ymin>99.15611814345992</ymin>
+			<xmax>905.4350343027884</xmax>
+			<ymax>238.39662447257382</ymax>
+		</bndbox>
+	</object>
+</annotation>

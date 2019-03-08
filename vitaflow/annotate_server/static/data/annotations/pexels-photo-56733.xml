@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<annotation>
+	<folder/>
+	<filename>pexels-photo-56733.jpg</filename>
+	<path>static/data/images/pexels-photo-56733.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size_part>
+		<width>499</width>
+		<height>750</height>
+		<depth>3</depth>
+	</size_part>
+	<segmented>0</segmented>
+	<object>
+		<name>Parrot</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>86.68324908847285</xmin>
+			<ymin>128.69198312236287</ymin>
+			<xmax>371.52468672060814</xmax>
+			<ymax>566.4556962025316</ymax>
+		</bndbox>
+	</object>
+</annotation>

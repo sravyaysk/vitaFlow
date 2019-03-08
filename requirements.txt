@@ -1,9 +1,13 @@
 # TODO add version number
-
-
-##################################################
-############### Standard Framework ###############
-##################################################
+#DL libraries
+tensorflow >= 1.11.0
+tensorflow-gpu >= 1.11.0
+tensorflow-probability >= 0.3.0
+tensorflow-probability-gpu >= 0.3.0
+tensorflow-serving-api
+tensorflow-hub
+tensorflow-model-server
+# Standard Framework
 # prefer do manually
 # cython3 --install-option="--no-cython-compile"
 pandas
@@ -11,6 +15,10 @@ numpy
 sklearn
 tqdm
 overrides
+flask
+requests
+#misc
+xmltodict
 # image libraries
 wand
 pillow
@@ -18,46 +26,21 @@ opencv-python
 # OCR liibs
 pytesseract
 pyocr
-
-
-##################################################
-################## Code Quality ##################
-##################################################
+# Code Quality
 flake8
-
-
-##################################################
-############ Deep Learning framework #############
-##################################################
+# Deep Learning framework
 # prefer do manually
 # .[tensorflow-cpu] --install-option='-e'
-
-
-
-##################################################
-###################### NLP #######################
-##################################################
 # NLP
 spacy
-
-
-##################################################
-################### Audio Libs ###################
-##################################################
+# Audio Libs
 # pyAudioAnalysis
 # eyed3
 # pydub
 # madmom
 librosa
-
-##################################################
-############# Distributed Framework ##############
-##################################################
+# Distributed Framework
 pyspark
-
-##################################################
-################## Sphinx Docs ###################
-##################################################
 # sphinx doc
 recommonmark
 sphinx_rtd_theme

@@ -14,15 +14,14 @@
 """
 Naive Convolutional Network
 """
-import os
 
 from overrides import overrides
 import tensorflow as tf
 
-from vitaflow.core import HParams
-from vitaflow.core.features import ImageFeature
-from vitaflow.core.models import ClassifierBase
-from vitaflow.helpers.print_helper import print_info
+from vitaflow.internal import HParams
+from vitaflow.internal.features import ImageFeature
+from vitaflow.internal.models import ClassifierBase
+from vitaflow.utils.print_helper import print_info
 
 
 class NaiveConvNet(ClassifierBase, ImageFeature):
