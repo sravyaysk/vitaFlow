@@ -21,7 +21,7 @@ import six
 from vitaflow.models.text import lstm
 from vitaflow.models.text import transformer
 
-from tensor2tensor.utils import registry
+from vitaflow.utils import registry
 
 # pylint: enable=unused-import
 

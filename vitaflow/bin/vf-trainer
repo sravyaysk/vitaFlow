@@ -17,6 +17,11 @@ vf-trainer \
   --eval_steps=100
 """
 
+import os
+import sys
+# Appending vitaFlow main Path
+sys.path.append(os.path.abspath('.'))
+
 from vitaflow.bin import vf_trainer
 
 import tensorflow as tf

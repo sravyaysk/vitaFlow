@@ -735,11 +735,23 @@ class HParams(object):
         Returns:
           A JSON string.
         """
-        values = {}
-        for key, value in self.items():
-            values[key] = str(value)
+        def remove_callables(x):
+            """Omit callable elements from input with arbitrary nesting."""
+            print("========================== {}".format(x))
+            if isinstance(x, dict):
+                return {k: remove_callables(v) for k, v in six.iteritems(x)
+                        if not callable(v)}
+            elif isinstance(x, list):
+                return [remove_callables(i) for i in x if not callable(i)]
+            else:
+                try:
+                    json.dumps(x)
+                    return x #TODO for some resons we are having class objects getting leaked into the hparams
+                except:
+                    return str(x)
+
         return json.dumps(
-            values,
+            remove_callables(self.values()),
             indent=indent,
             separators=separators,
             sort_keys=sort_keys)
