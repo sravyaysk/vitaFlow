@@ -90,7 +90,7 @@ information from camera images.
 2. __Annotation Server__
 
     We took a open source [Image annotation tool](https://github.com/frederictost/images_annotation_programme) and 
-    improvised to meet our needs.
+    improvised to meet our needs. Check [here](vitaflow/annotate_server) for more details.
 
 
 # License
