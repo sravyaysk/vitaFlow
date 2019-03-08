@@ -119,7 +119,7 @@ venv.bak/
 
 # Ignore test images & annotated data
 vitaflow/annotate_server/static/data/*
-vitaflow/annotate_server/notebook/*
+vitaflow/annotate_server/notebooks/*
 
 # Ignore annotation - tags
 vitaflow/annotate_server/resources/list_of_tags.json
