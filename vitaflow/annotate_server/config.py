@@ -23,7 +23,7 @@ ANNOTATIONS_DIR = "static/data/annotations"
 # COLLECTION_NAME = "collection_01"
 
 # Not annotated image 80% to be presented to user
-ratio_new_old = 80
+# ratio_new_old = 80
 
 # Acceptable file extension
 IMAGE_EXTS = ['.jpg']

@@ -39,3 +39,44 @@ To know more the works in development, please check the following Project Page
 * Support for HDFS files
 * Support for Spark for image process/text extraction
 
+# User Guide
+
+## How to start Annotation Server
+
+Please check for `requirement.txt` for installing required packages for Annotation Server.
+
+```
+$ pwd
+vitaFlow/vitaflow/annotate_server
+
+$ ~/anaconda3/bin/python vitaFlow/vitaflow/annotate_server/run.py
+...
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+...
+```
+
+## How to Start Annotation
+
+`#TODO`
+
+## How to Cropper Image
+
+`#TODO`
+
+## Functionality - How the folder structure is
+
+`#TODO`
+
+
+## Where to collect images & annotation xml files
+
+`#TODO`
+
+## How to select models
+
+`#TODO`
+
+## How to use existing ML/DL Models to auto tag images
+
+`#TODO`
+
