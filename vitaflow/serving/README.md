@@ -5,7 +5,7 @@ trained.
 
 ## 0. Constants
 
-```
+```sh
 PROBLEM=conll2002_es_ner
 MODEL=lstm_seq2seq
 MODEL_HPARAMS=lstm_seq2seq
@@ -14,7 +14,7 @@ TEMP_DIR=~/vf_data/tmp
 MODEL_OUT_DIR=~/vf_train/$PROBLEM\_$MODEL
 ```
 
-```
+```sh
 PROBLEM=translate_ende_wmt8k
 MODEL=transformer
 MODEL_HPARAMS=transformer_tiny
@@ -24,9 +24,10 @@ MODEL_OUT_DIR=~/vf_train/$PROBLEM\_$MODEL
 ```
 
 ## 1. Export for Serving
+
 First, build a simple model:
 
-```
+```sh
 python vitaflow/bin/vf-trainer \
   --generate_data \
   --problem=$PROBLEM \
@@ -38,9 +39,10 @@ python vitaflow/bin/vf-trainer \
   --train_steps=1000 \
   --eval_steps=100
 ```
+
 First, export it for serving:
 
-```
+```sh
 python vitaflow/bin/vf-exporter \
   --model=$MODEL \
   --hparams_set=$MODEL_HPARAMS \
@@ -58,7 +60,7 @@ Install the `tensorflow-model-server`
 
 Start the server pointing at the export:
 
-```
+```sh
 tensorflow_model_server \
   --port=9000 \
   --model_name=$MODEL \
@@ -76,13 +78,13 @@ it expects the inputs to already be encoded as integers. You can see how the
 
 Install some dependencies:
 
-```
+```sh
 pip install tensorflow-serving-api
 ```
 
 Query:
 
-```
+```sh
 vf-query-server \
   --server=localhost:9000 \
   --servable_name=$MODEL \
@@ -100,7 +102,7 @@ To do so, export the model as in Step 1, then do the following:
 
 #### Copy exported model to Google Cloud Storage
 
-```
+```sh
 ORIGIN=<your_gcs_path>
 EXPORTS_PATH=/tmp/vf_train/export/Servo
 LATEST_EXPORT=${EXPORTS_PATH}/$(ls ${EXPORTS_PATH} | tail -1)
@@ -109,7 +111,7 @@ gsutil cp -r ${LATEST_EXPORT}/* $ORIGIN
 
 #### Create a model
 
-```
+```sh
 MODEL_NAME=vf_test
 gcloud ml-engine models create $MODEL_NAME
 ```
@@ -118,7 +120,7 @@ This step only needs to be performed once.
 
 #### Create a model version
 
-```
+```sh
 VERSION=v0
 gcloud ml-engine versions create $VERSION \
   --model $MODEL_NAME \
@@ -133,7 +135,7 @@ will be billed accordingly.
 
 #### Query Cloud ML Engine
 
-```
+```sh
 vf-query-server \
   --cloud_mlengine_model_name $MODEL_NAME \
   --cloud_mlengine_model_version $VERSION \

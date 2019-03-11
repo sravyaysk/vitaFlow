@@ -70,7 +70,6 @@ information from camera images.
     We started vitaFlow with a vision to build a plug and play framework for Tensorflow model experimentation 
     with different datasets, that enables a fast prototyping of Deep Learning models that handles Video/Image/Text/Audio 
     and provide an seamless way of serving them in different end points.
-    
     Addressing some of the following cases:
     - __A Navie Developer__: Can I get an experimentation play ground, with some set of open datasets, data iterators 
     and models? to learn by doing?
@@ -80,12 +79,37 @@ information from camera images.
     - __An Online Competitor__: Can I reuse the models and pieces of modules that I have developed for my last 
     competition in my current competition? 
     - __Business Deadlines__ : We had spend few months of effort while addressing a clients proposals and build a prototype. 
-    Can we showcase the prototype developed to upcoming project proposals as quick as possible? 
-    
-    ![](docs/images/vitaflow_stack.png)
-    
-    Soon we came across [Tensor2Tensor](https://github.com/tensorflow/tensor2tensor), which does what we intended to do.
-    **We experimenting T2T for our needs by porting a minimalistic and essential components** 
+    Can we showcase the prototype developed to upcoming project proposals as quick as possible?
+    ![vitaflow_stack](docs/images/vitaflow_stack.png)
+
+    In our exploration we came across [Tensor2Tensor](https://github.com/tensorflow/tensor2tensor), which does what we intended to do. **So we ported a minimalistic and essential T2T components, and evaluating it for our needs**
+     
+
+    ```sh
+    cd /path/to/vitaflow_repo/
+    #list down all available problems(datasets), models and hyper parameters
+    vitaflow/bin/vf-trainer --registry_help=true
+
+    PROBLEM=conll2002_es_ner
+    MODEL=lstm_seq2seq
+    MODEL_HPARAMS=lstm_seq2seq
+    DATA_DIR=~/vf_data
+    TEMP_DIR=~/vf_data/tmp
+    MODEL_OUT_DIR=~/vf_train/$PROBLEM\_$MODEL
+
+    python vitaflow/bin/vf-trainer \
+    --generate_data \
+    --problem=$PROBLEM \
+    --data_dir=$DATA_DIR \
+    --tmp_dir=$TEMP_DIR \
+    --model=$MODEL \
+    --hparams_set=$MODEL_HPARAMS \
+    --output_dir=$MODEL_OUT_DIR \
+    --train_steps=1000 \
+    --eval_steps=100
+    ```
+
+    For more detailed walthrough check out [here](vf-tf-engine-walkthrough.md)!  
 
 2. __Annotation Server__
 
@@ -100,8 +124,6 @@ Apache License - Version 2.0.
 # [Contributions](contributions.md)
 
 # References
+
 - [Image annotation tool](https://github.com/frederictost/images_annotation_programme)
 - [Tensor2Tensor](https://github.com/tensorflow/tensor2tensor)
-
-
-

@@ -18,7 +18,7 @@ Class Model: model for the deep clustering speech seperation
 from overrides import overrides
 import tensorflow as tf
 
-from vitaflow.playground.shabda.core import ShabdaWavPairFeature
+from vitaflow.playground.shabda.core.feature_types.shabda_wav_pair_feature import ShabdaWavPairFeature
 from vitaflow.utils.hyperparams import HParams
 from vitaflow.internal.models.model_base import ModelBase
 from vitaflow.utils.print_helper import print_error
