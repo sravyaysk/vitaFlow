@@ -27,6 +27,7 @@ from vitaflow.utils.print_helper import print_error
 
 
 def to_clips(file_path, data, num_clips=128, duration=20, output_dir="/tmp/"):
+    print(file_path)
     file_path = file_path.replace("file:", "")
     tmp = io.BytesIO(data)
     wav_data, sampling_rate = sf.read(tmp)

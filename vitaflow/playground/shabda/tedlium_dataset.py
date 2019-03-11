@@ -20,7 +20,8 @@ from tqdm import tqdm
 from pyspark.sql import SparkSession
 
 from vitaflow.playground.shabda.utils import to_clips, _generate_tf_Records
-from vitaflow.internal import IPreprocessor, HParams
+from vitaflow.utils.hyperparams import HParams
+from vitaflow.internal import IPreprocessor
 from vitaflow.utils.print_helper import print_info
 # from vitaflow.core import IPreprocessor, HParams
 # from vitaflow.helpers.print_helper import print_info
@@ -92,6 +93,7 @@ class TEDLiumDataset(IPreprocessor):
         if not self._is_spark_initialized:
             self.spark = SparkSession.builder. \
             master(self._spark_master). \
+            config("spark.executor.memory", "1g").\
             appName("shabda").getOrCreate()
 
             self.sc = self.spark.sparkContext
@@ -205,6 +207,7 @@ class TEDLiumDataset(IPreprocessor):
         # get dirs for each speaker
         speakers_dirs = [os.path.join(data_dir, speaker) for speaker in os.listdir(data_dir) \
                          if os.path.isdir(os.path.join(data_dir, speaker))]
+        print_info(speakers_dirs)
 
         speaker_wav_files_dict = {}
 
@@ -316,15 +319,15 @@ class TEDLiumDataset(IPreprocessor):
 
         if not os.path.exists(os.path.join(self.TRAIN_OUT_PATH, "tfrecords")):
             self._initialize_spark()
-            print_info("Processing {} wav pairs, have a break...".format(self.TRAIN_WAV_PAIR))
+            print_info("Processing {} wav pairs, have a break...".format(len(self.TRAIN_WAV_PAIR)))
             self._generate_mix_speeches(self.TRAIN_WAV_PAIR, os.path.join(self.TRAIN_OUT_PATH, "tfrecords"))
         if not os.path.exists(os.path.join(self.VAL_OUT_PATH, "tfrecords")):
             self._initialize_spark()
-            print_info("Processing {} wav pairs, have a break...".format(self.VAL_WAV_PAIR))
+            print_info("Processing {} wav pairs, have a break...".format(len(self.VAL_WAV_PAIR)))
             self._generate_mix_speeches(self.VAL_WAV_PAIR, os.path.join(self.VAL_OUT_PATH, "tfrecords"))
         if not os.path.exists(os.path.join(self.TEST_OUT_PATH, "tfrecords")):
             self._initialize_spark()
-            print_info("Processing {} wav pairs, have a break...".format(self.TEST_WAV_PAIR))
+            print_info("Processing {} wav pairs, have a break...".format(len(self.TEST_WAV_PAIR)))
             self._generate_mix_speeches(self.TEST_WAV_PAIR, os.path.join(self.TEST_OUT_PATH, "tfrecords"))
 
 

@@ -17,21 +17,23 @@ DeWave repo is sucked into three python classes that resides as [tedlium_dataset
 
 ```
  find . -name "*.pyc" -exec rm -f {} \;
+ sudo apt-get install ffmpeg
+ sudo apt-get install spacy
 ```
 **Cache the Preprocessed Data Manually**
 ```
-CUDA_VISIBLE_DEVICES=0 python vitaflow/bin/run_experiments.py --mode=run_iterator -config_python_file=examples/shabda/config.py
+CUDA_VISIBLE_DEVICES=0 python vitaflow/bin/run_experiments.py --mode=run_iterator -config_python_file=vitaflow/playground/shabda/config.py
 ```
 **Train**
 ```
-CUDA_VISIBLE_DEVICES=0 python vitaflow/bin/run_experiments.py --mode=train -config_python_file=examples/shabda/config.py
+CUDA_VISIBLE_DEVICES=0 python vitaflow/bin/run_experiments.py --mode=train -config_python_file=vitaflow/playground/shabda/config.py
 ```
 **Predict on single file**
 ```
 CUDA_VISIBLE_DEVICES=0 python vitaflow/bin/run_experiments.py \
 --mode=predict_instance \
 --test_file_path=mixed.wav \
--config_python_file=examples/shabda/config.py
+-config_python_file=vitaflow/playground/shabda/config.py
 ```
 
 

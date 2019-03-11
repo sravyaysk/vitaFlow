@@ -22,7 +22,7 @@ class IDatasetType():
     `Datasets that follow CoNLL format <http://universaldependencies.org/docs/format.html>`_.
 
     """
-    @DeprecationWarning
+    
     def __init__(self):
         pass
 
@@ -54,7 +54,7 @@ class ICSVSeq2SeqType1(IDatasetType):
     Dataset consists of three CSV files for train//val/test respectively.
     Each CSV has four columns namely `WORD ENTITY_COL1 ENTITY_COL2 ENTITY_COL3`.
     """
-    @DeprecationWarning
+    
     def __init__(self):
         IDatasetType.__init__(self)
         self.TEXT_COL = "0"

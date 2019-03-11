@@ -27,7 +27,6 @@ import os
 
 from vitaflow.utils.hyperparams import HParams
 
-@DeprecationWarning
 class IPreprocessor:
     """
     A pre-processing interface that every dataset class should inherit.

@@ -28,9 +28,10 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA
 
-from vitaflow.playground.shabda.core import ShabdaWavPairFeature
+from vitaflow.playground.shabda.core.feature_types.shabda_wav_pair_feature import ShabdaWavPairFeature
 from vitaflow.playground.shabda.utils import _stft
-from vitaflow.internal import HParams, IIteratorBase
+from vitaflow.utils.hyperparams import HParams
+from vitaflow.internal import IIteratorBase
 from vitaflow.utils.print_helper import print_info
 from vitaflow.utils.print_helper import print_error
 # from vitaflow.core import HParams, IIteratorBase
@@ -339,7 +340,7 @@ class TEDLiumIterator(IIteratorBase, ShabdaWavPairFeature):
             print_error(np.array(embedding_ac).shape)
             if embedding_ac == []:
                 break
-            kmean = KMeans(n_clusters=2, random_state=0).fit(embedding_np)
+            kmean = KMeans(n_clusters=2, random_state=0).fit(embedding_ac)
 
             # ----------------------------------------------
 
