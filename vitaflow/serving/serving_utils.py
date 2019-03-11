@@ -25,9 +25,9 @@ import functools
 from googleapiclient import discovery
 import grpc
 
-from tensor2tensor import problems as problems_lib  # pylint: disable=unused-import
-from tensor2tensor.data_generators import text_encoder
-from tensor2tensor.utils import cloud_mlengine as cloud
+from vitaflow import problems as problems_lib  # pylint: disable=unused-import
+from vitaflow.internal.data_generators import text_encoder
+from vitaflow.utils import cloud_mlengine as cloud
 import tensorflow as tf
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc

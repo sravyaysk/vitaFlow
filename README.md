@@ -84,8 +84,33 @@ information from camera images.
     
     ![](docs/images/vitaflow_stack.png)
     
-    Soon we came across [Tensor2Tensor](https://github.com/tensorflow/tensor2tensor), which does what we intended to do.
-    **We experimenting T2T for our needs by porting a minimalistic and essential components** 
+    In our exploration we came across [Tensor2Tensor](https://github.com/tensorflow/tensor2tensor), which does what we intended to do. **We ported a minimalistic and essential T2T components, and evaluating it for our needs** 
+
+    ```sh
+    cd /path/to/vitaflow_repo/
+    #list down all available problems(datasets), models and hyper parameters
+    vitaflow/bin/vf-trainer --registry_help=true
+
+    PROBLEM=conll2002_es_ner
+    MODEL=lstm_seq2seq
+    MODEL_HPARAMS=lstm_seq2seq
+    DATA_DIR=~/vf_data
+    TEMP_DIR=~/vf_data/tmp
+    MODEL_OUT_DIR=~/vf_train/$PROBLEM\_$MODEL
+
+    python vitaflow/bin/vf-trainer \
+    --generate_data \
+    --problem=$PROBLEM \
+    --data_dir=$DATA_DIR \
+    --tmp_dir=$TEMP_DIR \
+    --model=$MODEL \
+    --hparams_set=$MODEL_HPARAMS \
+    --output_dir=$MODEL_OUT_DIR \
+    --train_steps=1000 \
+    --eval_steps=100
+    ```
+
+    For more detailed walthrough check out [here](vf-tf-engine-walkthrough.md)!  
 
 2. __Annotation Server__
 

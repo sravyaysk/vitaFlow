@@ -26,6 +26,7 @@ accessed/queried similar to dictionaries, keyed by default by `snake_case`
 equivalents.
 
 Forked from : https://github.com/tensorflow/tensor2tensor/blob/master/tensor2tensor/utils/registry.py
+
 ```
 @Registries.models.register
 class MyModel(VfModel):

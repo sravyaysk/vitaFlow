@@ -16,13 +16,13 @@
 """
 
 class SingleFeature():
-    @DeprecationWarning
+    
     def __init__(self):
         self.FEATURE_NAME = None
         self.LABEL_NAME = None
 
 class TwoFeatures:
-    @DeprecationWarning
+    
     def __init__(self):
         self.NUM_FEATURES = 2
         self.FEATURE_TYPE = None
@@ -38,14 +38,14 @@ class TwoFeatures:
 
 
 class ImageFeature(SingleFeature):
-    @DeprecationWarning
+    
     def __init__(self):
         SingleFeature.__init__(self)
         self.FEATURE_NAME = "image"
         self.LABEL_NAME = "label"
 
 class GANFeature(TwoFeatures):
-    @DeprecationWarning
+    
     def __init__(self):
         super(GANFeature, self).__init__()
         self.FEATURE_TYPE = "image+noise"
@@ -53,7 +53,7 @@ class GANFeature(TwoFeatures):
         self.FEATURE_2_NAME = "noise"
 
 class ITextFeature(TwoFeatures):
-    @DeprecationWarning
+    
     def __init__(self):
         super(ITextFeature, self).__init__()
         self.FEATURE_TYPE = "text+char_ids"
@@ -62,7 +62,7 @@ class ITextFeature(TwoFeatures):
 
 
 class IPostionalFeature():
-    @DeprecationWarning
+    
     def __init__(self):
         self.FEATURE_NAME = "text+char_ids+positional_info"
         self.NUM_FEATURES = 3

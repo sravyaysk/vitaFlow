@@ -39,6 +39,7 @@ spacy
 # pydub
 # madmom
 librosa
+soundfile
 # Distributed Framework
 pyspark
 # sphinx doc

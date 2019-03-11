@@ -737,7 +737,6 @@ class HParams(object):
         """
         def remove_callables(x):
             """Omit callable elements from input with arbitrary nesting."""
-            print("========================== {}".format(x))
             if isinstance(x, dict):
                 return {k: remove_callables(v) for k, v in six.iteritems(x)
                         if not callable(v)}
