@@ -2,9 +2,15 @@
 Given EAST - Text File & Image - we can corner the image.
 """
 
+import os
+from glob import glob
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+
+import config
+from bin.utils import trim_file_ext
 
 
 def get_slope(x2, x3, y2, y3):
@@ -146,7 +152,7 @@ def trim_outliers1(raw_data):
 
     _acceptable_min_lenght = np.quantile(sorted(mins_box_lengths), 0.50)
     # TODO - remove - too big or too small
-    _acceptable_min_lenght = _acceptable_min_lenght * 1.5
+    _acceptable_min_lenght = _acceptable_min_lenght * 2.5
 
     # find median - text length
     for i in range(len(stats)):
@@ -157,7 +163,7 @@ def trim_outliers1(raw_data):
     return new_plot_points
 
 
-def rotate_image_with_east(img_filename, text_filename):
+def rotate_image_with_east(img_filename, text_filename, save_file=None):
     image = plt.imread(img_filename)
     raw_data, bag = read_data(text_filename)
     new_plot_points = trim_outliers1(raw_data)
@@ -166,10 +172,30 @@ def rotate_image_with_east(img_filename, text_filename):
     box = cv2.boxPoints(rect)
     box = np.int0(box)
     warped = four_point_transform(image, box)
-    plt.figure(figsize=(10, 10))
-    plt.imshow(warped)
+    if save_file:
+        plt.imsave(save_file, warped)
+    else:
+        plt.figure(figsize=(10, 10))
+        plt.imshow(warped)
 
 
-rotate_image_with_east(
-    '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.jpg',
-    '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.txt')
+# rotate_image_with_east(
+#     '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.jpg',
+#     '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.txt')
+
+raw_images = glob(
+    '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/east/348s*jpg')
+
+raw_images = sorted(raw_images)
+
+for each in raw_images:
+    filename = os.path.basename(each)
+    new_file_name = os.path.join(config.ROOT_DIR, config.IMAGE_ROOT_DIR, filename)
+    text_file = os.path.join(
+        os.path.dirname(each),
+        trim_file_ext(os.path.basename(each)) + '.txt')
+    #     break
+    if os.path.isfile(text_file):
+        rotate_image_with_east(each, text_file, new_file_name)
+    else:
+        print('Not able to find text file for {}'.format(each))

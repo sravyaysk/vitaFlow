@@ -19,6 +19,9 @@ BINARIZE_ROOT_DIR = "static/data/binarisation"
 # To store annotation xml files
 ANNOTATIONS_DIR = "static/data/annotations"
 
+# To store annotation xml files
+TEXT_DIR = "static/data/text_data"
+
 # Collection name
 # COLLECTION_NAME = "collection_01"
 
@@ -35,6 +38,7 @@ OS_FILE_REFRESH_TIME_INVTERVAL = 2 * 60  # Shift to inotify
 for each_dir in [IMAGE_ROOT_DIR,
                  CROPPER_ROOT_DIR,
                  BINARIZE_ROOT_DIR,
-                 ANNOTATIONS_DIR]:
+                 ANNOTATIONS_DIR,
+                 TEXT_DIR]:
     each_dir = os.path.join(ROOT_DIR, each_dir)
     check_n_create(each_dir)
