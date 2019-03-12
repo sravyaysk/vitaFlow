@@ -160,34 +160,16 @@ def trim_outliers1(raw_data):
 def rotate_image_with_east(img_filename, text_filename):
     image = plt.imread(img_filename)
     raw_data, bag = read_data(text_filename)
-
-    # for a line plot all the found point
-    # plot_points = get_plot_points(raw_data)
-
-    #  exception
-    # new_plot_points = trim_outliers1(raw_data)
-    #  exception - delete 1 corner region
-    # plt.imshow(image)
-    # plt.plot(*zip(*new_plot_points), 'b')
-    # plt.plot(*zip(*new_plot_points[:-5]), 'g')
-    new_plot_points = trim_outliers1(raw_data)[:-5]
-
+    new_plot_points = trim_outliers1(raw_data)
     cnt = np.array(new_plot_points)
-    # re-read image
-    # image = plt.imread(img_filename)
-
-    # cnt = np.array(new_plot_points)
     rect = cv2.minAreaRect(cnt)
     box = cv2.boxPoints(rect)
     box = np.int0(box)
-
-    # plt.imshow(cv.drawContours(image,[box],0,(0,0,255),2))
     warped = four_point_transform(image, box)
     plt.figure(figsize=(10, 10))
     plt.imshow(warped)
 
 
-img_filename = '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.jpg'
-text_filename = '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.txt'
-
-rotate_image_with_east(img_filename, text_filename)
+rotate_image_with_east(
+    '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.jpg',
+    '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.txt')
