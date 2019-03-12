@@ -80,3 +80,34 @@ $ ~/anaconda3/bin/python vitaFlow/vitaflow/annotate_server/run.py
 
 `#TODO`
 
+## Workflow
+
+Previous Plan of Work
+
+         Image >> Image Processing  >> DL Model for Image Annotations >> Extract Annotated Images >> Text >> Receipt csv
+
+New Plan of Action
+
+         Image >> Image Processing  >> Line to Line Text Extraction >> Annotation Model >> Receipt csv
+
+In Previous Plan, we are expecting following from DL Model
+
+1. Identify the regions of text with in a large Image and then 
+2. Classify these text into categories (Merchant/Line Items/Total)
+
+In our new plan of action, as we are doing identification of text line, we are only expecting the model to only 2 step in above.    
+
+### Lifecycle for Images
+
+##### Step1: (Optional)For Automatic Receipt Localisation
+1. East Folder - All the images along with east-text files are placed here.
+2. Images Folder - using `receipt_localisation.py` generated the images here.
+
+##### Step2: Annotation Server
+1. Images Folder - Store all the images required to be annoated here.
+2. Using Annotation Server - correct & convert the images for binarisation
+3. Post binarisation - convert image to text files using `image_to_text.py`
+
+##### Step3: Annotation Server 
+1. Pass these text files to `Annotation Model` for Annotation(__WIP__)
+

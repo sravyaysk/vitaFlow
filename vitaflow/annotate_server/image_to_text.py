@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 """
+Convert `Image` to `Text Line Images` and then convert them to `Text` file.  
 
 to run
     `PYTHONIOENCODING=utf-8 python3`
