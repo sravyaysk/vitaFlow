@@ -61,7 +61,7 @@ We are continuously exploring and extending VitaFlow, by solving some real world
 
 As baseline problem we have considered [Receipts](vitaflow/playground/receipt_ocr/) to extract some useful text information from camera images. 
 
-![abstract_workflow](docs/images/abstract_workflow.png)
+![](docs/images/abstract_workflow.png)
 
  
 ## VitaFlow Components
