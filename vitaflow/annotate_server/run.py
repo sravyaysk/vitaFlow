@@ -22,6 +22,9 @@ sample_data = {"url": "static/images/NoImage.png",
                }
 
 
+# ##################################### Rest API Call #################################
+
+
 @app.route('/inc/validateTagsAndRegions', methods=['POST', 'GET'])
 def _rest_validate_tags_and_regions():
     form_data = dict(request.form)
@@ -47,64 +50,40 @@ def _rest_get_new_image(image=None):
     return jsonify(image_manager.GetNewImage.get_new_image())
 
 
-#
-# @app.route('/data/<path:path>')
-# def _rest_annotate_image(path=''):
-#     print('Path is {}'.format(path))
-#     return send_file('')
+@app.route("/cropper/upload", methods=['POST'])
+@app.route("/upload", methods=['POST'])
+def _rest_cropper_upload():
+    data = dict(request.form)
+    print('Cropper - File upload status: {}'.format(cropper.cropper_upload(data)))
+    return 'ok'
 
 
-@app.route('/annotate_image')
-def annotate_image():
-    return render_template('index.html')
+# ##################################### Page Call #################################
 
 
 @app.route('/')
 @app.route('/<image>')
-def annotate_image2(image=None):
+@app.route('/annotate_image')
+@app.route('/annotate_image/<image>')
+def page_annotate_image2(image=None):
     if image:
         print('\n' + '-' * 54 + image + '\n' + '-' * 54)
     return render_template('index.html')
 
 
-@app.route('/review_annotation')
-# @app.route('/review_annotation/<image:image>')
-def review_annotation():
+# @app.route('/annotate_image')
+# def page_annotate_image():
+#     return render_template('index.html')
+
+
+# @app.route('/review_annotation')
+@app.route('/review_annotation/<image>')
+def review_annotation(image):
     return render_template('index.html')
 
 
-@app.route('/show_completed_images')
-def show_completed_images():
-    # Get data & show
-    # show data nicely
-    image_manager.GetNewImage.refresh()
-    # print(image_manager.GetNewImage.PendingImages)
-    return jsonify(image_manager.GetNewImage.completed_images)
-
-
-def show_pending_images():
-    pass
-
-
-@app.route('/show_all_images')
-def show_all_images():
-    return jsonify([
-        ('receipt_images', list(image_manager.GetNewImage.receipt_images.keys())),
-        ('pending_images', list(image_manager.GetNewImage.pending_images)),
-        ('completed_images', list(image_manager.GetNewImage.completed_images)),
-    ])
-
-
-@app.route('/summary')
-@app.route('/summary/')
-def show_summary():
-    data = list(image_manager.GetNewImage.annotated_files.keys())
-    print('Request to display {} Records'.format(len(data)))
-    return render_template('summary.html', data=data)
-
-
 @app.route('/summary/<start>/<end>')
-def rest_show_summary(start, end):
+def _rest_show_summary(start, end):
     # TODO: setup - pagination using start and end
     start = int(start) if start.isdigit() else 0
     end = int(end) if end.isdigit() else 10
@@ -117,25 +96,56 @@ def rest_show_summary(start, end):
     return jsonify({'receipt_images': data_dict})
 
 
+# @app.route('/page_show_completed_images')
+# def page_show_completed_images():
+#     # Get data & show
+#     # show data nicely
+#     image_manager.GetNewImage.refresh()
+#     # print(image_manager.GetNewImage.PendingImages)
+#     return jsonify(image_manager.GetNewImage.completed_images)
+#
+
+@app.route('/show_all_images')
+def page_show_all_images():
+    data = jsonify([
+        ('receipt_images', list(image_manager.GetNewImage.receipt_images.keys())),
+        ('pending_images', list(image_manager.GetNewImage.pending_images)),
+        ('completed_images', list(image_manager.GetNewImage.completed_images)),
+    ])
+    return render_template("stats.html", html_data=data)
+
+
+@app.route('/summary')
+@app.route('/summary/')
+def page_show_summary():
+    data = list(image_manager.GetNewImage.annotated_files.keys())
+    print('Request to display {} Records'.format(len(data)))
+    return render_template('summary.html', data=data)
+
+
 @app.route("/cropper/<image_name>")
 def page_cropper(image_name=None):
     data = {'image_name': "/" + os.path.join(config.IMAGE_ROOT_DIR, image_name)}
     return render_template("Cropper_js.html", data=data)
 
 
-@app.route("/cropper/upload", methods=['POST'])
-@app.route("/upload", methods=['POST'])
-def cropper_upload():
-    data = dict(request.form)
-    print('Cropper - File upload status: {}'.format(cropper.cropper_upload(data)))
-    return 'ok'
-
-
 @app.route("/stats")
-def stats_page():
+def page_stats_page():
     data = stats.get_stats()
     # print(data)
     return render_template("stats.html", html_data=Markup(data))
+
+
+@app.route("/model_selection")
+def page_model_selection():
+    return render_template("model_selection.html")
+
+
+@app.route("/text_extraction")
+def page_text_extraction():
+    return render_template("text_extraction.html")
+
+
 
 
 if __name__ == '__main__':

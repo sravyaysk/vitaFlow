@@ -1,10 +1,22 @@
 """
-Given EAST - Text File & Image - we can corner the image.
+Receipt Localisation using East
+
+Added East data processing code for receipt localisation
+
+Using images & east generated text files in East folder,
+image files are processed and save to Images folder.
+
 """
+
+import os
+from glob import glob
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+
+import config
+from bin.utils import trim_file_ext
 
 
 def get_slope(x2, x3, y2, y3):
@@ -144,49 +156,52 @@ def trim_outliers1(raw_data):
         stats.append((side_a, side_b, tot_area))
         mins_box_lengths.append(min(side_a, side_b))
 
-    _acceptable_min_lenght = np.quantile(sorted(mins_box_lengths), 0.50)
+    _acceptable_min_length = np.quantile(sorted(mins_box_lengths), 0.50)
     # TODO - remove - too big or too small
-    _acceptable_min_lenght = _acceptable_min_lenght * 1.5
+    _acceptable_min_length = _acceptable_min_length * 2.5
 
     # find median - text length
     for i in range(len(stats)):
         side_a, side_b, tot_area = stats[i]
-        if min((side_a, side_b)) < _acceptable_min_lenght:
+        if min((side_a, side_b)) < _acceptable_min_length:
             x1, y1, x2, y2, x3, y3, x4, y4 = raw_data[i]
             new_plot_points += [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
     return new_plot_points
 
 
-def main(img_filename, text_filename):
+def rotate_image_with_east(img_filename, text_filename, save_file=None):
     image = plt.imread(img_filename)
     raw_data, bag = read_data(text_filename)
-
-    # for a line plot all the found point
-    # plot_points = get_plot_points(raw_data)
-
-    #  exception
-    # new_plot_points = trim_outliers1(raw_data)
-    #  exception - delete 1 corner region
-    # plt.imshow(image)
-    # plt.plot(*zip(*new_plot_points), 'b')
-    # plt.plot(*zip(*new_plot_points[:-5]), 'g')
-    new_plot_points = trim_outliers1(raw_data)[:-5]
-
+    new_plot_points = trim_outliers1(raw_data)
     cnt = np.array(new_plot_points)
-    # re-read image
-    # image = plt.imread(img_filename)
-
-    # cnt = np.array(new_plot_points)
     rect = cv2.minAreaRect(cnt)
     box = cv2.boxPoints(rect)
     box = np.int0(box)
-
-    # plt.imshow(cv.drawContours(image,[box],0,(0,0,255),2))
     warped = four_point_transform(image, box)
-    plt.imshow(warped)
+    if save_file:
+        plt.imsave(save_file, warped)
+    else:
+        plt.figure(figsize=(10, 10))
+        plt.imshow(warped)
 
 
-img_filename = '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.jpg'
-text_filename = '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.txt'
+# rotate_image_with_east(
+#     '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.jpg',
+#     '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.txt')
 
-main(img_filename, text_filename)
+raw_images = glob(
+    '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/east/348s*jpg')
+
+raw_images = sorted(raw_images)
+
+for each in raw_images:
+    filename = os.path.basename(each)
+    new_file_name = os.path.join(config.ROOT_DIR, config.IMAGE_ROOT_DIR, filename)
+    text_file = os.path.join(
+        os.path.dirname(each),
+        trim_file_ext(os.path.basename(each)) + '.txt')
+    #     break
+    if os.path.isfile(text_file):
+        rotate_image_with_east(each, text_file, new_file_name)
+    else:
+        print('Not able to find text file for {}'.format(each))
