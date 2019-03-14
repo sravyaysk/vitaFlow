@@ -20,10 +20,10 @@
 # Introduction
 Exploring data science projects or experimenting new ideas/algorithms are often exciting and fun to play around.
 
-However when it comes to building a end-to-end Machine Learning pipeline to handle different data sets and models or 
-algorithms, will often put as in a tough spot with lot of engineering challenges/aspects which were neglected previously.
+However when it comes to building an end-to-end Machine Learning pipeline to handle different data sets and models or 
+algorithms, will often put us in a tough spot with lot of engineering challenges/aspects which were neglected previously.
 
-The process itself encompassed many small details and tasks that the data science community does not tend to celebrate 
+The process itself encompasses many small details and tasks that the data science community does not tend to celebrate 
 (at least, not as much as the newest algorithm!). The algorithm itself is a very small piece of the whole ecosystem — 
 much like the little black box in this image:
 
@@ -42,11 +42,11 @@ Layout a platform that take cares of engineering aspects of Data Science project
 
 > __Data Science wisdom comes only through failed experimentation - Damian Mingle__
 
-The thought process is to come up with following modular components which then can be then glued through
+The thought process is to come up with following modular components which can then be glued through
 configuration:
 
  - Data Collection and Cleansing
- - Annotations tools
+ - Annotation tools
  - Dataset modules with pre-processing modules
  - DataIterator modules (backed by [TF Data](https://www.tensorflow.org/guide/datasets))
  - Tensorflow Models (backed by [TF Estimators](https://www.tensorflow.org/guide/estimators))
@@ -70,20 +70,20 @@ As baseline problem we have considered [Receipts](vitaflow/playground/receipt_oc
 
     We started vitaFlow with a vision to build a plug and play framework for Tensorflow model experimentation 
     with different datasets, that enables a fast prototyping of Deep Learning models that handles Video/Image/Text/Audio 
-    and provide an seamless way of serving them in different end points.
+    and provide a seamless way of serving them in different end points.
     Addressing some of the following cases:
-    - __A Navie Developer__: Can I get an experimentation play ground, with some set of open datasets, data iterators 
+    - __A Naive Developer__: Can I get an experimentation play ground, with some set of open datasets, data iterators 
     and models? to learn by doing?
     - __A Data Scientist__: Can I build a model with an available open dataset and later switch to production dataset 
     when the Data Engineering team bring in the production data?
     - __A Data Engineer__: Can I use any available model and run through my data during my data preparation cycle?
     - __An Online Competitor__: Can I reuse the models and pieces of modules that I have developed for my last 
     competition in my current competition? 
-    - __Business Deadlines__ : We had spend few months of effort while addressing a clients proposals and build a prototype. 
+    - __Business Deadlines__ : We had spend few months of effort while addressing a client's proposals and build a prototype. 
     Can we showcase the prototype developed to upcoming project proposals as quick as possible?
     ![vitaflow_stack](docs/images/vitaflow_stack.png)
 
-    In our exploration we came across [Tensor2Tensor](https://github.com/tensorflow/tensor2tensor), which does what we intended to do. **So we ported a minimalistic and essential T2T components, and evaluating it for our needs**
+    In our exploration, we came across [Tensor2Tensor](https://github.com/tensorflow/tensor2tensor), which does what we intended to do. **So we ported minimalistic and essential T2T components, and evaluating it for our needs**
      
 
     ```sh
