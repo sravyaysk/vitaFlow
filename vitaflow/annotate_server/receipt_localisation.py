@@ -185,23 +185,38 @@ def rotate_image_with_east(img_filename, text_filename, save_file=None):
         plt.imshow(warped)
 
 
-# rotate_image_with_east(
-#     '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.jpg',
-#     '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/binarisation/2cqfj49.txt')
+if __name__ == '__main__':
+    import traceback
 
-raw_images = glob(
-    '/Users/sampathm/devbox/vitaFlow/vitaflow/annotate_server/static/data/east/348s*jpg')
+    raw_images = glob(os.path.join(config.EAST_DIR + '/*jpg'))
+    raw_images = sorted(raw_images)
+    for each in raw_images:
+        #     break
+        if ('_act' in each) or ('_predict' in each):
+            continue
+        error_log = []
+        filename = os.path.basename(each)
+        new_file_name = os.path.join(config.ROOT_DIR, config.IMAGE_ROOT_DIR, filename)
+        text_file = os.path.join(
+            os.path.dirname(each),
+            trim_file_ext(os.path.basename(each)) + '.txt')
 
-raw_images = sorted(raw_images)
-
-for each in raw_images:
-    filename = os.path.basename(each)
-    new_file_name = os.path.join(config.ROOT_DIR, config.IMAGE_ROOT_DIR, filename)
-    text_file = os.path.join(
-        os.path.dirname(each),
-        trim_file_ext(os.path.basename(each)) + '.txt')
-    #     break
-    if os.path.isfile(text_file):
-        rotate_image_with_east(each, text_file, new_file_name)
-    else:
-        print('Not able to find text file for {}'.format(each))
+        message = '--------  ' * 5
+        message += 'Not able to find text file for {}'.format(each)
+        if os.path.isfile(text_file):
+            try:
+                if not os.path.isfile(new_file_name):
+                    rotate_image_with_east(each, text_file, new_file_name)
+                else:
+                    print('File is already present {}'.format(each))
+            except Exception as err:
+                message = '--------  ' * 5
+                message += 'Error while running for {}'.format(each)
+                error_log.append(message)
+                traceback.print_tb(err.__traceback__)
+                error_log.append(str(traceback.format_exc()))
+        else:
+            print(message)
+            error_log.append(message)
+    with open('receip_localisation.log', 'a+') as fp:
+        fp.writelines(error_log)

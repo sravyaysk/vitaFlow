@@ -19,8 +19,15 @@ BINARIZE_ROOT_DIR = "static/data/binarisation"
 # To store annotation xml files
 ANNOTATIONS_DIR = "static/data/annotations"
 
+# EAST IMAGES
+EAST_DIR = "static/data/east"
+
 # To store annotation xml files
 TEXT_DIR = "static/data/text_data"
+
+# Tesseract Config
+
+TESSERACT_CONFIG = '-c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyz -c preserve_interword_spaces=1'
 
 # Collection name
 # COLLECTION_NAME = "collection_01"

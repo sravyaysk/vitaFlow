@@ -8,12 +8,10 @@ to run
     `PYTHONIOENCODING=utf-8 python3`
 
 """
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 import cv2
-import config
 from pytesseract import image_to_string
 
 
@@ -70,7 +68,7 @@ def get_line_segments(image):
             # print(data[start], data[i])
             start = i
             memory = data[i]
-
+    line_segments.append((data[start], data[i]))
     return line_segments
 
 
@@ -80,7 +78,7 @@ def image_to_text_lines(image):
     for start, end in line_segments:
         if abs(start - end) < 10:
             continue
-        text_data = image_to_string(image[start - 2: end + 2, :])
+        text_data = image_to_string(image[start - 2: end + 2, :], config=config.TESSERACT_CONFIG)
         if text_data:
             # show_img(image[start - 1: end + 1, :])
             # print(text_data)
@@ -89,16 +87,23 @@ def image_to_text_lines(image):
 
 
 def main(image_filename):
-    '''
+    """
     convert image -> text file
 
     :param image_filename: filename with path
     :return:
-    '''
+    """
     image = plt.imread(image_filename)
     _text_file_name = (os.path.basename(image_filename)).rsplit('.')[0] + '.txt'
     text_file_name = os.path.join(config.TEXT_DIR, _text_file_name)
-    collected_text_data = image_to_text_lines(image)
+    if os.path.isfile(text_file_name):
+        print('Found the text file for {}'.format(image_filename))
+        return
+    try:
+        collected_text_data = image_to_text_lines(image)
+    except:
+        collected_text_data = []
+        print('Failed - Image2Text {} {}'.format(image_filename, text_file_name))
     with open(text_file_name, 'w', encoding='utf-8') as fp:
         fp.write(u'\n'.join(collected_text_data))
         # import pdb
@@ -129,7 +134,13 @@ def async_main():
 
 if __name__ == '__main__':
     from glob import glob
+    import os
+    import config
+    from multiprocessing import Pool
 
-    for image_filename in glob(config.BINARIZE_ROOT_DIR + '/*'):
-        main(image_filename)
-        # break
+    raw_images = glob(os.path.join(config.BINARIZE_ROOT_DIR + '/*jpg'))
+    raw_images = sorted(raw_images)
+    # for each in raw_images:
+    #     main(each)
+    with Pool(5) as p:
+        print(p.map(main, raw_images))

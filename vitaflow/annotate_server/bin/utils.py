@@ -14,7 +14,9 @@ def check_n_create(full_path):
         print('Created missing dir `{}`!'.format(full_path))
         os.mkdir(full_path)
     else:
-        print('Using dir at `{}`!'.format(full_path))
+        # TODO: remove below
+        # print('Using dir at `{}`!'.format(full_path))
+        pass
 
 
 def parser_folder(search_folder, exts=None):
