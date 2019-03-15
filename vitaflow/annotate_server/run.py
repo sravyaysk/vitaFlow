@@ -58,6 +58,35 @@ def _rest_cropper_upload():
     return 'ok'
 
 
+@app.route("/text_extraction_data/")
+@app.route("/text_extraction_data/<start>")
+@app.route("/text_extraction_data/<start>/<end>")
+def _rest_page_text_extraction(start=None, end=None):
+    if start is None:
+        start = 0
+    if end is None:
+        end = 10
+    receipt_images = image_manager.GetNewImage.receipt_images
+    data = []
+    for image in list(receipt_images.keys())[start:end]:
+        url = os.path.join(config.IMAGE_ROOT_DIR, image)
+        text_data = 'No file found!'
+        try:
+            with open(os.path.join(config.TEXT_DIR, image + '.txt'), 'br') as fp:
+                import unicodedata
+                _data = fp.read()
+                # TODO: Not able to read any files & make it Json Serializable.
+                text_data = unicodedata.normalize('' + _data)
+                text_data = str(text_data.encode('utf-8'))
+        except:
+            text_data = 'Filed to parse file!'
+        data.append((url, text_data))
+    html_data = jsonify(list(data))
+    return html_data
+
+
+
+
 # ##################################### Page Call #################################
 
 
@@ -143,7 +172,8 @@ def page_model_selection():
 
 @app.route("/text_extraction")
 def page_text_extraction():
-    return render_template("text_extraction.html")
+    html_data = '<p>Hello Gro</p>'
+    return render_template("text_extraction.html", data=html_data)
 
 
 

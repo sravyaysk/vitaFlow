@@ -55,30 +55,28 @@ $ ~/anaconda3/bin/python vitaFlow/vitaflow/annotate_server/run.py
 ...
 ```
 
-## How to Start Annotation
-
-`#TODO`
+This Annotation Server is developed in Python3 using Flask. 
 
 ## How to Cropper Image
 
-`#TODO`
+After starting Annotation server, while Annotating Images - Cropper Option is show to crop that specific Image.
+
+Cropper has very versatile set of rotation and crop option.
 
 ## Functionality - How the folder structure is
 
-`#TODO`
+Annotation Tool is build with a flexible design to keep adding features as well as scalable.
 
+For example, `binarisation`, `receipt localisation` and `image_to_text` features are added as an option feature but can run seperately with out whole pipeline or can be hosted as a micro-service.
 
-## Where to collect images & annotation xml files
-
-`#TODO`
-
-## How to select models
-
-`#TODO`
+- Folder: Image(Core): Location for storing images required to be annotated.
+- Folder: Cropper(Optional): Location where cropped images are stored.
+- Folder: Binarisation(Core): Location where cropped and gray scaled images are stored.
+- Folder: Annotation(Core): Location where one can find .xml files.
 
 ## How to use existing ML/DL Models to auto tag images
 
-`#TODO`
+WIP
 
 ## Workflow
 
@@ -110,4 +108,9 @@ In our new plan of action, as we are doing identification of text line, we are o
 
 ##### Step3: Annotation Server 
 1. Pass these text files to `Annotation Model` for Annotation(__WIP__)
+
+
+# Project Dashboard
+
+
 
