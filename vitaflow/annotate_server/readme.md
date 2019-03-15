@@ -102,13 +102,14 @@ In our new plan of action, as we are doing identification of text line, we are o
 2. Images Folder - using `receipt_localisation.py` generated the images here.
 
 ##### Step2: Annotation Server
-1. Images Folder - Store all the images required to be annoated here.
+1. Images Folder - Store all the images required to be annotated here.
 2. Using Annotation Server - correct & convert the images for binarisation
 3. Post binarisation - convert image to text files using `image_to_text.py`
 
-##### Step3: Annotation Server 
-1. Pass these text files to `Annotation Model` for Annotation(__WIP__)
+##### Step3:
+1. Pass these text files to `Annotation Model` for Annotation(_WIP_) & generate annoatation
 
+##### Step3: Annotation Server
 
 # Project Dashboard
 
