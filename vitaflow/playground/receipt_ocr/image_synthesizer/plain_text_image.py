@@ -19,20 +19,20 @@ Publix
 Wegmans
 Trader Joe's
 H-E-B
-Aldi
+Alladin
 Harris Teeter
 Hy-Vee
 Costco
-WinCo
+WinCo 
 Whole Foods
-Fry's
+Bil Fry's
 Kroger
 Target
 Winn-Dixie
 ShopRite
 Food Lion
 Albertsons
-Meijer
+Meijer Er
 Sam's Club
 Giant Food
 Safeway
@@ -79,8 +79,41 @@ Top round steak
 Wheat bread
 '''.strip().splitlines()
 
+ALL_MERCHANTS_ADDR = '''Sanger, CA
+Reedley, CA
+Temperance & Hwy 168 Clovis, CA
+Ashlan & Fowler Clovis, CA
+Herndon & Fowler Clovis, CA
+Vons Clovis 1756, CA
+Sierra Vista Mall Clovis, CA
+Vons Fresno 1754, CA
+Clovis & Kings Canyon Fresno, CA
+Dinuba, CA
+Herndon & Clovis Clovis, CA
+West Shaw Clovis, CA
+Peach & Mckinley Fresno, CA
+Target Clovis T 2018, CA
+Herndon & Willow Clovis, CA
+Willow & Nees Clovis, CA
+Frank Phillips & US 75, Bartlesville
+Food Pyramid Bartlesville O, OK
+Apache Street, Tulsa
+Harry & Rock, Wichita
+3rd & Range Line, Joplin
+Price Cutter Joplin 57, MO
+Food Pyramid Tulsa 63, OK
+Super Target Tulsa St 1782, OK
+51st & Harvard, Tulsa
+Aspen & Kenosha, Broken Arrow
+Food Pyramid Tulsa 61, OK
+Food Pyramid Tulsa 64, OK
+Target Broken Arrow T 2422, OK
+'''.strip().splitlines()
+
+
 ALL_LINE_ITEMS = [_.strip() for _ in ALL_LINE_ITEMS]
 ALL_MERCHANTS_NAMES = [_.strip() for _ in ALL_MERCHANTS_NAMES]
+ALL_MERCHANTS_ADDR = [_.strip() for _ in ALL_MERCHANTS_ADDR]
 
 
 def get_random_merchant_name():
@@ -89,6 +122,10 @@ def get_random_merchant_name():
 
 def get_random_line_item():
     return random.choice(ALL_LINE_ITEMS)
+
+
+def get_random_merchant_address():
+    return random.choice(ALL_MERCHANTS_ADDR)
 
 
 def get_random_string(max_num_chars=15):
@@ -155,6 +192,9 @@ def insert_text(draw: ImageDraw,
 
 def create_naive_receipt(file_path):
     # create Image object with the input image
+    # TODO: Generated a proper text receipt & from it generated receipt
+    # TODO: Generate Header, Body & Footer - as sperate regions and image-concated them
+    # TODO: Convert this to a class model
     receipt_text = []
     _number_of_line_items = random.choice(range(5, 15))
 
@@ -163,7 +203,11 @@ def create_naive_receipt(file_path):
     # the image object as background
     draw = ImageDraw.Draw(image)
 
-    _merchant_tag = get_random_merchant_name().center(10)
+    _merchant_tag = get_random_merchant_name().center(15)
+    _merchant_addr = get_random_merchant_address().center(50)
+    _merchant_addr2 = '{}-{}-{}'.format(get_random_number(3, 3),
+                                        get_random_number(3, 3),
+                                        get_random_number(4, 4), ).center(50)
     _date = random.random()
     date, _, _ = get_random_date("1/1/2015 1:30 PM", "1/1/2019 4:50 AM", _date)
     date = "Date : " + str(date)
@@ -171,12 +215,21 @@ def create_naive_receipt(file_path):
 
     receipt_text = [
         _merchant_tag.strip(),
+        _merchant_addr.strip(),
+        _merchant_addr2.strip(),
         _invoice_text.strip() + ' ' + date,
         "Item  Price",
     ]
-    draw = insert_text(draw=draw, x=60, y=30, text=_merchant_tag, font_size=20)
-    draw = insert_text(draw=draw, x=20, y=80, text=_invoice_text, font_size=10)
-    draw = insert_text(draw=draw, x=120, y=80, text=date, font_size=10)
+    # first line
+    draw = insert_text(draw=draw, x=40, y=30, text=_merchant_tag, font_size=25)
+    draw = insert_text(draw=draw, x=20, y=65, text=_merchant_addr, font_size=10)
+    draw = insert_text(draw=draw, x=20, y=80, text=_merchant_addr2, font_size=10)
+
+    # invoice - date line
+    draw = insert_text(draw=draw, x=20, y=100, text=_invoice_text, font_size=10)
+    draw = insert_text(draw=draw, x=120, y=100, text=date, font_size=10)
+
+    # table header
     draw = insert_text(draw=draw, x=30, y=120, text="Item", font_size=10)
     draw = insert_text(draw=draw, x=150, y=120, text="Price", font_size=10)
 
@@ -189,7 +242,7 @@ def create_naive_receipt(file_path):
         draw = insert_text(draw=draw, x=20, y=140 + (i * _min_line_width), text=item_text, font_size=10)
 
         # item - price
-        item_price = get_random_number(max_num_chars=5)
+        item_price = get_random_number(max_num_chars=3)
         draw = insert_text(draw=draw, x=150, y=140 + (i * _min_line_width), text=item_price, font_size=10)
         receipt_text.append('{}  {}'.format(item_text.strip(), item_price).strip())
 
@@ -208,9 +261,16 @@ def create_naive_receipt(file_path):
     receipt_text.append(_text)
     draw = insert_text(draw=draw, x=100, y=total_y, text=_text, font_size=10)
     total_y += 20
-    _text = "Total : " + str(total + total * 0.15)
+    _tag_total = random.choice([
+        "Total : ",
+        "Amount Due : ",
+        "Total Amount : ",
+        "Total To Pay : ",
+        "Total Charges : ",
+    ])
+    _text = _tag_total + str(total + total * 0.15)
     receipt_text.append(_text)
-    draw = insert_text(draw=draw, x=120, y=total_y, text=_text, font_size=10)
+    draw = insert_text(draw=draw, x=95 - len(_tag_total), y=total_y, text=_text, font_size=13)
 
     # write to a file
     fp = open(file_path + '.txt', 'w')
@@ -248,7 +308,7 @@ def test():
 
     for i in tqdm(range(number_files)):
         create_naive_receipt(OUT_DIR + "/test/" + str(i) + ".jpg")
-        replicate_xml(out_file_path=OUT_DIR + "/test/" + str(i) + ".xml")
+        # replicate_xml(out_file_path=OUT_DIR + "/test/" + str(i) + ".xml")
 
 
 def eval():
@@ -257,7 +317,7 @@ def eval():
 
     for i in tqdm(range(number_files)):
         create_naive_receipt(OUT_DIR + "/eval/" + str(i) + ".jpg")
-        replicate_xml(out_file_path=OUT_DIR + "/eval/" + str(i) + ".xml")
+        # replicate_xml(out_file_path=OUT_DIR + "/eval/" + str(i) + ".xml")
 
 
 def main():
