@@ -12,108 +12,7 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 from tqdm import tqdm
 
-OUT_DIR = "receipt_mock_data"
-
-ALL_MERCHANTS_NAMES = '''
-Publix
-Wegmans
-Trader Joe's
-H-E-B
-Alladin
-Harris Teeter
-Hy-Vee
-Costco
-WinCo 
-Whole Foods
-Bil Fry's
-Kroger
-Target
-Winn-Dixie
-ShopRite
-Food Lion
-Albertsons
-Meijer Er
-Sam's Club
-Giant Food
-Safeway
-Stop & Shop
-Walmart
-'''.strip().splitlines()
-
-ALL_LINE_ITEMS = '''
-All-purpose flour
-American cheese
-Apples 
-Banana 
-Beef Round
-Boneless chicken breast
-Boneless pork chop
-Broccoli
-Chicken Breasts
-Chocolate chip cookies
-Creamy peanut butter
-Dried beans
-Eggs (regular) 
-Frozen turkey
-Ground beef
-Ice cream
-Lemons
-Lettuce 
-Loaf of Fresh White Bread 
-Local Cheese
-Milk (regular)
-Navel oranges
-Onion 
-Oranges 
-Pasta
-Potato 
-Rice (white)
-Salted butter
-Seedless grapes
-Sirloin steak
-Sliced bacon
-Strawberries
-Sugar
-Tomato 
-Top round steak
-Wheat bread
-'''.strip().splitlines()
-
-ALL_MERCHANTS_ADDR = '''Sanger, CA
-Reedley, CA
-Temperance & Hwy 168 Clovis, CA
-Ashlan & Fowler Clovis, CA
-Herndon & Fowler Clovis, CA
-Vons Clovis 1756, CA
-Sierra Vista Mall Clovis, CA
-Vons Fresno 1754, CA
-Clovis & Kings Canyon Fresno, CA
-Dinuba, CA
-Herndon & Clovis Clovis, CA
-West Shaw Clovis, CA
-Peach & Mckinley Fresno, CA
-Target Clovis T 2018, CA
-Herndon & Willow Clovis, CA
-Willow & Nees Clovis, CA
-Frank Phillips & US 75, Bartlesville
-Food Pyramid Bartlesville O, OK
-Apache Street, Tulsa
-Harry & Rock, Wichita
-3rd & Range Line, Joplin
-Price Cutter Joplin 57, MO
-Food Pyramid Tulsa 63, OK
-Super Target Tulsa St 1782, OK
-51st & Harvard, Tulsa
-Aspen & Kenosha, Broken Arrow
-Food Pyramid Tulsa 61, OK
-Food Pyramid Tulsa 64, OK
-Target Broken Arrow T 2422, OK
-'''.strip().splitlines()
-
-
-ALL_LINE_ITEMS = [_.strip() for _ in ALL_LINE_ITEMS]
-ALL_MERCHANTS_NAMES = [_.strip() for _ in ALL_MERCHANTS_NAMES]
-ALL_MERCHANTS_ADDR = [_.strip() for _ in ALL_MERCHANTS_ADDR]
+from config import ALL_MERCHANTS_ADDR, ALL_MERCHANTS_NAMES, ALL_LINE_ITEMS, OUT_DIR
 
 
 def get_random_merchant_name():
@@ -188,6 +87,44 @@ def insert_text(draw: ImageDraw,
     font = ImageFont.truetype(font_file, size=font_size)
     draw.text((x, y), text, fill=color, font=font)
     return draw
+
+
+def generate_ann(text_data):
+    res_bag = []
+    _counter = 0
+
+    # merchant
+    _merchant = text_data.splitlines()[0]
+    _m1 = 0
+    _m2 = len(_merchant)
+    _counter += 1
+    res_bag.append('T{} Merchant {} {} {}'.format(_counter, _m1, _m2, _merchant))
+
+    # Date
+    _d1 = text_data.find('Date')
+    _d2 = _d1 + len('Date : 05/08/2018')
+    _date = text_data[_d1:_d2]
+    _counter += 1
+    res_bag.append('T{} Date {} {} {}'.format(_counter, _d1, _d2, _date))
+
+    # LineItems
+    _t1 = text_data.find('Item  Price\n') + len('Item  Price\n')
+    _t2 = text_data.find('Tax') - 1
+    _line1 = _t1
+    for line in text_data[_t1:_t2].splitlines():
+        _line2 = _line1 + len(line)
+        _counter += 1
+        res_bag.append('T{} LineItem {} {} {}'.format(_counter, _line1, _line2, line))
+        _line1 = _line1 + len(line) + 1
+
+    # Total
+    _total = text_data.splitlines()[-1]
+    _t1 = text_data.find(_total)
+    _t2 = _t1 + len(_total)
+    _counter += 1
+    res_bag.append('T{} Total {} {} {}'.format(_counter, _t1, _t1, _total))
+
+    return '\n'.join(res_bag)
 
 
 def create_naive_receipt(file_path):
@@ -274,8 +211,11 @@ def create_naive_receipt(file_path):
 
     # write to a file
     fp = open(file_path + '.txt', 'w')
+    fp_ann = open(file_path + '.ann', 'w')
+    text_data = '\n'.join(receipt_text)
     try:
-        fp.writelines(['{}\n'.format(_) for _ in receipt_text])
+        fp.write(text_data)
+        fp_ann.write(generate_ann(text_data))
     except UnicodeEncodeError:
         import pdb
         pdb.set_trace()
@@ -294,7 +234,7 @@ def replicate_xml(out_file_path, image_store_path="images", in_file_pathh="0.xml
 
 
 def train():
-    number_files = 100
+    number_files = 10
     os.makedirs(OUT_DIR + "/train/")
 
     for i in tqdm(range(number_files)):
@@ -303,7 +243,7 @@ def train():
 
 
 def test():
-    number_files = 100
+    number_files = 10
     os.makedirs(OUT_DIR + "/test/")
 
     for i in tqdm(range(number_files)):
