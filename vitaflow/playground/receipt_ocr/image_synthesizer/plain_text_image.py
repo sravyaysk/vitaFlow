@@ -147,7 +147,7 @@ def create_naive_receipt(file_path):
     #
     footer_col1 = int(_image_size[0] * 0.55)
     footer_col2 = int(_image_size[0] * 0.50)
-    print(f'Image Size: _image_size')
+    # print(f'Image Size: _image_size')
 
     image = Image.new(mode="RGB", size=_image_size, color=(255, 255, 255))
     # initialise the drawing context with
@@ -250,7 +250,7 @@ def replicate_xml(out_file_path, image_store_path="images", in_file_pathh="0.xml
 
 
 def train():
-    number_files = 5
+    number_files = 200
     os.makedirs(OUT_DIR + "/train/")
 
     for i in tqdm(range(number_files)):
@@ -281,8 +281,8 @@ def main():
         shutil.rmtree(OUT_DIR)
     os.mkdir(OUT_DIR)
     train()
-    # test()
-    # eval()
+    test()
+    eval()
 
 
 if __name__ == '__main__':
