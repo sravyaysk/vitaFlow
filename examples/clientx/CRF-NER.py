@@ -42,23 +42,23 @@ def is_new_tag(prev, current):
         else:
             return False
 
-full_path = os.path.join(experiment_root_directory,experiment_name)
+full_path = os.environ['DEMO_DATA_PATH']
 
 train_sent = []
-for i in os.listdir("examples/clientx/train"):
-    df = pd.read_csv(os.path.join("examples/clientx/train",i),sep="\t",quoting=csv.QUOTE_NONE)
+for i in os.listdir(full_path + "/train"):
+    df = pd.read_csv(os.path.join(full_path + "/train",i),sep="\t",quoting=csv.QUOTE_NONE)
     data =  list(zip(*[df[c].values.tolist() for c in ['0', '1']]))
     train_sent.append(data)
     
 test_sent=[]
-for i in os.listdir("examples/clientx/val"):
-    df = pd.read_csv(os.path.join("examples/clientx/val",i),sep="\t",quoting=csv.QUOTE_NONE)
+for i in os.listdir(full_path + "/val"):
+    df = pd.read_csv(os.path.join(full_path + "/val",i),sep="\t",quoting=csv.QUOTE_NONE)
     data =  list(zip(*[df[c].values.tolist() for c in ['0', '1']]))
     test_sent.append(data)
     
 predict_sent=[]
-for i in os.listdir(full_path+"/preprocessed_data/test/"):
-    df = pd.read_csv(full_path+"/preprocessed_data/test/"+i,sep="\t",quoting=csv.QUOTE_NONE)
+for i in os.listdir(full_path+"/clientx_dataset/preprocessed_data/test/"):
+    df = pd.read_csv(full_path+"/clientx_dataset/preprocessed_data/test/"+i,sep="\t",quoting=csv.QUOTE_NONE)
     data =  list(zip(*[df[c].values.tolist() for c in ['0', '1']]))
     predict_sent.append(data)
 
@@ -151,20 +151,20 @@ l=[]
 for i in range(len(predictions)):
     l.append(list(zip(predictions[i],predict_sent2[i])))
 
-for i in os.listdir(full_path+"/preprocessed_data/test/"):
-    df = pd.read_csv(full_path+"/preprocessed_data/test/"+i,sep="\t",quoting=csv.QUOTE_NONE)
+for i in os.listdir(full_path+"/clientx_dataset/preprocessed_data/test/"):
+    df = pd.read_csv(full_path+"/clientx_dataset/preprocessed_data/test/"+i,sep="\t",quoting=csv.QUOTE_NONE)
 
 count=0
-for i in os.listdir(full_path+"/preprocessed_data/test/"):
-    with open(full_path+"/preprocessed_data/test/"+i.rsplit(".",1)[0]+".csv", mode='wt', encoding='utf-8') as myfile:
+for i in os.listdir(full_path+"/clientx_dataset/preprocessed_data/test/"):
+    with open(full_path+"/clientx_dataset/preprocessed_data/test/"+i.rsplit(".",1)[0]+".csv", mode='wt', encoding='utf-8') as myfile:
         csv_out=csv.writer(myfile)
         csv_out.writerow(["word","pred"])
         for row in l[count]:
             csv_out.writerow([str(row[1]),str(row[0])])
     count=count+1
 
-for i in os.listdir(full_path+"/preprocessed_data/test/"):
-    df = pd.read_csv(full_path+"/preprocessed_data/test/"+i.rsplit(".",1)[0]+".csv")
+for i in os.listdir(full_path+"/clientx_dataset/preprocessed_data/test/"):
+    df = pd.read_csv(full_path+"/clientx_dataset/preprocessed_data/test/"+i.rsplit(".",1)[0]+".csv")
 
 
 doc_text=""
@@ -178,16 +178,16 @@ for index, row in df.iterrows():
         else:
             # second index onwards
             if is_new_tag(prev_tag, row["pred"]):
-                doc_text = doc_text + text + "," + strip_iob(prev_tag)+"\n"
+                doc_text = doc_text + text + "~" + strip_iob(prev_tag)+"\n"
                 text = row["word"]
 
             else:
                 text = text + " " + row["word"]
             prev_tag = row["pred"]
-doc_text = doc_text + text + "," + strip_iob(prev_tag) + "\n"
+doc_text = doc_text + text + "~" + strip_iob(prev_tag) + "\n"
 
 
 
-with open(full_path+"/clientx_data_iterator/postprocessed/"+i.rsplit(".",1)[0]+".csv", "w") as post_file:
-    post_file.write("Item,Tag\n")
+with open("postprocessed/"+i.rsplit(".",1)[0]+".csv", "w") as post_file:
+    post_file.write("Item~Tag\n")
     post_file.write(doc_text)

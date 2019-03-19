@@ -270,17 +270,17 @@ def test():
 
 def eval():
     number_files = 25
-    os.makedirs(OUT_DIR + "/eval/")
+    os.makedirs(OUT_DIR + "/val/")
 
     for i in tqdm(range(number_files)):
-        create_naive_receipt(OUT_DIR + "/eval/" + str(i) + ".png")
+        create_naive_receipt(OUT_DIR + "/val/" + str(i) + ".png")
         # replicate_xml(out_file_path=OUT_DIR + "/eval/" + str(i) + ".xml")
 
 
 def main():
     if os.path.exists(OUT_DIR):
         shutil.rmtree(OUT_DIR)
-    os.mkdir(OUT_DIR)
+    os.makedirs(OUT_DIR)
     train()
     test()
     eval()
