@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import cv2
+import os
 from pytesseract import image_to_string
 
 
