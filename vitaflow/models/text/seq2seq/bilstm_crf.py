@@ -90,7 +90,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
         # Model hyper parameters
         self.USE_CHAR_EMBEDDING = self._hparams.use_char_embd
         self.LEARNING_RATE = self._hparams.learning_rate
-        self.KEEP_PROP = self._hparams.keep_propability
+        self.KEEP_PROP = 0.5 #self._hparams.keep_propability
         self.WORD_EMBEDDING_SIZE = self._hparams.word_emd_size
         self.CHAR_EMBEDDING_SIZE = self._hparams.char_emd_size
         self.WORD_LEVEL_LSTM_HIDDEN_SIZE = self._hparams.word_level_lstm_hidden_size

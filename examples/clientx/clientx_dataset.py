@@ -97,7 +97,7 @@ class CLIENTXDataset(IPreprocessor, ICSVSeq2SeqType1):
             "experiment_name": "CLIENTXDataset",
             "minimum_num_words": 5,
             "over_write": False,
-            "temp-data": os.path.join(os.path.expanduser("~"), "vita-temp/"),
+            "temp-data": os.environ['DEMO_DATA_PATH'], #os.path.join("/opt/data", "vitaFlow-clientx/"),
         })
         return hparams
 

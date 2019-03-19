@@ -1,9 +1,9 @@
 #!/bin/bash
-
+export DEMO_DATA_PATH=/opt/data/vitaflow_demo/
 #1 input -> folder (hardcoded)
-inputdirectory='/mnt1/gaurish/vitaFlow-clientx/'
+inputdirectory=$DEMO_DATA_PATH
 #2. py2 -> stanoff2conll
-source activate quantipy2.7
+#source activate quantipy2.7
 #cd ./examples/clientx/standoff2conll
 
 # clear annotations folder
@@ -21,7 +21,7 @@ mkdir -p postprocessed
 
 sourcefile=`basename $1`
 touch ./examples/clientx/standoff2conll/annotations/"${sourcefile%.*}.ann"
-python ./examples/clientx/standoff2conll/standoff2conll.py ./examples/clientx/standoff2conll/annotations
+python2 ./examples/clientx/standoff2conll/standoff2conll.py ./examples/clientx/standoff2conll/annotations
 
 # csv file in one place
 
@@ -31,7 +31,7 @@ python ./examples/clientx/standoff2conll/standoff2conll.py ./examples/clientx/st
 rm -rf $inputdirectory'clientx_dataset/clientx_data_iterator/postprocessed/'
 rm -rf $inputdirectory'clientx_dataset/preprocessed_data/test/'
 rm -rf $inputdirectory'clientx_dataset/test_padded_data_True.p'
-rm -rf postprocessed/
+
 
 #change here
 mkdir -p $inputdirectory'clientx_dataset/clientx_data_iterator/postprocessed/'
@@ -42,7 +42,7 @@ mkdir -p $inputdirectory'clientx_dataset/preprocessed_data/test/'
 mv csv/* $inputdirectory'clientx_dataset/preprocessed_data/test/'
 
 # run predictions
-source activate qPy3
+#source activate qPy3
 
 CUDA_VISIBLE_DEVICES=0 python vitaflow/bin/run_experiments.py --mode=predict --config_python_file=examples/clientx/config.py
 

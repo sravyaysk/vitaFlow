@@ -1,6 +1,6 @@
 import os
 
-experiment_root_directory = os.path.join("/mnt1/gaurish", "vitaFlow-clientx/")
+experiment_root_directory = os.environ['DEMO_DATA_PATH'] #os.path.join("/opt/data", "vitaFlow-clientx/")
 experiment_name = "clientx_dataset"
 use_char_embd = True
 

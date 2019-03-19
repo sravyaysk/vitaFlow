@@ -1,0 +1,19 @@
+WinCo
+
+Sanger, CA
+556-248-9267
+
+Invoice : 72740 Date : 05/06/2017
+Items Prices
+Lettuce 2.12
+Carrot Delhi 36.94
+Baby Com Cleaned 997.27
+Mango Raw 741.57
+Mango Raw 214.72
+Tomato 804.39
+Chakota Greens 82.04
+
+Tax:0.15
+Sub Total : 2879.05
+
+Amount Due: 3310.91

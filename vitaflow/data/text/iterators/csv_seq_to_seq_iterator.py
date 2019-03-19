@@ -774,20 +774,20 @@ class CSVSeqToSeqIterator(IIteratorBase, ITextFeature):
                     else:
                         # second index onwards
                         if is_new_tag(prev_tag, row["predicted_id"]):
-                            doc_text = doc_text + text + "," + strip_iob(prev_tag)+"\n"
+                            doc_text = doc_text + text + "~" + strip_iob(prev_tag)+"\n"
                             text = row["0"]
 
                         else:
                             text = text + " " + row["0"]
                         prev_tag = row["predicted_id"]
-            doc_text = doc_text + text + "," + strip_iob(prev_tag) + "\n"
+            doc_text = doc_text + text + "~" + strip_iob(prev_tag) + "\n"
             print(doc_text)
 
             post_out_dir = os.path.join(self.OUT_DIR, "postprocessed")
             check_n_makedirs(post_out_dir)
           
             with open(os.path.join(post_out_dir,os.path.basename(file)), "w") as post_file:
-                post_file.write("Item,Tag\n")
+                post_file.write("Item~Tag\n")
                 post_file.write(doc_text)
 
         # for loop ends

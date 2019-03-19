@@ -60,11 +60,11 @@ def predict_api():
     if modelPath == "DL":
         status = subprocess.call(['./examples/clientx/predict-pipeline.sh',saved_filename])
         if status == 0:        
-            df = pd.read_csv("./postprocessed/"+filename.rsplit(".",1)[0]+".csv")
+            df = pd.read_csv("./postprocessed/"+filename.rsplit(".",1)[0]+".csv", delimiter='~')
     else:
         status = subprocess.call(['./examples/clientx/predict-pipeline-ml.sh',saved_filename])
         if status == 0:        
-            df = pd.read_csv("./postprocessed/"+filename.rsplit(".",1)[0]+".csv")
+            df = pd.read_csv("./postprocessed/"+filename.rsplit(".",1)[0]+".csv", delimiter='~')
     
     str_io = io.StringIO()
     df.to_html(buf=str_io, classes='table table-striped')
@@ -160,4 +160,4 @@ def server_error(e):
 
 if __name__ == '__main__':
     # This is used when running locally.
-    app.run(host='172.17.0.5', port=8090, debug=True)
+    app.run(host='localhost', port=8090, debug=True)

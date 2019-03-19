@@ -1,9 +1,10 @@
+import os
 
 merchant_fonts = []
 line_items_fonts = []
 
 
-OUT_DIR = "receipt_mock_data"
+OUT_DIR = os.environ['DEMO_DATA_PATH'] + "/receipt_mock_data/"
 
 ALL_MERCHANTS_NAMES = '''
 Publix
