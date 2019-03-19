@@ -22,13 +22,13 @@ __author__ = 'Gaurish Thakkar'
 import os
 import shutil
 
-from vitaflow.core.dataset_types.dataset_types import ICLIENTXType1
+from vitaflow.core.dataset_types.dataset_types import ICSVSeq2SeqType1
 from vitaflow.core.hyperparams import HParams
 from vitaflow.core.ipreprocessor import IPreprocessor
 from vitaflow.helpers.print_helper import *
 
 
-class CLIENTXDataset(IPreprocessor, ICLIENTXType1):
+class CLIENTXDataset(IPreprocessor, ICSVSeq2SeqType1):
     """
     Converts the given train, val, test folder to IOB format
 

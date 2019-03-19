@@ -10,13 +10,14 @@
             <div class="card text-center bg-light">
                 <div class="card-body" style="padding-bottom: 0.2cm">
                     <title>Sequence tag document</title>
-                    <h1>Upload document</h1>
+                    <h1>Upload Image</h1>
                     <form method=post enctype=multipart/form-data>
                         <input class="card-title form-control" style="padding-left:35%" type=file name="pdf_file" required>
-                        Model Directory: <input class="card-title form-control" type="text" id="dname" name="dname" placeholder="Ex: i-tagger/conll_experiments/bilstm_crf_v0/" required>
-                        <input class="card-text btn btn-outline-primary" id = 'btnGet' type=button value=GetModels required><br><br>
-       
-                        Select Model:  <select class="card-title form-control" id="myDropDownId" name="model" required></select><br><br> 
+                        Model: <select class="card-title form-control"  id="dname" name="dname" placeholder="Ex: i-tagger/conll_experiments/bilstm_crf_v0/" required>
+                        <option value="DL">Seq2Seq DL</option>
+	                <option value="ML">CRF ML</option>
+		    </select>
+                        
  
                         <input class="card-text btn btn-outline-primary" type=submit value=Upload>
                     </form>
