@@ -109,7 +109,7 @@ def generate_ann(text_data):
     res_bag.append('T{}\tDate {} {}\t{}'.format(_counter, _d1, _d2, _date))
 
     # LineItems
-    _t1 = text_data.find('Item  Price\n') + len('Item  Price\n')
+    _t1 = text_data.find('Items  Prices\n') + len('Items  Prices\n')
     _t2 = text_data.find('Tax') - 1
     _line1 = _t1
     for line in text_data[_t1:_t2].splitlines():
