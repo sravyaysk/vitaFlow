@@ -123,3 +123,4 @@ vitaflow/annotate_server/notebook/*
 
 # Ignore annotation - tags
 vitaflow/annotate_server/resources/list_of_tags.json
+vitaflow/annotate_server/notebooks/

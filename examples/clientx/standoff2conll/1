@@ -1,0 +1,50 @@
+diff --git a/examples/conll2003/README.md b/examples/conll2003/README.md
+index e05f1eb..58b2eab 100644
+--- a/examples/conll2003/README.md
++++ b/examples/conll2003/README.md
+@@ -120,7 +120,9 @@ python vitaflow/bin/run_experiments.py \
+ 	--config_python_file=examples/conll2003/config.py 
+ ```
+ 
+-We start the training by passing **--mode = train** . *run_experiments.py* will pickup the config file provided to it  and look for the dataset. 
++We start the training by passing **
++
++** . *run_experiments.py* will pickup the config file provided to it  and look for the dataset. 
+ 
+ **--option= train** is an optional parameter and defaults to train when not present.
+ 
+diff --git a/vitaflow/bin/run_experiments.py b/vitaflow/bin/run_experiments.py
+index a78697d..fa165b5 100644
+--- a/vitaflow/bin/run_experiments.py
++++ b/vitaflow/bin/run_experiments.py
+@@ -27,7 +27,7 @@ import os
+ import sys
+ 
+ import tensorflow as tf
+-from memory_profiler import profile
++# from memory_profiler import profile
+ 
+ # Appending vitaFlow main Path
+ sys.path.append(os.path.abspath('.'))
+diff --git a/vitaflow/models/text/seq2seq/bilstm_crf.py b/vitaflow/models/text/seq2seq/bilstm_crf.py
+index 6be6aa6..634c980 100644
+--- a/vitaflow/models/text/seq2seq/bilstm_crf.py
++++ b/vitaflow/models/text/seq2seq/bilstm_crf.py
+@@ -90,7 +90,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
+         # Model hyper parameters
+         self.USE_CHAR_EMBEDDING = self._hparams.use_char_embd
+         self.LEARNING_RATE = self._hparams.learning_rate
+-        self.KEEP_PROP = self._hparams.keep_propability
++        self.KEEP_PROP = 0.5 #self._hparams.keep_propability
+         self.WORD_EMBEDDING_SIZE = self._hparams.word_emd_size
+         self.CHAR_EMBEDDING_SIZE = self._hparams.char_emd_size
+         self.WORD_LEVEL_LSTM_HIDDEN_SIZE = self._hparams.word_level_lstm_hidden_size
+@@ -158,7 +158,7 @@ class BiLSTMCrf(ModelBase, ITextFeature):
+             "word_emd_size": 24,
+             "char_emd_size": 24,
+             "num_lstm_layers": 1,
+-            "keep_probability": 0.5,
++            "keep_probability": 0.5
+         }
+         return hparams
+ 
