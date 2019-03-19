@@ -37,7 +37,8 @@ def get_random_string(max_num_chars=15):
 def get_random_number(min_num_chars=1, max_num_chars=5):
     num_chars = random.randint(min_num_chars, max_num_chars)
     digits = "".join([random.choice(string.digits) for i in range(num_chars)])
-    return int(float(digits))
+    x = int(float(digits))
+    return "{:5.2f}".format(x)
 
 
 def strTimeProp(start, end, format, prop):
@@ -82,7 +83,7 @@ def insert_text(draw: ImageDraw,
                 text,
                 color='rgb(0, 0, 0)',
                 font_file='fonts/Roboto-Bold.ttf',
-                font_size=12):
+                font_size=14):
     text = str(text)
     font = ImageFont.truetype(font_file, size=font_size)
     draw.text((x, y), text, fill=color, font=font)
@@ -98,14 +99,14 @@ def generate_ann(text_data):
     _m1 = 0
     _m2 = len(_merchant)
     _counter += 1
-    res_bag.append('T{} Merchant {} {} {}'.format(_counter, _m1, _m2, _merchant))
+    res_bag.append('T{}\tMerchant {} {}\t{}'.format(_counter, _m1, _m2, _merchant))
 
     # Date
     _d1 = text_data.find('Date')
     _d2 = _d1 + len('Date : 05/08/2018')
     _date = text_data[_d1:_d2]
     _counter += 1
-    res_bag.append('T{} Date {} {} {}'.format(_counter, _d1, _d2, _date))
+    res_bag.append('T{}\tDate {} {}\t{}'.format(_counter, _d1, _d2, _date))
 
     # LineItems
     _t1 = text_data.find('Item  Price\n') + len('Item  Price\n')
@@ -114,7 +115,7 @@ def generate_ann(text_data):
     for line in text_data[_t1:_t2].splitlines():
         _line2 = _line1 + len(line)
         _counter += 1
-        res_bag.append('T{} LineItem {} {} {}'.format(_counter, _line1, _line2, line))
+        res_bag.append('T{}\tLineItem {} {}\t{}'.format(_counter, _line1, _line2, line))
         _line1 = _line1 + len(line) + 1
 
     # Total
@@ -122,7 +123,7 @@ def generate_ann(text_data):
     _t1 = text_data.find(_total)
     _t2 = _t1 + len(_total)
     _counter += 1
-    res_bag.append('T{} Total {} {} {}'.format(_counter, _t1, _t1, _total))
+    res_bag.append('T{}\tTotal {} {}\t{}'.format(_counter, _t1, _t2, _total))
 
     return '\n'.join(res_bag)
 
@@ -130,21 +131,34 @@ def generate_ann(text_data):
 def create_naive_receipt(file_path):
     # create Image object with the input image
     # TODO: Generated a proper text receipt & from it generated receipt
-    # TODO: Generate Header, Body & Footer - as sperate regions and image-concated them
+    # TODO: Generate Header, Body & Footer - as seperate regions and image-concated them
     # TODO: Convert this to a class model
     receipt_text = []
     _number_of_line_items = random.choice(range(5, 15))
+    _image_size = (360, 250 + _number_of_line_items * 15)
+    # one table center - column
+    one_table_col1 = int(_image_size[0] * 0.25)
+    one_table_col2 = int(_image_size[0] * 0.15)
+    one_table_col21 = int(_image_size[0] * 0.10)
+    one_table_col22 = int(_image_size[0] * 0.55)
+    # two table columns
+    two_table_col1 = int(_image_size[0] * 0.15)
+    two_table_col2 = int(_image_size[0] * 0.65)
+    #
+    footer_col1 = int(_image_size[0] * 0.55)
+    footer_col2 = int(_image_size[0] * 0.50)
+    print(f'Image Size: _image_size')
 
-    image = Image.new(mode="RGB", size=(220, 250 + _number_of_line_items * 15), color=(255, 255, 255))
+    image = Image.new(mode="RGB", size=_image_size, color=(255, 255, 255))
     # initialise the drawing context with
     # the image object as background
     draw = ImageDraw.Draw(image)
 
     _merchant_tag = get_random_merchant_name().center(15)
     _merchant_addr = get_random_merchant_address().center(50)
-    _merchant_addr2 = '{}-{}-{}'.format(get_random_number(3, 3),
-                                        get_random_number(3, 3),
-                                        get_random_number(4, 4), ).center(50)
+    _merchant_addr2 = '{}-{}-{}'.format(get_random_number(3, 3).split('.')[0],
+                                        get_random_number(3, 3).split('.')[0],
+                                        get_random_number(4, 4).split('.')[0]).center(50)
     _date = random.random()
     date, _, _ = get_random_date("1/1/2015 1:30 PM", "1/1/2019 4:50 AM", _date)
     date = "Date : " + str(date)
@@ -155,59 +169,61 @@ def create_naive_receipt(file_path):
         _merchant_addr.strip(),
         _merchant_addr2.strip(),
         _invoice_text.strip() + ' ' + date,
-        "Item  Price",
+        "Items  Prices",
     ]
+    ########################################## HEADER
     # first line
-    draw = insert_text(draw=draw, x=40, y=30, text=_merchant_tag, font_size=25)
-    draw = insert_text(draw=draw, x=20, y=65, text=_merchant_addr, font_size=10)
-    draw = insert_text(draw=draw, x=20, y=80, text=_merchant_addr2, font_size=10)
+    draw = insert_text(draw=draw, x=one_table_col1, y=30, text=_merchant_tag, font_size=25)
+    draw = insert_text(draw=draw, x=one_table_col2, y=65, text=_merchant_addr, font_size=14)
+    draw = insert_text(draw=draw, x=one_table_col2, y=80, text=_merchant_addr2, font_size=14)
 
     # invoice - date line
-    draw = insert_text(draw=draw, x=20, y=100, text=_invoice_text, font_size=10)
-    draw = insert_text(draw=draw, x=120, y=100, text=date, font_size=10)
+    draw = insert_text(draw=draw, x=one_table_col21, y=100, text=_invoice_text, font_size=14)
+    draw = insert_text(draw=draw, x=one_table_col22, y=100, text=date, font_size=14)
 
     # table header
-    draw = insert_text(draw=draw, x=30, y=120, text="Item", font_size=10)
-    draw = insert_text(draw=draw, x=150, y=120, text="Price", font_size=10)
+    draw = insert_text(draw=draw, x=two_table_col1, y=130, text="Items", font_size=14)
+    draw = insert_text(draw=draw, x=two_table_col2, y=130, text="Prices", font_size=14)
 
+    ########################################## BODY
     total = 0
     total_y = -1
     _min_line_width = 15
     for i in range(1, _number_of_line_items):
         # item
-        item_text = get_random_line_item().center(10)
-        draw = insert_text(draw=draw, x=20, y=140 + (i * _min_line_width), text=item_text, font_size=10)
+        item_text = get_random_line_item()
+        draw = insert_text(draw=draw, x=two_table_col1, y=140 + (i * _min_line_width), text=item_text, font_size=14)
 
         # item - price
-        item_price = get_random_number(max_num_chars=3)
-        draw = insert_text(draw=draw, x=150, y=140 + (i * _min_line_width), text=item_price, font_size=10)
+        item_price = '%5s' % float(get_random_number(max_num_chars=3))
+        draw = insert_text(draw=draw, x=two_table_col2, y=140 + (i * _min_line_width), text=item_price, font_size=14)
         receipt_text.append('{}  {}'.format(item_text.strip(), item_price).strip())
 
-        total = total + item_price
+        total = total + float(item_price)
 
     total_y = 140 + (i * _min_line_width)
 
     total_y += 10
-    # draw = insert_text(draw=draw, x=20, y=total_y, text="-" * 45 , font_size=10)
+    # draw = insert_text(draw=draw, x=20, y=total_y, text="-" * 45 , font_size=14)
     total_y += 20
     _text = "Tax : " + str(0.15)
     receipt_text.append(_text)
-    draw = insert_text(draw=draw, x=125, y=total_y, text=_text, font_size=10)
+    draw = insert_text(draw=draw, x=footer_col1, y=total_y, text=_text, font_size=14)
     total_y += 20
     _text = "Sub Total : " + str(total)
     receipt_text.append(_text)
-    draw = insert_text(draw=draw, x=100, y=total_y, text=_text, font_size=10)
+    draw = insert_text(draw=draw, x=footer_col1, y=total_y, text=_text, font_size=14)
     total_y += 20
     _tag_total = random.choice([
-        "Total : ",
-        "Amount Due : ",
-        "Total Amount : ",
-        "Total To Pay : ",
-        "Total Charges : ",
+        "        Total: ",
+        "   Amount Due: ",
+        " Total Amount: ",
+        " Total To Pay:",
+        "Total Charges:",
     ])
     _text = _tag_total + str(total + total * 0.15)
     receipt_text.append(_text)
-    draw = insert_text(draw=draw, x=95 - len(_tag_total), y=total_y, text=_text, font_size=13)
+    draw = insert_text(draw=draw, x=footer_col2 - len(_tag_total), y=total_y, text=_text, font_size=14 + 4)
 
     # write to a file
     fp = open(file_path + '.txt', 'w')
@@ -220,7 +236,7 @@ def create_naive_receipt(file_path):
         import pdb
         pdb.set_trace()
     # save image
-    image.save(file_path, "JPEG")
+    image.save(file_path, "PNG")
 
 
 def replicate_xml(out_file_path, image_store_path="images", in_file_pathh="0.xml"):
@@ -234,29 +250,29 @@ def replicate_xml(out_file_path, image_store_path="images", in_file_pathh="0.xml
 
 
 def train():
-    number_files = 10
+    number_files = 5
     os.makedirs(OUT_DIR + "/train/")
 
     for i in tqdm(range(number_files)):
-        create_naive_receipt(OUT_DIR + "/train/" + str(i) + ".jpg")
+        create_naive_receipt(OUT_DIR + "/train/" + str(i) + ".png")
         # replicate_xml(out_file_path=OUT_DIR + "/train/" + str(i) + ".xml")
 
 
 def test():
-    number_files = 10
+    number_files = 50
     os.makedirs(OUT_DIR + "/test/")
 
     for i in tqdm(range(number_files)):
-        create_naive_receipt(OUT_DIR + "/test/" + str(i) + ".jpg")
+        create_naive_receipt(OUT_DIR + "/test/" + str(i) + ".png")
         # replicate_xml(out_file_path=OUT_DIR + "/test/" + str(i) + ".xml")
 
 
 def eval():
-    number_files = 1
+    number_files = 25
     os.makedirs(OUT_DIR + "/eval/")
 
     for i in tqdm(range(number_files)):
-        create_naive_receipt(OUT_DIR + "/eval/" + str(i) + ".jpg")
+        create_naive_receipt(OUT_DIR + "/eval/" + str(i) + ".png")
         # replicate_xml(out_file_path=OUT_DIR + "/eval/" + str(i) + ".xml")
 
 
