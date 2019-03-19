@@ -119,9 +119,10 @@ def generate_ann(text_data):
         _line1 = _line1 + len(line) + 1
 
     # Total
-    _total = text_data.splitlines()[-1]
+    _total = text_data.splitlines()[-1].strip()
     _t1 = text_data.find(_total)
     _t2 = _t1 + len(_total)
+    # _t2 = len(text_data)
     _counter += 1
     res_bag.append('T{}\tTotal {} {}\t{}'.format(_counter, _t1, _t2, _total))
 

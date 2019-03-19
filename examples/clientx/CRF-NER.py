@@ -1,24 +1,16 @@
-import os
-import pandas as pd
-import numpy as np
 import csv
 
-from itertools import chain
-
-import nltk
-import sklearn
-import scipy.stats
-from sklearn.metrics import make_scorer
-
+import pandas as pd
 import sklearn_crfsuite
-from sklearn_crfsuite import scorers
-from sklearn_crfsuite import metrics
+
 from config import *
+
 
 def strip_iob(iob_tag):
     tag = iob_tag.replace("B-", "")
     tag = tag.replace("I-", "")
     return tag
+
 
 def is_new_tag(prev, current):
     if "O" in prev:
