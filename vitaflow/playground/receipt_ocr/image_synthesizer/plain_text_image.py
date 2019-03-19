@@ -36,8 +36,8 @@ def get_random_string(max_num_chars=15):
 
 def get_random_number(min_num_chars=1, max_num_chars=5):
     num_chars = random.randint(min_num_chars, max_num_chars)
-    digits = "".join([random.choice(string.digits) for i in range(num_chars)])
-    x = int(float(digits))
+    digits = "".join([random.choice(string.digits) for i in range(num_chars + 2)])
+    x = float(digits) / 100.0
     return "{:5.2f}".format(x)
 
 
@@ -146,8 +146,9 @@ def create_naive_receipt(file_path):
     two_table_col2 = int(_image_size[0] * 0.65)
     #
     footer_col1 = int(_image_size[0] * 0.55)
-    footer_col2 = int(_image_size[0] * 0.50)
+    footer_col2 = int(_image_size[0] * 0.45)
     # print(f'Image Size: _image_size')
+    _default_font = 14
 
     image = Image.new(mode="RGB", size=_image_size, color=(255, 255, 255))
     # initialise the drawing context with
@@ -162,7 +163,7 @@ def create_naive_receipt(file_path):
     _date = random.random()
     date, _, _ = get_random_date("1/1/2015 1:30 PM", "1/1/2019 4:50 AM", _date)
     date = "Date : " + str(date)
-    _invoice_text = "Invoice : " + str(get_random_number(min_num_chars=4, max_num_chars=6))
+    _invoice_text = "Invoice : " + str(get_random_number(min_num_chars=4, max_num_chars=6).split('.')[0])
 
     receipt_text = [
         _merchant_tag.strip(),
@@ -210,7 +211,7 @@ def create_naive_receipt(file_path):
     receipt_text.append(_text)
     draw = insert_text(draw=draw, x=footer_col1, y=total_y, text=_text, font_size=14)
     total_y += 20
-    _text = "Sub Total : " + str(total)
+    _text = "Sub Total : " + str(round(total, 2))
     receipt_text.append(_text)
     draw = insert_text(draw=draw, x=footer_col1, y=total_y, text=_text, font_size=14)
     total_y += 20
@@ -221,7 +222,7 @@ def create_naive_receipt(file_path):
         " Total To Pay:",
         "Total Charges:",
     ])
-    _text = _tag_total + str(total + total * 0.15)
+    _text = _tag_total + str(round(total + total * 0.15, 2))
     receipt_text.append(_text)
     draw = insert_text(draw=draw, x=footer_col2 - len(_tag_total), y=total_y, text=_text, font_size=14 + 4)
 
