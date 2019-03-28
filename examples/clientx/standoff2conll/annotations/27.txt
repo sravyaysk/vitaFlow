@@ -1,0 +1,25 @@
+Costco
+
+Harry & Rock, Wichita
+290-719-9845
+
+Invoice : 25326 Date : 06/10/2016
+Items Prices
+Potato[M] 473
+All-purpose flour 1.24
+Navel oranges 8.47
+Lime Local 222.19
+Coconut [M] 6.49
+Potato[M] 761.4
+Potato[M] 8.02
+Mushroom Button 940.95
+Pumpkin Japan 20.5
+Top round steak 7.8
+Beans 53.24
+Brinjal [R] 03
+Sweet Corn 1.97
+
+Tax: 0.15
+
+Sub Total : 2037.3
+Total Amount: 2342.89

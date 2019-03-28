@@ -23,8 +23,8 @@ from server import serve
 
 
 _VERBOSE_HANDLER = False
-_DEFAULT_SERVER_ADDR = ''
-_DEFAULT_SERVER_PORT = 8001
+_DEFAULT_SERVER_ADDR = 'localhost'
+_DEFAULT_SERVER_PORT = 8121
 
 _PERMISSIONS = """
 Allow: /ajax.cgi
