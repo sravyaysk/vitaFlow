@@ -29,6 +29,10 @@ class CIDARIterator:
         self._prefetch_size = prefetch_size
         
         self._num_train_examples = -1
+        
+        #TODO find a right way to get this
+        files = glob.glob(os.path.join(self._data_dir, "train/*.tfrecords"))
+        self._num_train_examples = get_tf_records_count(files=files)
 
     def train_input_fn(self):
         """
@@ -82,7 +86,7 @@ class CIDARIterator:
         """
         files = glob.glob(os.path.join(self._data_dir, "train/*.tfrecords"))
                           
-        self._num_train_examples = get_tf_records_count(files=files)
+        # self._num_train_examples = get_tf_records_count(files=files)
         # TF dataset APIs
         dataset = tf.data.TFRecordDataset(files, num_parallel_reads=self._num_threads)
         # Map the generator output as features as a dict and labels
@@ -96,14 +100,12 @@ class CIDARIterator:
 
         return dataset
 
-    #
-
     def _get_val_input_fn(self):
         """
         Inheriting class must implement this
         :return: callable
         """
-        files = glob.glob(os.path.join(self._data_dir, "test/*.tfrecords"))
+        files = glob.glob(os.path.join(self._data_dir, "val/*.tfrecords"))
         # TF dataset APIs
         dataset = tf.data.TFRecordDataset(files, num_parallel_reads=self._num_threads)
         # Map the generator output as features as a dict and labels
@@ -116,19 +118,21 @@ class CIDARIterator:
         print(dataset.output_shapes)
         return dataset
 
-    # def _get_test_input_function(self):
-        # 	"""
-        # 	Inheriting class must implement this
-        # 	:return: callable
-        # 	"""
-        # 	dataset = tf.data.TFRecordDataset(glob.glob(os.path.join(self._dataset.TEST_OUT_PATH, "tfrecords/*.tfrecord")),
-        # 																		num_parallel_reads=self._hparams.num_threads)
-        # 	# Map the generator output as features as a dict and labels
-        # 	dataset = dataset.map(self.decode)
+    def _get_test_input_function(self):
+        """
+        Inheriting class must implement this
+        :return: callable
+        """
+        files = glob.glob(os.path.join(self._data_dir, "test/*.tfrecords"))
+        # TF dataset APIs
+        dataset = tf.data.TFRecordDataset(files, num_parallel_reads=self._num_threads)
+    
+        # Map the generator output as features as a dict and labels
+        dataset = dataset.map(self.decode)
 
-        # 	dataset = dataset.batch(
-        # 			batch_size=self._hparams.batch_size, drop_remainder=True)
-        # 	dataset = dataset.prefetch(self._hparams.prefetch_size)
-        # 	print("Dataset output sizes are: ")
-        # 	print(dataset.output_shapes)
-        # 	return dataset
+        dataset = dataset.batch(
+                batch_size=self._hparams.batch_size, drop_remainder=True)
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        print("Dataset output sizes are: ")
+        print(dataset.output_shapes)
+        return dataset

@@ -742,6 +742,8 @@ def _mat_feature(mat):
 def make_dirs(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+#########################################################################################3
         
 @gin.configurable
 class ICDARTFDataset():
@@ -821,4 +823,5 @@ class ICDARTFDataset():
 
     def run(self):
         self.prepare_data(data_path=self._data_dir+"/train/", out_path=self._train_out_dir)
+        self.prepare_data(data_path=self._data_dir+"/val/", out_path =self._val_out_dir)
         self.prepare_data(data_path=self._data_dir+"/test/", out_path =self._test_out_dir)
