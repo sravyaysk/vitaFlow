@@ -1,9 +1,9 @@
 # EAST: An Efficient and Accurate Scene Text Detector
 
-**Refernce Git** : https://github.com/argman/EAST
-**Paper** : https://arxiv.org/abs/1704.03155v2
-**Dataset ICDAR 2015** : http://rrc.cvc.uab.es/?ch=4&com=introduction
-**Imaginea Folks** :
+**Refernce Git** : https://github.com/argman/EAST  
+**Paper** : https://arxiv.org/abs/1704.03155v2   
+**Dataset ICDAR 2015** : http://rrc.cvc.uab.es/?ch=4&com=introduction  
+**Imaginea Folks** :   
 
 - Use Google Drive Link: https://drive.google.com/drive/folders/1CmEkiDHWQB-miGQRSU3pK7qoAfoifb-R?usp=sharing
 - Goto 2015 folder and download following files to /opt/data/icdar/2015/:
