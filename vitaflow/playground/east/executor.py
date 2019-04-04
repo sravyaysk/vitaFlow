@@ -3,11 +3,7 @@
 import gin
 import time
 import tensorflow as tf
-from tqdm import tqdm
 
-from icdar_data import ICDARTFDataset
-from east_model import EASTModel
-from iterator import CIDARIterator
 
 class Executor(object):
   """Class that executes training, evaluation, prediction, export, and other
@@ -150,21 +146,22 @@ class Executor(object):
   def test_iterator(self):
     iterator = self._data_iterator.train_input_fn().make_initializable_iterator()
     training_init_op = iterator.initializer
-    num_samples = self._data_iterator.num_train_samples
+    num_samples = self._data_iterator._num_train_examples
+    batch_size = self._data_iterator._batch_size
     next_element = iterator.get_next()
-    batch_size = 32
 
     with tf.Session() as sess:
         sess.run(training_init_op)
         start_time = time.time()
 
-        pbar = tqdm(desc="steps", total=num_samples)
+        pbar = tqdm(desc="steps", total=int(num_samples/batch_size))
 
         i = 0
         while (True):
-            res = sess.run(next_element)
-            pbar.update()
             try:
+                res = sess.run(next_element)
+                pbar.update()
+  
                 if True:
                     print("Data shapes : ", end=" ")
                     for key in res[0].keys():
@@ -172,53 +169,9 @@ class Executor(object):
                     print(" label shape : {}".format(res[1].shape))
 
             except tf.errors.OutOfRangeError:
+                print("tf.errors.OutOfRangeError")
                 break
         end_time = time.time()
-
-
-@gin.configurable
-def run(batch_size=32,
-        save_checkpoints_steps=100,
-        keep_checkpoint_max=5,
-        save_summary_steps=10,
-        log_step_count_steps=10,
-        num_epochs=5):
-    """
-    """
-                                                      
-    model = EASTModel()
-    data_iterator = CIDARIterator()
-    
-    run_config = tf.ConfigProto()
-    run_config.gpu_options.allow_growth = True
-    # run_config.gpu_options.per_process_gpu_memory_fraction = 0.50
-    run_config.allow_soft_placement = True
-    run_config.log_device_placement = False
-    model_dir = model.model_dir
-
-    run_config = tf.estimator.RunConfig(session_config=run_config,
-                                            save_checkpoints_steps=save_checkpoints_steps,
-                                            keep_checkpoint_max=keep_checkpoint_max,
-                                            save_summary_steps=save_summary_steps,
-                                            model_dir=model_dir,
-                                            log_step_count_steps=log_step_count_steps)
-
-    executor = Executor(model=model,
-                data_iterator=data_iterator,
-                config=run_config,
-                train_hooks=None,
-                eval_hooks=None,
-                session_config=None)
-
-    for current_epoch in tqdm(range(num_epochs), desc="Epoch"):
-        # current_max_steps = (num_samples // batch_size) * (current_epoch + 1)
-        # print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
-        executor.train(max_steps=None)
-        # print("\n\n Evaluating for epoch\n\n", current_epoch)
-        # executor.evaluate(steps=200)
-
-if __name__ == "__main__":
-    gin.parse_config_file('config.gin')
-    obj = ICDARTFDataset()
-    obj.run()
-    run()
+        
+        print("Time taken : ", end_time - start_time)
+        exit(-1)

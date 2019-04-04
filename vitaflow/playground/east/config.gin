@@ -1,0 +1,16 @@
+# DataSet 
+ICDARTFDataset.data_dir = "/opt/data/icdar/2015/"
+ICDARTFDataset.out_dir = "/opt/tmp/icdar/"
+
+# Iterator
+CIDARIterator.data_dir = "/opt/tmp/icdar/"
+CIDARIterator.batch_size = 8
+CIDARIterator.prefetch_size = 8
+
+# Model
+EASTModel.model_root_directory = "/opt/tmp/"
+EASTModel.experiment_name = "east"
+
+# main
+run.test_iterator = False
+run.test_images_dir = "/opt/tmp/ch4_test_images/"
