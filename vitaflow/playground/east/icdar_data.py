@@ -775,9 +775,9 @@ class ICDARTFDataset():
         """
         """
         return {
-            "image"  : _mat_feature(image_mat),
-            "score_map" : _mat_feature(score_map_mat),
-            "geo_map" : _mat_feature(geo_map_mat),
+            "images"  : _mat_feature(image_mat),
+            "score_maps" : _mat_feature(score_map_mat),
+            "geo_maps" : _mat_feature(geo_map_mat),
             "training_masks" : _mat_feature(training_masks_mat)
         }
 

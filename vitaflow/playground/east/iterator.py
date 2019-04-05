@@ -61,22 +61,22 @@ class CIDARIterator:
             serialized_example,
             # Defaults are not specified since both keys are required.
             features={
-                'image': tf.FixedLenFeature([512 * 512 * 3], tf.float32),
-                'score_map': tf.FixedLenFeature([128 * 128 * 1], tf.float32),
-                'geo_map': tf.FixedLenFeature([128 * 128 * 5], tf.float32),
+                'images': tf.FixedLenFeature([512 * 512 * 3], tf.float32),
+                'score_maps': tf.FixedLenFeature([128 * 128 * 1], tf.float32),
+                'geo_maps': tf.FixedLenFeature([128 * 128 * 5], tf.float32),
                 'training_masks': tf.FixedLenFeature([128 * 128 * 1], tf.float32),
             })
 
         image = tf.reshape(
-            tf.cast(features['image'], tf.float32), shape=[512, 512, 3])
+            tf.cast(features['images'], tf.float32), shape=[512, 512, 3])
         score_map = tf.reshape(
-            tf.cast(features['score_map'], tf.float32), shape=[128, 128, 1])
+            tf.cast(features['score_maps'], tf.float32), shape=[128, 128, 1])
         geo_map = tf.reshape(
-            tf.cast(features['geo_map'], tf.float32), shape=[128, 128, 5])
+            tf.cast(features['geo_maps'], tf.float32), shape=[128, 128, 5])
         training_masks = tf.reshape(
             tf.cast(features['training_masks'], tf.float32), shape=[128, 128, 1])
 
-        return {"image": image, "score_map": score_map, "geo_map": geo_map, "training_masks": training_masks}, training_masks
+        return {"images": image, "score_maps": score_map, "geo_maps": geo_map, "training_masks": training_masks}, training_masks
 
     
     def _get_train_input_fn(self):
@@ -136,3 +136,10 @@ class CIDARIterator:
         print("Dataset output sizes are: ")
         print(dataset.output_shapes)
         return dataset
+
+    def serving_input_receiver_fn(self):
+        inputs = {
+            "images": tf.placeholder(tf.float32, [None, None, None, 3]),
+        }
+        return tf.estimator.export.ServingInputReceiver(inputs, inputs)
+

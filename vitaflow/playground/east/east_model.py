@@ -168,6 +168,7 @@ def average_gradients(tower_grads):
 
     return average_grads
 
+###############################################################################################
 
 @gin.configurable
 class EASTModel:
@@ -211,7 +212,7 @@ class EASTModel:
                             type(self).__name__)
 
     def _build(self, features, labels, params, mode, config=None):
-        input_images = features['image']
+        input_images = features['images']
 
         is_training = mode == tf.estimator.ModeKeys.TRAIN
         # Build inference graph
@@ -220,10 +221,11 @@ class EASTModel:
 
         loss = None
         optimizer = None
+        predictions = {"f_score" : f_score, "f_geometry" : f_geometry}
 
         if mode != tf.estimator.ModeKeys.PREDICT:
-            input_score_maps = features['score_map']
-            input_geo_maps = features['geo_map']
+            input_score_maps = features['score_maps']
+            input_geo_maps = features['geo_maps']
             input_training_masks = features['training_masks']
         
             model_loss = get_loss(input_score_maps, f_score,
@@ -245,10 +247,10 @@ class EASTModel:
 
             optimizer = self._get_optimizer(loss=loss)
 
-
         return tf.estimator.EstimatorSpec(
                 mode=mode,
-                predictions={"f_score" : f_score, "f_geometry" : f_geometry},
+                predictions=predictions,
+                export_outputs={'predict': tf.estimator.export.PredictOutput(predictions)},
                 loss=loss,
                 train_op=optimizer,
                 eval_metric_ops=None)

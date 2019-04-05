@@ -50,6 +50,7 @@ ls
 
 ```sh
 pip install tensorflow-gpu
+pip install tensorflow-serving-api
 pip install gin-config
 pip install numpy
 pip install opencv-python
@@ -57,6 +58,7 @@ pip install shapely
 pip install tqdm
 pip install matplotlib
 pip install scipy
+pip install grpcio
 ```
 
 ## Configuration
@@ -68,11 +70,30 @@ Check this [file](config.gin)!
 ```sh
 #train
 python main.py
+
 #predict
 python main --predict=true
+
+#serving
+export MODEL_NAME=EAST
+export MODEL_PATH=/opt/tmp/icdar/east/EASTModel/exported/
+
+tensorflow_model_server   \
+--port=8500   \
+--rest_api_port=8501   \
+--model_name="$MODEL_NAME" \
+--model_base_path="$MODEL_PATH"
+
+TENSORFLOW_SERVER_HOST="localhost"
+python grpc_predict.py \
+  --image /opt/tmp/ch4_test_images/img_20.jpg \
+  --model "$MODEL_NAME"  \
+  --host $TENSORFLOW_SERVER_HOST \
+  --signature_name serving_default
 ```
 
 ### PS
 
 - As compared to original EAST repo, we have used Tensorflow high level APIs tf.data and tf.Estimators
 - This comes in handy when we move to big dataset or if we wanted to experiment with different models/data
+- TF Estimator also takes care of exporting the model for serving! [Reference](https://medium.com/@yuu.ishikawa/serving-pre-modeled-and-custom-tensorflow-estimator-with-tensorflow-serving-12833b4be421)

@@ -25,7 +25,7 @@ def run(save_checkpoints_steps=100,
         num_epochs=50,
         test_iterator=False,
         test_images_dir="",
-        output_dir="/opt/tmp/"):
+        output_dir=gin.REQUIRED):
     """
     """
                                                       
@@ -65,19 +65,21 @@ def run(save_checkpoints_steps=100,
             print("\n\n Training for epoch {} with steps {}\n\n".format(current_epoch, current_max_steps))
             executor.train(max_steps=None)
             print("\n\n Evaluating for epoch\n\n", current_epoch)
-            executor.evaluate(steps=200)
+            executor.evaluate(steps=None)
+            executor.export_model(model_dir+"/exported/")
     else:
         estimator = executor._estimator
 
         images = get_images(test_images_dir)
         for image_file_path in images:
+            print("================> Text segmentation on :", image_file_path)
             im = cv2.imread(image_file_path)[:, :, ::-1]
             start_time = time.time()
             im_resized, (ratio_h, ratio_w) = resize_image(im)
             im_resized = np.expand_dims(im_resized, axis=0).astype(np.float32)
             
             def get_dataset():
-                dataset = tf.data.Dataset.from_tensor_slices(({"image": im_resized}, 
+                dataset = tf.data.Dataset.from_tensor_slices(({"images": im_resized}, 
                                                                 np.ones_like(im_resized)))
                 dataset = dataset.batch(batch_size=1)
                 print(dataset.output_shapes)
