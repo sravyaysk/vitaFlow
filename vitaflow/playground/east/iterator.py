@@ -3,6 +3,11 @@ import glob
 import os
 import gin
 
+def get_tf_records_count(files):
+    total_records = -1
+    for file in files:
+        total_records += sum(1 for _ in tf.python_io.tf_record_iterator(file))
+    return total_records
 
 @gin.configurable
 class CIDARIterator:
@@ -11,9 +16,9 @@ class CIDARIterator:
 
     def __init__(self,
                  data_dir=gin.REQUIRED,
-                 num_threads=4,
-                 batch_size=32,
-                 prefetch_size=32):
+                 num_threads=2,
+                 batch_size=16,
+                 prefetch_size=16):
         """
         ......
         """
@@ -22,6 +27,12 @@ class CIDARIterator:
         self._num_threads = num_threads
         self._batch_size = batch_size
         self._prefetch_size = prefetch_size
+        
+        self._num_train_examples = -1
+        
+        #TODO find a right way to get this
+        files = glob.glob(os.path.join(self._data_dir, "train/*.tfrecords"))
+        self._num_train_examples = get_tf_records_count(files=files)
 
     def train_input_fn(self):
         """
@@ -67,19 +78,21 @@ class CIDARIterator:
 
         return {"image": image, "score_map": score_map, "geo_map": geo_map, "training_masks": training_masks}, training_masks
 
+    
     def _get_train_input_fn(self):
         """
         Inheriting class must implement this
         :return: dataset
         """
+        files = glob.glob(os.path.join(self._data_dir, "train/*.tfrecords"))
+                          
+        # self._num_train_examples = get_tf_records_count(files=files)
         # TF dataset APIs
-        dataset = tf.data.TFRecordDataset(glob.glob(os.path.join(self._data_dir, "train/*.tfrecord")),
-                                          num_parallel_reads=self._num_threads)
+        dataset = tf.data.TFRecordDataset(files, num_parallel_reads=self._num_threads)
         # Map the generator output as features as a dict and labels
         dataset = dataset.map(self.decode)
 
-        dataset = dataset.batch(
-            batch_size=self._batch_size, drop_remainder=True)
+        dataset = dataset.batch(batch_size=self._batch_size, drop_remainder=False)
         dataset = dataset.prefetch(self._prefetch_size)
         # dataset = dataset.cache(filename=os.path.join(self.iterator_dir, "train_data_cache"))
         print("Dataset output sizes are: ")
@@ -87,39 +100,39 @@ class CIDARIterator:
 
         return dataset
 
-    #
-
     def _get_val_input_fn(self):
         """
         Inheriting class must implement this
         :return: callable
         """
+        files = glob.glob(os.path.join(self._data_dir, "val/*.tfrecords"))
         # TF dataset APIs
-        dataset = tf.data.TFRecordDataset(glob.glob(os.path.join(self._data_dir, "test/*.tfrecord")),
-                                          num_parallel_reads=self._num_threads)
+        dataset = tf.data.TFRecordDataset(files, num_parallel_reads=self._num_threads)
         # Map the generator output as features as a dict and labels
         dataset = dataset.map(self.decode)
 
         dataset = dataset.batch(
-            batch_size=self._batch_size, drop_remainder=True)
+            batch_size=self._batch_size, drop_remainder=False)
         dataset = dataset.prefetch(self._prefetch_size)
         print("Dataset output sizes are: ")
         print(dataset.output_shapes)
         return dataset
 
-    # def _get_test_input_function(self):
-        # 	"""
-        # 	Inheriting class must implement this
-        # 	:return: callable
-        # 	"""
-        # 	dataset = tf.data.TFRecordDataset(glob.glob(os.path.join(self._dataset.TEST_OUT_PATH, "tfrecords/*.tfrecord")),
-        # 																		num_parallel_reads=self._hparams.num_threads)
-        # 	# Map the generator output as features as a dict and labels
-        # 	dataset = dataset.map(self.decode)
+    def _get_test_input_function(self):
+        """
+        Inheriting class must implement this
+        :return: callable
+        """
+        files = glob.glob(os.path.join(self._data_dir, "test/*.tfrecords"))
+        # TF dataset APIs
+        dataset = tf.data.TFRecordDataset(files, num_parallel_reads=self._num_threads)
+    
+        # Map the generator output as features as a dict and labels
+        dataset = dataset.map(self.decode)
 
-        # 	dataset = dataset.batch(
-        # 			batch_size=self._hparams.batch_size, drop_remainder=True)
-        # 	dataset = dataset.prefetch(self._hparams.prefetch_size)
-        # 	print("Dataset output sizes are: ")
-        # 	print(dataset.output_shapes)
-        # 	return dataset
+        dataset = dataset.batch(
+                batch_size=self._hparams.batch_size, drop_remainder=True)
+        dataset = dataset.prefetch(self._hparams.prefetch_size)
+        print("Dataset output sizes are: ")
+        print(dataset.output_shapes)
+        return dataset

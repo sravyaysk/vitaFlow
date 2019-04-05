@@ -35,7 +35,7 @@ def get_images(data_path):
                 if filename.endswith(ext):
                     files.append(os.path.join(parent, filename))
                     break
-    print('Find {} images'.format(len(files)))
+    print('Found {} images'.format(len(files)))
     return files
 
 
@@ -610,7 +610,12 @@ def image_2_data(image_file_path,
         im = cv2.imread(im_fn)
         # print im_fn
         h, w, _ = im.shape
+        #repalce extenstion
+        # img_1.png -> img_1.txt
         txt_fn = im_fn.replace(os.path.basename(im_fn).split('.')[1], 'txt')
+        #img_1.txt -> gt_img_01.txt
+        txt_fn = txt_fn.replace(os.path.basename(txt_fn).split('.')[0], 'gt_' + os.path.basename(txt_fn).split('.')[0])
+        
         if not os.path.exists(txt_fn):
             print('text file {} does not exists'.format(txt_fn))
             return
@@ -712,10 +717,10 @@ def image_2_data(image_file_path,
         geo_map = geo_map[::4, ::4, :].astype(np.float32)
         training_mask = training_mask[::4, ::4, np.newaxis].astype(np.float32)
         
-        print_shape(image, "image")
-        print_shape(score_map, "score_map")
-        print_shape(geo_map, "geo_map")
-        print_shape(training_mask, "training_mask")
+        # print_shape(image, "image")
+        # print_shape(score_map, "score_map")
+        # print_shape(geo_map, "geo_map")
+        # print_shape(training_mask, "training_mask")
         return image, score_map, geo_map, training_mask
 
     except Exception as e:
@@ -734,6 +739,12 @@ def _float_feature(value):
 def _mat_feature(mat):
     return tf.train.Feature(float_list=tf.train.FloatList(value=mat.flatten()))
 
+def make_dirs(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+#########################################################################################3
+        
 @gin.configurable
 class ICDARTFDataset():
     def __init__(self,
@@ -746,16 +757,14 @@ class ICDARTFDataset():
                 geometry="RBOX"):
         self._data_dir = data_dir
         
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
-        if not os.path.exists(out_dir+"/train/"):
-            os.makedirs(out_dir+"/train/")
-        if not os.path.exists(out_dir+"/val/"):
-            os.makedirs(out_dir+"/val/")
-        if not os.path.exists(out_dir+"/test/"):
-            os.makedirs(out_dir+"/test/")
-        self._out_dir = out_dir
+        self._train_out_dir = out_dir + "/train/"
+        self._val_out_dir   = out_dir + "/val/"
+        self._test_out_dir  = out_dir + "/test/"
 
+        make_dirs(self._train_out_dir)
+        make_dirs(self._val_out_dir)
+        make_dirs(self._test_out_dir)
+        
         self._geometry = geometry
         self._min_text_size = min_text_size
         self._max_image_large_side = max_image_large_side
@@ -772,16 +781,15 @@ class ICDARTFDataset():
             "training_masks" : _mat_feature(training_masks_mat)
         }
 
-    def prepare_data(self, data_path, out_file):
-        num_of_files_skipped = 0
-        if os.path.exists(out_file):
-            print("Found ", out_file)
-            return 
+    def write_tf_records(self, images, file_path_name):
+        num_of_files_skipped = 0    
         
-        print("Serializing data found in ", data_path)
+        if os.path.exists(file_path_name):
+            print("Found ", file_path_name, "already! Hence skipping")
+            return
         
-        with tf.python_io.TFRecordWriter(out_file) as writer:
-            for image_file in tqdm(get_images(data_path)):
+        with tf.python_io.TFRecordWriter(file_path_name) as writer:
+            for image_file in tqdm(images):
                 ret = image_2_data(image_file_path=image_file, 
                                    geometry=self._geometry,
                                    min_text_size=self._min_text_size,
@@ -794,11 +802,26 @@ class ICDARTFDataset():
                 features = tf.train.Features(feature=self._get_features(image_mat, score_map_mat, geo_map_mat, training_masks_mat))
                 example = tf.train.Example(features=features)
                 writer.write(example.SerializeToString())
-        
+                
         print("Number of files skipped : ", num_of_files_skipped)
+            
+        
+    def prepare_data(self, data_path, out_path):
+            
+        print("Serializing data found in ", data_path)
+        
+        images = get_images(data_path)
+        
+        number_images_per_tfrecords = 8
+        index = 0 
+        for i in tqdm(range(0, len(images), number_images_per_tfrecords), desc="prepare_data: "):
+            self.write_tf_records(images=images[i:i+number_images_per_tfrecords], 
+                                  file_path_name=out_path + "/" + str(index) + ".tfrecords")
+            index += 1
+            
+        
 
     def run(self):
-        self.prepare_data(data_path=self._data_dir+"/train/", 
-                          out_file=os.path.join(self._out_dir, "train/train.tfrecord"))
-        self.prepare_data(data_path=self._data_dir+"/test/", 
-                          out_file = os.path.join(self._out_dir, "test/test.tfrecord"))
+        self.prepare_data(data_path=self._data_dir+"/train/", out_path=self._train_out_dir)
+        self.prepare_data(data_path=self._data_dir+"/val/", out_path =self._val_out_dir)
+        self.prepare_data(data_path=self._data_dir+"/test/", out_path =self._test_out_dir)
