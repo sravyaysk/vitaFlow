@@ -5,12 +5,14 @@ ICDARTFDataset.out_dir = "/opt/tmp/icdar/"
 # Iterator
 CIDARIterator.data_dir = "/opt/tmp/icdar/"
 CIDARIterator.batch_size = 8
-CIDARIterator.prefetch_size = 8
+CIDARIterator.prefetch_size = 1
 
 # Model
-EASTModel.model_root_directory = "/opt/tmp/"
+EASTModel.model_root_directory = "/opt/tmp/icdar/"
 EASTModel.experiment_name = "east"
 
 # main
 run.test_iterator = False
 run.test_images_dir = "/opt/tmp/ch4_test_images/"
+run.num_epochs = 3
+run.output_dir = "/opt/tmp/icdar/"
