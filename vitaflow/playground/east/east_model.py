@@ -26,9 +26,6 @@ def mean_image_subtraction(images, means=[123.68, 116.78, 103.94]):
     if len(means) != num_channels:
       raise ValueError('len(means) must match the number of channels')
     channels = tf.split(axis=3, num_or_size_splits=num_channels, value=images)
-    print("==================================")
-    print(channels[0])
-    print(images)
     for i in range(num_channels):
         channels[i] = channels[i] - tf.convert_to_tensor(means[i])
     return tf.concat(axis=3, values=channels)
@@ -168,30 +165,88 @@ def average_gradients(tower_grads):
 
     return average_grads
 
+def average_gradients(tower_grads):
+    average_grads = []
+    for grad_and_vars in zip(*tower_grads):
+        grads = []
+        for g, _ in grad_and_vars:
+            expanded_g = tf.expand_dims(g, 0)
+            grads.append(expanded_g)
+
+        grad = tf.concat(grads, 0)
+        grad = tf.reduce_mean(grad, 0)
+
+        v = grad_and_vars[0][1]
+        grad_and_var = (grad, v)
+        average_grads.append(grad_and_var)
+
+    return average_grads
+
 ###############################################################################################
+
 
 @gin.configurable
 class EASTModel:
     def __init__(self,
-                 learning_rate=0.01,
+                 learning_rate=0.0001,
                  model_root_directory=gin.REQUIRED,
-                 experiment_name=gin.REQUIRED):
+                 experiment_name=gin.REQUIRED,
+                 moving_average_decay=0.997):
         self._model_root_directory = model_root_directory
         self._experiment_name = experiment_name
         self._learning_rate = learning_rate
+        self._moving_average_decay = moving_average_decay
 
     def _get_optimizer(self, loss):
-      optimizer = tf.train.AdamOptimizer(
-          learning_rate=self._learning_rate,
-          beta1=0.9,
-          beta2=0.999,
-          epsilon=1e-8)
-      gradients, v = zip(*optimizer.compute_gradients(loss))
-      gradients, _ = tf.clip_by_global_norm(gradients, 200)
-      train_op = optimizer.apply_gradients(
-          zip(gradients, v),
-          global_step=tf.train.get_global_step())
-      return train_op
+        tower_grads = []
+        with tf.name_scope("optimizer") as scope:
+            # try:
+            #     global_step = tf.get_variable('global_step', 
+            #                         [], 
+            #                         initializer=tf.constant_initializer(0), 
+            #                         trainable=False)
+            # except ValueError:
+            #     scope.reuse_variables()
+            #     global_step = tf.get_variable('global_step', 
+            #                         [], 
+            #                         initializer=tf.constant_initializer(0), 
+            #                         trainable=False)
+
+            global_step=tf.train.get_global_step()
+            learning_rate = tf.train.exponential_decay(self._learning_rate, 
+                                                        global_step, 
+                                                        decay_steps=10000, 
+                                                        decay_rate=0.94, 
+                                                        staircase=True)
+            # add summary
+            tf.summary.scalar('learning_rate', learning_rate)
+
+            optimizer = tf.train.AdamOptimizer(
+                learning_rate=learning_rate,
+                beta1=0.9,
+                beta2=0.999,
+                epsilon=1e-8)
+
+            # gradients, v = zip(*optimizer.compute_gradients(loss))
+            # gradients, _ = tf.clip_by_global_norm(gradients, 200)
+            # train_op = optimizer.apply_gradients(
+            #     zip(gradients, v),
+            #     global_step=tf.train.get_global_step())
+            
+            batch_norm_updates_op = tf.group(*tf.get_collection(tf.GraphKeys.UPDATE_OPS)) #TODO scope
+            grads = optimizer.compute_gradients(loss)
+            tower_grads.append(grads)
+            grads = average_gradients(tower_grads)
+            apply_gradient_op = optimizer.apply_gradients(grads, global_step=global_step)
+
+            variable_averages = tf.train.ExponentialMovingAverage(
+            self._moving_average_decay, global_step)
+            variables_averages_op = variable_averages.apply(tf.trainable_variables())
+            # batch norm updates
+            with tf.control_dependencies([variables_averages_op, apply_gradient_op, batch_norm_updates_op]):
+                train_op = tf.no_op(name='train_op')
+
+        return train_op
 
     def __call__(self, features, labels, params, mode, config=None):
         """
@@ -213,6 +268,7 @@ class EASTModel:
 
     def _build(self, features, labels, params, mode, config=None):
         input_images = features['images']
+        # input_images = tf.cast(input_images, tf.float32)
 
         is_training = mode == tf.estimator.ModeKeys.TRAIN
         # Build inference graph
@@ -227,6 +283,9 @@ class EASTModel:
             input_score_maps = features['score_maps']
             input_geo_maps = features['geo_maps']
             input_training_masks = features['training_masks']
+            # input_score_maps = tf.cast(input_score_maps, tf.float32)
+            # input_geo_maps = tf.cast(input_geo_maps, tf.float32)
+            # input_training_masks = tf.cast(input_training_masks, tf.float32)
         
             model_loss = get_loss(input_score_maps, f_score,
                                     input_geo_maps, f_geometry,

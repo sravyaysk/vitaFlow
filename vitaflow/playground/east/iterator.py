@@ -2,10 +2,11 @@ import tensorflow as tf
 import glob
 import os
 import gin
+from tqdm import tqdm 
 
 def get_tf_records_count(files):
     total_records = -1
-    for file in files:
+    for file in tqdm(files, desc="tfrecords size: "):
         total_records += sum(1 for _ in tf.python_io.tf_record_iterator(file))
     return total_records
 
@@ -16,7 +17,7 @@ class CIDARIterator:
 
     def __init__(self,
                  data_dir=gin.REQUIRED,
-                 num_threads=2,
+                 num_threads=1,
                  batch_size=16,
                  prefetch_size=16):
         """
