@@ -1,7 +1,7 @@
 """
 """
 import time
-
+import logging 
 import gin
 import tensorflow as tf
 from tqdm import tqdm
@@ -13,16 +13,21 @@ from iterator import CIDARIterator
 from executor import Executor
 from prediction import *
 
+
+# get TF logger
+log = logging.getLogger('tensorflow')
+log.setLevel(logging.DEBUG)
+
 tf.app.flags.DEFINE_bool('predict', False, 'run_prediction')
 
 FLAGS = tf.app.flags.FLAGS
 
 @gin.configurable
-def run(save_checkpoints_steps=100,
+def run(save_checkpoints_steps=10,
         keep_checkpoint_max=5,
-        save_summary_steps=10,
-        log_step_count_steps=10,
-        num_epochs=50,
+        save_summary_steps=5,
+        log_step_count_steps=5,
+        num_epochs=5,
         test_iterator=False,
         test_images_dir="",
         output_dir=gin.REQUIRED):
@@ -94,9 +99,13 @@ def run(save_checkpoints_steps=100,
             
             score = np.expand_dims(score, axis=0)
             geometry = np.expand_dims(geometry, axis=0)
+            
             print("===============================")
             print(score.shape)
             print(geometry.shape)
+            print("===============================")
+            print(score)
+            print(geometry)
 
             timer['net'] = time.time() - start
             boxes, timer = detect(score_map=score, geo_map=geometry, timer=timer)

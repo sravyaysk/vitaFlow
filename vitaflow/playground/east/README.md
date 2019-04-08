@@ -84,12 +84,20 @@ tensorflow_model_server   \
 --model_name="$MODEL_NAME" \
 --model_base_path="$MODEL_PATH"
 
-TENSORFLOW_SERVER_HOST="localhost"
 python grpc_predict.py \
-  --image /opt/tmp/ch4_test_images/img_20.jpg \
+  --image /opt/tmp/test/img_967.jpg \
+  --output_dir /opt/tmp/icdar/ \
   --model "$MODEL_NAME"  \
-  --host $TENSORFLOW_SERVER_HOST \
+  --host "localhost" \
   --signature_name serving_default
+
+
+python grpc_predict.py \
+  --images_dir /opt/tmp/test/ \
+  --output_dir /opt/tmp/icdar/ \
+  --model "$MODEL_NAME"  \
+  --host "localhost" \
+  --signature_name serving_default 
 ```
 
 ### PS
