@@ -47,22 +47,29 @@ def load_annoataion(p):
     '''
     text_polys = []
     text_tags = []
-    if not os.path.exists(p):
-        return np.array(text_polys, dtype=np.float32)
-    with open(p, 'r') as f:
-        reader = csv.reader(f)
-        for line in reader:
-            label = line[-1]
-            # strip BOM. \ufeff for python3,  \xef\xbb\bf for python2
-            line = [i.strip('\ufeff').strip('\xef\xbb\xbf') for i in line]
+    # if not os.path.exists(p):
+    #     return np.array(text_polys, dtype=np.float32)
 
-            x1, y1, x2, y2, x3, y3, x4, y4 = list(map(float, line[:8]))
-            text_polys.append([[x1, y1], [x2, y2], [x3, y3], [x4, y4]])
-            if label == '*' or label == '###':
-                text_tags.append(True)
-            else:
-                text_tags.append(False)
-        return np.array(text_polys, dtype=np.float32), np.array(text_tags, dtype=np.bool)
+    try:
+        f = open(p, 'r')
+    except FileNotFoundError:
+        raise FileNotFoundError
+    else:
+        with f:
+            reader = csv.reader(f)
+            for line in reader:
+                label = line[-1]
+                # strip BOM. \ufeff for python3,  \xef\xbb\bf for python2
+                line = [i.strip('\ufeff').strip('\xef\xbb\xbf') for i in line]
+
+                x1, y1, x2, y2, x3, y3, x4, y4 = list(map(float, line[:8]))
+                text_polys.append([[x1, y1], [x2, y2], [x3, y3], [x4, y4]])
+                if label == '*' or label == '###':
+                    text_tags.append(True)
+                else:
+                    text_tags.append(False)
+            return np.array(text_polys, dtype=np.float32), np.array(text_tags, dtype=np.bool)
+
 
 
 # text_file_name = images[0].replace(os.path.basename(images[0]).split('.')[1], 'txt')
@@ -605,22 +612,43 @@ def image_2_data(image_file_path,
     score_maps = []
     geo_maps = []
     training_masks = []
+    found_text_file = False
     try:
         im_fn = image_file_path
         im = cv2.imread(im_fn)
         # print im_fn
         h, w, _ = im.shape
+
         #repalce extenstion
         # img_1.png -> img_1.txt
         txt_fn = im_fn.replace(os.path.basename(im_fn).split('.')[1], 'txt')
-        #img_1.txt -> gt_img_01.txt
-        txt_fn = txt_fn.replace(os.path.basename(txt_fn).split('.')[0], 'gt_' + os.path.basename(txt_fn).split('.')[0])
-        
-        if not os.path.exists(txt_fn):
-            print('text file {} does not exists'.format(txt_fn))
-            return
 
-        text_polys, text_tags = load_annoataion(txt_fn)
+        #img_1.txt -> gt_img_01.txt
+        # txt_fn = txt_fn.replace(os.path.basename(txt_fn).split('.')[0], 'gt_' + os.path.basename(txt_fn).split('.')[0])
+        # text_polys, text_tags = load_annoataion(txt_fn)
+       
+        # if not os.path.exists(txt_fn):
+            # return
+
+        #TODO clean this out!
+        try:
+            #2019 dataset : img_1.png -> img_1.txt
+            text_polys, text_tags = load_annoataion(txt_fn)
+            if os.path.exists(txt_fn):
+                found_text_file = True
+        except:
+            #2015 dataset : #img_1.txt -> gt_img_01.txt
+            txt_fn = im_fn.replace(os.path.basename(im_fn).split('.')[1], 'txt')
+            #img_1.txt -> gt_img_01.txt
+            txt_fn = txt_fn.replace(os.path.basename(txt_fn).split('.')[0], 'gt_' + os.path.basename(txt_fn).split('.')[0])
+            text_polys, text_tags = load_annoataion(txt_fn)
+            if os.path.exists(txt_fn):
+                found_text_file = True
+
+        if not found_text_file:
+           return
+
+
 
         text_polys, text_tags = check_and_validate_polys(text_polys, text_tags, (h, w))
         # if text_polys.shape[0] == 0:

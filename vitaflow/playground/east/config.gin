@@ -1,5 +1,5 @@
 # DataSet 
-ICDARTFDataset.data_dir = "/opt/data/icdar/2015/"
+ICDARTFDataset.data_dir = "/opt/data/icdar/"
 ICDARTFDataset.out_dir = "/opt/tmp/icdar/"
 
 # Iterator
