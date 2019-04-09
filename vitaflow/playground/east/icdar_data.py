@@ -632,27 +632,19 @@ def image_2_data(image_file_path,
 
         #TODO clean this out!
         try:
-            #2019 dataset
+            #2019 dataset : img_1.png -> img_1.txt
             text_polys, text_tags = load_annoataion(txt_fn)
             if os.path.exists(txt_fn):
                 found_text_file = True
         except:
-            try:
-                #2015 dataset
-                txt_fn = im_fn.replace(os.path.basename(im_fn).split('.')[1], 'txt')
-                #img_1.txt -> gt_img_01.txt
-                txt_fn = txt_fn.replace(os.path.basename(txt_fn).split('.')[0], 'gt_' + os.path.basename(txt_fn).split('.')[0])
-                text_polys, text_tags = load_annoataion(txt_fn)
-                if os.path.exists(txt_fn):
-                    found_text_file = True
-            except:
-                #2013 dataset : not in use
-                txt_fn = im_fn.replace(os.path.basename(im_fn).split('.')[1], 'txt')
-                #img_1.txt -> img_01_gt.txt
-                txt_fn = txt_fn.replace(os.path.basename(txt_fn).split('.')[0], os.path.basename(txt_fn).split('.')[0]+ '_gt')
-                text_polys, text_tags = load_annoataion(txt_fn)
-                if os.path.exists(txt_fn):
-                    found_text_file = True
+            #2015 dataset : #img_1.txt -> gt_img_01.txt
+            txt_fn = im_fn.replace(os.path.basename(im_fn).split('.')[1], 'txt')
+            #img_1.txt -> gt_img_01.txt
+            txt_fn = txt_fn.replace(os.path.basename(txt_fn).split('.')[0], 'gt_' + os.path.basename(txt_fn).split('.')[0])
+            text_polys, text_tags = load_annoataion(txt_fn)
+            if os.path.exists(txt_fn):
+                found_text_file = True
+
         if not found_text_file:
            return
 
